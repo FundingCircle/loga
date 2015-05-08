@@ -1,4 +1,5 @@
 require 'service_logger/version'
+require 'service_logger/utilities'
 require 'service_logger/gelf_formatter'
 require 'service_logger/gelf_udp_log_device'
 require 'service_logger/logging'

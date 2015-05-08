@@ -4,6 +4,8 @@ module ServiceLogger
   # Graylog Extended Log Format (GELF) Formatter v1.1
   # Specification https://www.graylog.org/resources/gelf-2/
   class GELFFormatter < Logger::Formatter
+    include Utilities
+
     VERSION               = '1.1'.freeze
     SYSLOG_LEVELS_MAPPING = {
       'DEBUG'   => 7,
@@ -26,7 +28,7 @@ module ServiceLogger
         'host'             => @host,
         'short_message'    =>  message.fetch(:short_message),
         'full_message'     => '',
-        'timestamp'        => unix_timestamp_with_milliseconds(message.fetch(:timestamp, time)),
+        'timestamp'        => unix_time_with_ms(message.fetch(:timestamp, time)),
         'level'            => severity_to_syslog_level(severity),
         '_event_type'      => message.fetch(:type, 'custom'),
         '_service.name'    => @service_name,
@@ -37,10 +39,6 @@ module ServiceLogger
 
       event.merge!(message.fetch(:data, {}))
       "#{JSON.dump(event)}\n"
-    end
-
-    def unix_timestamp_with_milliseconds(time)
-      "#{time.to_i}.#{time.strftime('%L')}"
     end
 
     def severity_to_syslog_level(severity)

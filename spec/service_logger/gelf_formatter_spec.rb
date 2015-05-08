@@ -15,7 +15,6 @@ describe ServiceLogger::GELFFormatter do
   subject { described_class.new(options) }
 
   describe '#call(severity, time, _progname, message)' do
-    let(:time) { Time.new(2015, 12, 15, 9, 0, 5.123) }
     let(:message) do
       {
         short_message: 'Hello World',
@@ -24,7 +23,7 @@ describe ServiceLogger::GELFFormatter do
       }
     end
 
-    subject { JSON.parse(super().call('INFO', time, nil, message)) }
+    subject { JSON.parse(super().call('INFO', time_anchor, nil, message)) }
 
     specify do
       expect(subject).to include('version'       => '1.1',
@@ -39,7 +38,7 @@ describe ServiceLogger::GELFFormatter do
     end
 
     it 'formats the time as unix timestamp with milliseconds' do
-      expect(subject).to include('timestamp' => "#{time.to_i}.123")
+      expect(subject).to include('timestamp' => '1450171805.123')
     end
 
     context 'when the message does not includes short_message key' do
@@ -77,16 +76,6 @@ describe ServiceLogger::GELFFormatter do
       it 'does not include the original exception key' do
         expect(subject).to_not include(:exception)
       end
-    end
-  end
-
-  describe '#unix_timestamp_with_milliseconds(time)' do
-    let(:time) { Time.new(2015, 12, 15, 9, 0, 5.123) }
-
-    subject { super().unix_timestamp_with_milliseconds(time) }
-
-    it 'formats Time in seconds since unix epoch with decimal places for milliseconds' do
-      expect(subject).to eq("#{time.to_i}.123")
     end
   end
 
