@@ -1,0 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
+Style/TrailingComma:
+  Enabled: true
+  EnforcedStyleForMultiline: comma

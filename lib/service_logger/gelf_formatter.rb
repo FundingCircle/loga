@@ -1,0 +1,47 @@
+require 'logger'
+
+module ServiceLogger
+  # Graylog Extended Log Format (GELF) Formatter v1.1
+  # Specification https://www.graylog.org/resources/gelf-2/
+  class GELFFormatter < Logger::Formatter
+    VERSION               = '1.1'.freeze
+    SYSLOG_LEVELS_MAPPING = {
+      'DEBUG'   => 7,
+      'INFO'    => 6,
+      'WARN'    => 4,
+      'ERROR'   => 3,
+      'FATAL'   => 2,
+      'UNKNOWN' => 1,
+    }.freeze
+
+    def initialize(opts)
+      @service_name    = opts.fetch(:service_name)
+      @service_version = opts.fetch(:service_version)
+      @host            = opts.fetch(:host)
+    end
+
+    def call(severity, time, _progname, message)
+      event = {
+        'version'          => VERSION,
+        'host'             => @host,
+        'short_message'    =>  message.fetch(:short_message),
+        'full_message'     => '',
+        'timestamp'        => unix_timestamp_with_milliseconds(message.fetch(:timestamp, time)),
+        'level'            => severity_to_syslog_level(severity),
+        '_event_type'      => message.fetch(:type, 'custom'),
+        '_service.name'    => @service_name,
+        '_service.version' => @service_version,
+      }
+      event.merge!(message.fetch(:data, {}))
+      "#{JSON.dump(event)}\n"
+    end
+
+    def unix_timestamp_with_milliseconds(time)
+      "#{time.to_i}.#{time.strftime('%L')}"
+    end
+
+    def severity_to_syslog_level(severity)
+      SYSLOG_LEVELS_MAPPING[severity]
+    end
+  end
+end
