@@ -2,6 +2,7 @@ module ServiceLogger
   module Sidekiq
     class ClientLogger
       include Utilities
+
       def call(_worker, item, _queue, _redis_pool)
         started_at = Time.now
         severity   = :info
@@ -22,7 +23,7 @@ module ServiceLogger
           data['_job.params']      = item['args']
           data['_job.enqueued_at'] = unix_time_with_ms(Time.at(item['enqueued_at']))
           data['_job.queue']       = item['queue']
-          data['_job.duration']    = ((Time.now - started_at) * 1000).round
+          data['_job.duration']    = duration_in_ms(started_at, Time.now)
 
           logger.public_send(severity,
                              type:          'job.enqueued',

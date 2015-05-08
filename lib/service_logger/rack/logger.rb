@@ -3,6 +3,8 @@ require 'rack/request'
 module ServiceLogger
   module Rack
     class Logger
+      include Utilities
+
       def initialize(app)
         @app = app
       end
@@ -30,7 +32,7 @@ module ServiceLogger
           exception ||= env['action_dispatch.exception']
 
           data['_request.request_id'] = env['X-Request-Id'] || env['action_dispatch.request_id']
-          data['_request.duration']   = duration_in_ms(Time.now, started_at)
+          data['_request.duration']   = duration_in_ms(started_at, Time.now)
 
           logger.public_send(exception ? :error : :info,
                              type:          'http_request',
@@ -47,10 +49,6 @@ module ServiceLogger
                request.request_method,
                request.fullpath,
               )
-      end
-
-      def duration_in_ms(ended_at, started_at)
-        ((ended_at - started_at) * 1000).round
       end
 
       def logger
