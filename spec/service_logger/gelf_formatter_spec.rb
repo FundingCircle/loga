@@ -42,24 +42,40 @@ describe ServiceLogger::GELFFormatter do
       expect(subject).to include('timestamp' => "#{time.to_i}.123")
     end
 
-    context 'when the message does provide a short_message' do
+    context 'when the message does not includes short_message key' do
       let(:message) { {} }
       it 'raises a KeyError' do
         expect { subject }.to raise_error(KeyError)
       end
     end
-    context 'when the message provides data' do
+
+    context 'when the message includes a data key' do
       let(:message) do
-        super().merge(
-          data: {
-            '_user_uuid' => 'abcd',
-          },
-        )
+        super().merge(data: { '_user_uuid' => 'abcd' })
       end
       it 'merges the data key values with the message' do
-        expect(subject).to include('_user_uuid' => 'abcd',
-                                   'short_message' => 'Hello World',
+        expect(subject).to include('_user_uuid' => 'abcd')
+      end
+    end
+
+    context 'when the message includes an exception key' do
+      let(:backtrace) { '/home/corn.rb:5' }
+      let(:exception) do
+        StandardError.new('Corn Error').tap { |e| e.set_backtrace [backtrace] }
+      end
+      let(:message) do
+        super().merge(exception: exception)
+      end
+
+      it 'formats the exception' do
+        expect(subject).to include('_exception.klass'     => 'StandardError',
+                                   '_exception.message'   => 'Corn Error',
+                                   '_exception.backtrace' => backtrace,
                                   )
+      end
+
+      it 'does not include the original exception key' do
+        expect(subject).to_not include(:exception)
       end
     end
   end

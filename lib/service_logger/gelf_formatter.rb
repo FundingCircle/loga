@@ -32,6 +32,9 @@ module ServiceLogger
         '_service.name'    => @service_name,
         '_service.version' => @service_version,
       }
+
+      event.merge! extract_exception(message.delete(:exception))
+
       event.merge!(message.fetch(:data, {}))
       "#{JSON.dump(event)}\n"
     end
@@ -42,6 +45,17 @@ module ServiceLogger
 
     def severity_to_syslog_level(severity)
       SYSLOG_LEVELS_MAPPING[severity]
+    end
+
+    private
+
+    def extract_exception(e)
+      return {} if e.nil?
+      {
+        '_exception.backtrace' => e.backtrace.join("\n"),
+        '_exception.message'   => e.message,
+        '_exception.klass'     => e.class.to_s,
+      }
     end
   end
 end

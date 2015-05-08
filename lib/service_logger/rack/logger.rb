@@ -10,7 +10,6 @@ module ServiceLogger
       def call(env)
         started_at = Time.now
         request    = ::Rack::Request.new(env.dup)
-        severity   = :info
         exception  = nil
 
         begin
@@ -29,28 +28,18 @@ module ServiceLogger
           raise e
         ensure
           exception ||= env['action_dispatch.exception']
-          if exception
-            severity  = :error
-            data.merge! extract_exception(exception)
-          end
+
           data['_request.request_id'] = env['X-Request-Id'] || env['action_dispatch.request_id']
           data['_request.duration']   = duration_in_ms(Time.now, started_at)
-          logger.public_send(severity,
+
+          logger.public_send(exception ? :error : :info,
                              type:          'http_request',
                              short_message: short_message(request),
                              data:          data,
                              timestamp:     started_at,
+                             exception:     exception,
                             )
         end
-      end
-
-      # TODO: pass exception down to formatter instead
-      def extract_exception(e)
-        data = {}
-        data['_exception.backtrace'] = e.backtrace.join("\n")
-        data['_exception.message']   = e.message
-        data['_exception.klass']     = e.class.to_s
-        data
       end
 
       def short_message(request)
