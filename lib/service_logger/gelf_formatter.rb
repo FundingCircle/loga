@@ -1,4 +1,5 @@
 require 'logger'
+require 'json'
 
 module ServiceLogger
   # Graylog Extended Log Format (GELF) Formatter v1.1

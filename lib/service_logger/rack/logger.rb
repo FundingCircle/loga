@@ -11,7 +11,7 @@ module ServiceLogger
 
       def call(env)
         started_at = Time.now
-        request    = ::Rack::Request.new(env.dup)
+        request    = ::Rack::Request.new(env)
 
         data               = {}
         data['method']     = request.request_method

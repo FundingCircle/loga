@@ -1,6 +1,5 @@
 require 'logger'
 require 'socket'
-require 'json'
 
 module ServiceLogger
   module Logging
