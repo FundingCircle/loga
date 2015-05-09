@@ -12,45 +12,46 @@ module ServiceLogger
       def call(env)
         started_at = Time.now
         request    = ::Rack::Request.new(env.dup)
-        data       = {}
 
-        data['_request.method']     = request.request_method
-        data['_request.path']       = request.path
-        data['_request.params']     = request.params
-        data['_request.request_ip'] = request.ip
-        data['_request.user_agent'] = request.user_agent
+        data               = {}
+        data['method']     = request.request_method
+        data['path']       = request.path
+        data['params']     = request.params
+        data['request_ip'] = request.ip
+        data['user_agent'] = request.user_agent
+
+        smsg = { 'fullpath' => request.fullpath }
 
         begin
-
           @app.call(env).tap do |status, _headers, _body|
-            data['_request.status'] = status
+            data['status'] = status
           end
         rescue Exception => exception
           raise exception
         ensure
           exception ||= env['action_dispatch.exception']
 
-          data['_request.request_id'] = extract_request_id(env)
-          data['_request.duration']   = duration_in_ms(started_at, Time.now)
+          data['request_id'] = extract_request_id(env)
+          data['duration']   = duration_in_ms(started_at, Time.now)
 
           logger.public_send(exception ? :error : :info,
                              type:          'http_request',
-                             short_message: short_message(request),
-                             data:          data,
+                             short_message: short_message(data, smsg),
+                             data:          { request: data },
                              timestamp:     started_at,
                              exception:     exception,
                             )
         end
       end
 
-      def short_message(request)
+      private
+
+      def short_message(data, smsg)
         format('%s %s',
-               request.request_method,
-               request.fullpath,
+               data['method'],
+               smsg['fullpath'],
               )
       end
-
-      private
 
       def extract_request_id(env)
         env['X-Request-Id'] || env['action_dispatch.request_id']

@@ -50,7 +50,7 @@ describe ServiceLogger::GELFFormatter do
 
     context 'when the message includes a data key' do
       let(:message) do
-        super().merge(data: { '_user_uuid' => 'abcd' })
+        super().merge(data: { 'user_uuid' => 'abcd' })
       end
       it 'merges the data key values with the message' do
         expect(subject).to include('_user_uuid' => 'abcd')
@@ -75,6 +75,46 @@ describe ServiceLogger::GELFFormatter do
 
       it 'does not include the original exception key' do
         expect(subject).to_not include(:exception)
+      end
+    end
+  end
+
+  describe '#extract_data(data)' do
+    let(:data) { {} }
+
+    subject { super().extract_data(data) }
+
+    context 'when data is nil' do
+      let(:data) { nil }
+
+      it 'returns an empty hash' do
+        expect(subject).to eq({})
+      end
+    end
+
+    context 'when data is present' do
+      let(:data) do
+        {
+          'request' => {
+            'method' => 'GET',
+            'params' => {
+              'name' => 'bob',
+            },
+          },
+          'job' => {
+            'duration' => 123,
+          },
+          'thread' => 0,
+        }
+      end
+
+      it 'extracts hash into GELF additional fiels' do
+        expect(subject).to match(
+          '_request.method' => 'GET',
+          '_request.params' => { 'name' => 'bob' },
+          '_job.duration'   => 123,
+          '_thread'         => 0,
+        )
       end
     end
   end

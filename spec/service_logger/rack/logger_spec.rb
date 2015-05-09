@@ -71,14 +71,4 @@ describe ServiceLogger::Rack::Logger do
       end
     end
   end
-
-  describe '#short_message(request)' do
-    let(:request) { ::Rack::Request.new(env) }
-
-    subject { super().short_message(request) }
-
-    specify do
-      expect(subject).to eq('GET /about_us?limit=1')
-    end
-  end
 end

@@ -14,21 +14,21 @@ module ServiceLogger
           raise e
         ensure
           data = {}
-          data['_job.retry']       = item['retry']
-          data['_job.klass']       = item['class']
-          data['_job.jid']         = item['jid']
-          data['_job.params']      = item['args']
-          data['_job.enqueued_at'] = extract_unix_timestamp(item['enqueued_at'])
-          data['_job.queue']       = item['queue']
-          data['_job.retry_count'] = item['retry_count']
-          data['_job.duration']    = duration_in_ms(started_at, Time.now)
-          data['_job.failed_at']   = extract_unix_timestamp(item['failed_at'])
-          data['_job.retried_at']  = extract_unix_timestamp(item['retried_at'])
+          data['retry']       = item['retry']
+          data['klass']       = item['class']
+          data['jid']         = item['jid']
+          data['params']      = item['args']
+          data['enqueued_at'] = extract_unix_timestamp(item['enqueued_at'])
+          data['queue']       = item['queue']
+          data['retry_count'] = item['retry_count']
+          data['duration']    = duration_in_ms(started_at, Time.now)
+          data['failed_at']   = extract_unix_timestamp(item['failed_at'])
+          data['retried_at']  = extract_unix_timestamp(item['retried_at'])
 
           logger.public_send(exception ? :error : :info,
                              type:          'job_enqueued',
                              short_message: short_message(data),
-                             data:          data,
+                             data:          { 'job' => data },
                              timestamp:     started_at,
                              exception:     exception,
                             )
@@ -37,7 +37,7 @@ module ServiceLogger
 
       def short_message(data)
         format('%s Enqueued',
-               data['_job.klass'],
+               data['klass'],
               )
       end
 
