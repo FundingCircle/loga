@@ -1,32 +1,49 @@
 module ServiceLogger
   module Sidekiq
     class ServerLogger
+      include Utilities
+
       def call(_worker, item, _queue)
         started_at = Time.now
+        exception  = nil
 
         begin
           yield
+        rescue Exception => e
+          exception = e
+          raise e
         ensure
-          data = {
-            retry:       item['retry'],
-            klass:       item['class'],
-            jid:         item['jid'],
-            params:      item['args'],
-            enqueued_at: Time.at(item['enqueued_at']).utc.iso8601(3),
-            queue:       item['queue'],
-            retry_count: item['retry_count'],
-            duration:    ((Time.now - started_at) * 1000).round,
-          }
+          data = {}
+          data['_job.retry']       = item['retry']
+          data['_job.klass']       = item['class']
+          data['_job.jid']         = item['jid']
+          data['_job.params']      = item['args']
+          data['_job.enqueued_at'] = extract_unix_timestamp(item['enqueued_at'])
+          data['_job.queue']       = item['queue']
+          data['_job.retry_count'] = item['retry_count']
+          data['_job.duration']    = duration_in_ms(started_at, Time.now)
+          data['_job.failed_at']   = extract_unix_timestamp(item['failed_at'])
+          data['_job.retried_at']  = extract_unix_timestamp(item['retried_at'])
 
-          data[:failed_at]  = Time.at(item['failed_at']).utc.iso8601(3)  if item['failed_at']
-          data[:retried_at] = Time.at(item['retried_at']).utc.iso8601(3) if item['retried_at']
-
-          logger.info(
-            type: 'job_processed',
-            data: data,
-            timestamp: started_at,
-          )
+          logger.public_send(exception ? :error : :info,
+                             type:          'job_processed',
+                             short_message: short_message(data),
+                             data:          data,
+                             timestamp:     started_at,
+                             exception:     exception,
+                            )
         end
+      end
+
+      def short_message(data)
+        format('%s Processed',
+               data['_job.klass'],
+              )
+      end
+
+      def extract_unix_timestamp(timestamp)
+        return if timestamp.nil?
+        unix_time_with_ms Time.at(timestamp)
       end
 
       def logger

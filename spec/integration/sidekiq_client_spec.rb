@@ -48,7 +48,7 @@ describe 'Sidekiq client logger' do
         'full_message'      => '',
         'timestamp'         => '1450171805.123',
         'level'             => 6,
-        '_event_type'       => 'job.enqueued',
+        '_event_type'       => 'job_enqueued',
         '_service.name'     => 'hello_world_app',
         '_service.version'  => '1.0',
         '_job.enqueued_at'  => '1450171805.123',
@@ -58,6 +58,9 @@ describe 'Sidekiq client logger' do
         '_job.queue'        => 'default',
         '_job.retry'        => true,
         '_job.duration'     => 0,
+        '_job.retried_at'   => nil,
+        '_job.failed_at'    => nil,
+        '_job.retry_count'  => nil,
       )
     end
   end
