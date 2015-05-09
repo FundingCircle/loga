@@ -17,10 +17,12 @@ It provides provides:
 - [ ] Configuration setting to limit backtrace logging to n lines
 - [ ] Hutch logging integration for producer and consumer
 - [ ] HTTP Request params filterting setting
+- [ ] Hooks to augment data being logged
+- [ ] Specs and ci for mutliple rubies and gemspecs
 
 ### Refactoring
 - [ ] Remove date formatting duplication
-- [ ] Remove Sidekiq{Client,Server} duplication
+- [ ] Remove Sidekiq{Client,Server} duplication (:sparkles: blocks)
 
 ## ~~Installation~~
 
