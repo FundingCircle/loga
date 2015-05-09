@@ -12,26 +12,25 @@ module ServiceLogger
       def call(env)
         started_at = Time.now
         request    = ::Rack::Request.new(env.dup)
-        exception  = nil
+        data       = {}
+
+        data['_request.method']     = request.request_method
+        data['_request.path']       = request.path
+        data['_request.params']     = request.params
+        data['_request.request_ip'] = request.ip
+        data['_request.user_agent'] = request.user_agent
 
         begin
-          data                        = {}
-          data['_request.method']     = request.request_method
-          data['_request.path']       = request.path
-          data['_request.params']     = request.params
-          data['_request.request_ip'] = request.ip
-          data['_request.user_agent'] = request.user_agent
 
           @app.call(env).tap do |status, _headers, _body|
             data['_request.status'] = status
           end
-        rescue Exception => e
-          exception = e
-          raise e
+        rescue Exception => exception
+          raise exception
         ensure
           exception ||= env['action_dispatch.exception']
 
-          data['_request.request_id'] = env['X-Request-Id'] || env['action_dispatch.request_id']
+          data['_request.request_id'] = extract_request_id(env)
           data['_request.duration']   = duration_in_ms(started_at, Time.now)
 
           logger.public_send(exception ? :error : :info,
@@ -49,6 +48,12 @@ module ServiceLogger
                request.request_method,
                request.fullpath,
               )
+      end
+
+      private
+
+      def extract_request_id(env)
+        env['X-Request-Id'] || env['action_dispatch.request_id']
       end
 
       def logger
