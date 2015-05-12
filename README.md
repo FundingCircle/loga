@@ -11,20 +11,18 @@ It provides provides:
 - GELF log formatter
 - GELF log device
 
-## TODO
+## Road Map
 
-### Features
-- [ ] Configuration setting to limit backtrace logging to n lines
-- [ ] Hutch logging integration for producer and consumer
-- [ ] HTTP Request params filterting setting
+- [ ] CI setup with ruby 1.9 and 2.0
+- [ ] Setting to limit backtrace size
+- [ ] Setting to filter out sensitive request parameters
+- [ ] Support standard Ruby logger message input
+- [ ] Hutch logging integration (Producer and Consumer)
+- [ ] ActionMailer integration (New event_types)
+- [ ] GELF additional fields naming retrospective
 - [ ] Hooks to augment data being logged
-- [ ] Specs and ci for mutliple rubies and gemspecs
 
-### Refactoring
-- [ ] Remove date formatting duplication
-- [ ] Remove Sidekiq{Client,Server} duplication (:sparkles: blocks)
-
-## ~~Installation~~
+## Installation
 
 Add this line to your application's Gemfile:
 
@@ -48,7 +46,7 @@ target = ServiceLogger::GELFUPDLogDevice.new(host: '192.168.99.100')
 ServiceLogger.configure do |config|
   config.service_name   = 'marketplace'
   config.service_verion = 'v1.0.0' or SHA
-  config.log_target         = target
+  config.log_target     = target
 end
 ```
 
@@ -57,6 +55,7 @@ Rails-less applications
 # config.ru
 use ServiceLogger::Rack::Logger
 ```
+
 Rails applications
 ```ruby
 # config/application.rb
