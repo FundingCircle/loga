@@ -40,7 +40,7 @@ describe 'Rack request logger with Sinatra' do
     it 'logs the request' do
       get '/ok',
           { username: 'yoshi' },
-          'HTTP_USER_AGENT' => 'Chrome', 'X-Request-Id' => '471a34dc'
+          'HTTP_USER_AGENT' => 'Chrome'
 
       expect(json_line).to match(
         'version'             => '1.1',
@@ -58,7 +58,7 @@ describe 'Rack request logger with Sinatra' do
         '_request.request_ip' => '127.0.0.1',
         '_request.user_agent' => 'Chrome',
         '_request.status'     => 200,
-        '_request.request_id' => '471a34dc',
+        '_request.request_id' => nil,
         '_request.duration'   => be_an(Integer),
       )
     end
@@ -68,7 +68,7 @@ describe 'Rack request logger with Sinatra' do
     it 'logs the request with the exception' do
       get '/error',
           { username: 'yoshi' },
-          'HTTP_USER_AGENT' => 'Chrome', 'X-Request-Id' => '471a34dc'
+          'HTTP_USER_AGENT' => 'Chrome'
 
       expect(json_line).to match(
         'version'              => '1.1',
@@ -85,7 +85,7 @@ describe 'Rack request logger with Sinatra' do
         '_request.params'      => { 'username' => 'yoshi' },
         '_request.request_ip'  => '127.0.0.1',
         '_request.user_agent'  => 'Chrome',
-        '_request.request_id'  => '471a34dc',
+        '_request.request_id'  => nil,
         '_request.duration'    => be_an(Integer),
         '_exception.klass'     => 'StandardError',
         '_exception.message'   => 'Hello Sinatra Error',

@@ -41,7 +41,10 @@ describe ServiceLogger::Rack::Logger do
 
     context 'when an exception is raised and wrapped by ActionDispatch::ShowExceptions' do
       let(:app) do
-        -> (env) { env['action_dispatch.exception'] = exception }
+        lambda do |env|
+          env['action_dispatch.exception'] = exception
+          [500, {}, '']
+        end
       end
 
       it 'logs the exception' do

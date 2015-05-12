@@ -23,15 +23,16 @@ module ServiceLogger
         smsg = { 'fullpath' => request.fullpath }
 
         begin
-          @app.call(env).tap do |status, _headers, _body|
-            data['status'] = status
+          @app.call(env).tap do |status, headers, _body|
+            data['status']     = status
+            data['request_id'] = headers['X-Request-Id']
           end
         rescue Exception => exception
           raise exception
         ensure
           exception ||= env['action_dispatch.exception']
 
-          data['request_id'] = extract_request_id(env)
+          data['request_id'] ||= env['action_dispatch.request_id']
           data['duration']   = duration_in_ms(started_at, Time.now)
 
           logger.public_send(exception ? :error : :info,
@@ -51,10 +52,6 @@ module ServiceLogger
                data['method'],
                smsg['fullpath'],
               )
-      end
-
-      def extract_request_id(env)
-        env['X-Request-Id'] || env['action_dispatch.request_id']
       end
 
       def logger

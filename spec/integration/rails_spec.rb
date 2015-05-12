@@ -57,7 +57,7 @@ describe 'Rack request logger with Rails' do
     it 'logs the request' do
       get '/ok',
           { username: 'yoshi' },
-          'HTTP_USER_AGENT' => 'Chrome', 'X-Request-Id' => '471a34dc'
+          'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
       expect(json_line).to match(
         'version'             => '1.1',
         'host'                => be_a(String),
@@ -84,7 +84,7 @@ describe 'Rack request logger with Rails' do
     it 'logs the request with the exception' do
       get '/error',
           { username: 'yoshi' },
-          'HTTP_USER_AGENT' => 'Chrome', 'X-Request-Id' => '471a34dc'
+          'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
       expect(json_line).to match(
         'version'              => '1.1',
