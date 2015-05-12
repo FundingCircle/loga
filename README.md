@@ -18,7 +18,7 @@ It provides provides:
 - [ ] Setting to filter out sensitive request parameters
 - [x] Support standard Ruby logger message input
 - [ ] Hutch logging integration (Producer and Consumer)
-- [ ] ActionMailer integration (New event_types)
+- [ ] ActionMailer integration (New events)
 - [ ] GELF additional fields naming retrospective
 - [ ] Hooks to augment data being logged
 
@@ -96,7 +96,7 @@ ServiceLogger.logger.info('Hello World')
   "level":             "6",
   "_service.name":     "hello_app",
   "_service.version":  "abcdef",
-  "_event_type":       "custom"
+  "_event":       "custom"
 }'
 
 # Passing a Hash
@@ -116,12 +116,12 @@ ServiceLogger.logger.info(
   "level":             "6",
   "_service.name":     "hello_app",
   "_service.version":  "abcdef",
-  "_event_type":       "custom"
+  "_event":       "custom"
 }'
 ```
 
 ## Event types
-Middleware augment the GELF payload with the `_event_type` key to label events.
+Middleware augment the GELF payload with the `_event` key to label events.
 
 | event type        | description                       | middleware              |
 |-------------------|-----------------------------------|-------------------------|

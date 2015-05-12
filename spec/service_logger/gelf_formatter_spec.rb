@@ -31,7 +31,7 @@ describe ServiceLogger::GELFFormatter do
       let(:message) do
         {
           short_message: 'Hello World',
-          event_type:    'http_request',
+          event:    'http_request',
           data:          {},
         }
       end

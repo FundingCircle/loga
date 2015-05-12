@@ -35,7 +35,7 @@ module ServiceLogger
     #   "level":             "6",
     #   "_service.name":     "hello_app",
     #   "_service.version":  "abcdef",
-    #   "_event_type":       "custom"
+    #   "_event":       "custom"
     # }'
     #
     # Pasing a Hash
@@ -55,10 +55,10 @@ module ServiceLogger
     #   "level":             "6",
     #   "_service.name":     "hello_app",
     #   "_service.version":  "abcdef",
-    #   "_event_type":       "custom"
+    #   "_event":       "custom"
     # }'
     def call(severity, time, _progname, message)
-      event = {
+      payload = {
         'version'          => VERSION,
         'host'             => @host,
         '_service.name'    => @service_name,
@@ -66,20 +66,20 @@ module ServiceLogger
       }
 
       if message.is_a? String
-        event.merge!('short_message' => message)
+        payload.merge!('short_message' => message)
       else
-        event.merge!(
+        payload.merge!(
           'short_message'    =>  message.fetch(:short_message),
           'full_message'     => '',
           'timestamp'        => unix_time_with_ms(message.fetch(:timestamp, time)),
           'level'            => severity_to_syslog_level(severity),
-          '_event_type'      => message.fetch(:type, 'custom'),
+          '_event'      => message.fetch(:type, 'custom'),
         )
-        event.merge! extract_data(message.delete(:data))
-        event.merge! extract_exception(message.delete(:exception))
+        payload.merge! extract_data(message.delete(:data))
+        payload.merge! extract_exception(message.delete(:exception))
       end
 
-      JSON.dump(event)
+      JSON.dump(payload)
     end
 
     def severity_to_syslog_level(severity)
