@@ -15,66 +15,78 @@ describe ServiceLogger::GELFFormatter do
   subject { described_class.new(options) }
 
   describe '#call(severity, time, _progname, message)' do
-    let(:message) do
-      {
-        short_message: 'Hello World',
-        event_type:    'http_request',
-        data:          {},
-      }
-    end
+    subject { super().call('INFO', time_anchor, nil, message) }
 
-    subject { JSON.parse(super().call('INFO', time_anchor, nil, message)) }
+    let(:result) { JSON.parse(subject) }
 
-    specify do
-      expect(subject).to include('version'       => '1.1',
-                                 'host'          => host,
-                                 'short_message' => 'Hello World',
-                                 'full_message'  => '',
-                                )
-    end
+    context 'when message is a String' do
+      let(:message) { 'Tree house magic' }
 
-    it 'formats the severity as standard syslog level' do
-      expect(subject).to include('level' => 6)
-    end
-
-    it 'formats the time as unix timestamp with milliseconds' do
-      expect(subject).to include('timestamp' => '1450171805.123')
-    end
-
-    context 'when the message does not includes short_message key' do
-      let(:message) { {} }
-      it 'raises a KeyError' do
-        expect { subject }.to raise_error(KeyError)
+      it 'uses the message as the short_message' do
+        expect(result['short_message']).to eq(message)
       end
     end
 
-    context 'when the message includes a data key' do
+    context 'when message is a Hash' do
       let(:message) do
-        super().merge(data: { 'user_uuid' => 'abcd' })
-      end
-      it 'merges the data key values with the message' do
-        expect(subject).to include('_user_uuid' => 'abcd')
-      end
-    end
-
-    context 'when the message includes an exception key' do
-      let(:backtrace) { '/home/corn.rb:5' }
-      let(:exception) do
-        StandardError.new('Corn Error').tap { |e| e.set_backtrace [backtrace] }
-      end
-      let(:message) do
-        super().merge(exception: exception)
+        {
+          short_message: 'Hello World',
+          event_type:    'http_request',
+          data:          {},
+        }
       end
 
-      it 'formats the exception' do
-        expect(subject).to include('_exception.klass'     => 'StandardError',
-                                   '_exception.message'   => 'Corn Error',
-                                   '_exception.backtrace' => backtrace,
-                                  )
+      specify do
+        expect(result).to include('version'       => '1.1',
+                                  'host'          => host,
+                                  'short_message' => 'Hello World',
+                                  'full_message'  => '',
+                                 )
       end
 
-      it 'does not include the original exception key' do
-        expect(subject).to_not include(:exception)
+      it 'formats the severity as standard syslog level' do
+        expect(result).to include('level' => 6)
+      end
+
+      it 'formats the time as unix timestamp with milliseconds' do
+        expect(result).to include('timestamp' => '1450171805.123')
+      end
+
+      context 'when the message does not includes short_message key' do
+        let(:message) { {} }
+        it 'raises a KeyError' do
+          expect { subject }.to raise_error(KeyError)
+        end
+      end
+
+      context 'when the message includes a data key' do
+        let(:message) do
+          super().merge(data: { 'user_uuid' => 'abcd' })
+        end
+        it 'merges the data key values with the message' do
+          expect(result).to include('_user_uuid' => 'abcd')
+        end
+      end
+
+      context 'when the message includes an exception key' do
+        let(:backtrace) { '/home/corn.rb:5' }
+        let(:exception) do
+          StandardError.new('Corn Error').tap { |e| e.set_backtrace [backtrace] }
+        end
+        let(:message) do
+          super().merge(exception: exception)
+        end
+
+        it 'formats the exception' do
+          expect(result).to include('_exception.klass'     => 'StandardError',
+                                    '_exception.message'   => 'Corn Error',
+                                    '_exception.backtrace' => backtrace,
+                                   )
+        end
+
+        it 'does not include the original exception key' do
+          expect(result).to_not include(:exception)
+        end
       end
     end
   end

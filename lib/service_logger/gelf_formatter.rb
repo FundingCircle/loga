@@ -23,32 +23,61 @@ module ServiceLogger
       @host            = opts.fetch(:host)
     end
 
-    # Format log event in GELF
+    # Format message in GELF
     #
-    # Message structure
-    # {
+    # Passing a String
+    # logger.info('Hello World')
+    # => '{
+    #   "version":           "1.1",
+    #   "host":              "example.com",
+    #   "short_message":     "Hello World",
+    #   "timestamp":         "1450171805.123",
+    #   "level":             "6",
+    #   "_service.name":     "hello_app",
+    #   "_service.version":  "abcdef",
+    #   "_event_type":       "custom"
+    # }'
+    #
+    # Pasing a Hash
+    # logger.info(
     #   short_message: 'GET /hello_world', # REQUIRED
     #   full_message:  String,             # OPTIONAL
     #   type:          String,             # OPTIONAL
     #   timestamp:     Time,               # OPTIONAL
     #   data:          Hash,               # OPTIONAL
     #   exception:     Exception,          # OPTIONAL
-    # }
+    # )
+    # => '{
+    #   "version":           "1.1",
+    #   "host":              "example.com",
+    #   "short_message":     "GET /hello_world",
+    #   "timestamp":         "1450171805.123",
+    #   "level":             "6",
+    #   "_service.name":     "hello_app",
+    #   "_service.version":  "abcdef",
+    #   "_event_type":       "custom"
+    # }'
     def call(severity, time, _progname, message)
       event = {
         'version'          => VERSION,
         'host'             => @host,
-        'short_message'    =>  message.fetch(:short_message),
-        'full_message'     => '',
-        'timestamp'        => unix_time_with_ms(message.fetch(:timestamp, time)),
-        'level'            => severity_to_syslog_level(severity),
-        '_event_type'      => message.fetch(:type, 'custom'),
         '_service.name'    => @service_name,
         '_service.version' => @service_version,
       }
 
-      event.merge! extract_data(message.delete(:data))
-      event.merge! extract_exception(message.delete(:exception))
+      if message.is_a? String
+        event.merge!('short_message' => message)
+      else
+        event.merge!(
+          'short_message'    =>  message.fetch(:short_message),
+          'full_message'     => '',
+          'timestamp'        => unix_time_with_ms(message.fetch(:timestamp, time)),
+          'level'            => severity_to_syslog_level(severity),
+          '_event_type'      => message.fetch(:type, 'custom'),
+        )
+        event.merge! extract_data(message.delete(:data))
+        event.merge! extract_exception(message.delete(:exception))
+      end
 
       JSON.dump(event)
     end

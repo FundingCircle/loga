@@ -16,7 +16,7 @@ It provides provides:
 - [ ] CI setup with ruby 1.9 and 2.0
 - [ ] Setting to limit backtrace size
 - [ ] Setting to filter out sensitive request parameters
-- [ ] Support standard Ruby logger message input
+- [x] Support standard Ruby logger message input
 - [ ] Hutch logging integration (Producer and Consumer)
 - [ ] ActionMailer integration (New event_types)
 - [ ] GELF additional fields naming retrospective
@@ -86,7 +86,38 @@ end
 Custom events
 ```ruby
 # Anywhere in your application
-ServiceLogger.logger.info(short_message: 'Some message')
+# Passing a String
+ServiceLogger.logger.info('Hello World')
+=> '{
+  "version":           "1.1",
+  "host":              "example.com",
+  "short_message":     "Hello World",
+  "timestamp":         "1450171805.123",
+  "level":             "6",
+  "_service.name":     "hello_app",
+  "_service.version":  "abcdef",
+  "_event_type":       "custom"
+}'
+
+# Passing a Hash
+ServiceLogger.logger.info(
+  short_message: 'GET /hello_world', # REQUIRED
+  full_message:  String,             # OPTIONAL
+  type:          String,             # OPTIONAL
+  timestamp:     Time,               # OPTIONAL
+  data:          Hash,               # OPTIONAL
+  exception:     Exception,          # OPTIONAL
+)
+=> '{
+  "version":           "1.1",
+  "host":              "example.com",
+  "short_message":     "GET /hello_world",
+  "timestamp":         "1450171805.123",
+  "level":             "6",
+  "_service.name":     "hello_app",
+  "_service.version":  "abcdef",
+  "_event_type":       "custom"
+}'
 ```
 
 ## Event types
