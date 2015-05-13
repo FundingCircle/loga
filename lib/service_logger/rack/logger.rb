@@ -30,7 +30,7 @@ module ServiceLogger
         rescue Exception => exception
           raise exception
         ensure
-          exception ||= env['action_dispatch.exception']
+          exception ||= env['action_dispatch.exception'] || env['sinatra.error']
 
           data['request_id'] ||= env['action_dispatch.request_id']
           data['duration']   = duration_in_ms(started_at, Time.now)
