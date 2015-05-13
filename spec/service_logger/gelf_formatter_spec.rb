@@ -25,7 +25,7 @@ describe ServiceLogger::GELFFormatter do
     end
 
     it 'includes default additional fields' do
-      expect(result).to include('_event'           => 'custom',
+      expect(result).to include('_event'           => 'unknown',
                                 '_service.name'    => service_name,
                                 '_service.version' => service_version,
                                )

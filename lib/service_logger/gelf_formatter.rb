@@ -35,7 +35,7 @@ module ServiceLogger
     #   "level":             "6",
     #   "_service.name":     "hello_app",
     #   "_service.version":  "abcdef",
-    #   "_event":       "custom"
+    #   "_event":            "unknown"
     # }'
     #
     # Pasing a Hash
@@ -55,7 +55,7 @@ module ServiceLogger
     #   "level":             "6",
     #   "_service.name":     "hello_app",
     #   "_service.version":  "abcdef",
-    #   "_event":       "custom"
+    #   "_event":            "unknown"
     # }'
     def call(severity, time, _progname, message)
       timestamp = nil
@@ -83,7 +83,7 @@ module ServiceLogger
 
       payload['short_message'] = short_message
       payload['timestamp']     = unix_time_with_ms(timestamp || time)
-      payload['_event']        = event || 'custom'
+      payload['_event']        = event || 'unknown'
       JSON.dump(payload)
     end
 

@@ -96,7 +96,7 @@ ServiceLogger.logger.info('Hello World')
   "level":             "6",
   "_service.name":     "hello_app",
   "_service.version":  "abcdef",
-  "_event":       "custom"
+  "_event":            "unknown"
 }'
 
 # Passing a Hash
@@ -116,7 +116,7 @@ ServiceLogger.logger.info(
   "level":             "6",
   "_service.name":     "hello_app",
   "_service.version":  "abcdef",
-  "_event":       "custom"
+  "_event":            "unknown"
 }'
 ```
 
@@ -130,7 +130,7 @@ Middleware augment the GELF payload with the `_event` key to label events.
 | job_consumed      | Sidekiq worker consumes a job     | SidekiqServer           |
 | message_published | Publisher publishes a RMQ message | TODO                    |
 | message_consumed  | Consumer consumes a RMQ message   | TODO                    |
-| custom            | Event within the application      | Logger (not middleware) |
+| unknown           | Event within the application      | Logger (not middleware) |
 
 ## Sample GELF
 
