@@ -101,12 +101,17 @@ ServiceLogger.logger.info('Hello World')
 
 # Passing a Hash
 ServiceLogger.logger.info(
-  short_message: 'GET /hello_world', # REQUIRED
-  full_message:  String,             # OPTIONAL
-  type:          String,             # OPTIONAL
-  timestamp:     Time,               # OPTIONAL
-  data:          Hash,               # OPTIONAL
-  exception:     Exception,          # OPTIONAL
+  short_message: 'Hello World',               # REQUIRED
+  full_message:  'Hello World and the Moon',  # OPTIONAL
+  type:          'new_user',                  # OPTIONAL
+  timestamp:     Time,                        # OPTIONAL
+  data:          {                            # OPTIONAL
+    'color' => 'red',
+    'user'  => {
+      'name' => 'Bob',
+    },
+  },
+  exception:     Exception,                   # OPTIONAL
 )
 => '{
   "version":           "1.1",
@@ -116,7 +121,9 @@ ServiceLogger.logger.info(
   "level":             "6",
   "_service.name":     "hello_app",
   "_service.version":  "abcdef",
-  "_event":            "unknown"
+  "_event":            "unknown",
+  "_color":            "red",
+  "_user.name":        "Bob"
 }'
 ```
 
