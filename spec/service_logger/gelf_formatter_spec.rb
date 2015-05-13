@@ -14,6 +14,24 @@ describe ServiceLogger::GELFFormatter do
 
   subject { described_class.new(options) }
 
+  shared_examples 'GELFFormatter fields' do
+    it 'includes required fields' do
+      expect(result).to include('version'          => '1.1',
+                                'host'             => host,
+                                'short_message'    => short_message,
+                                'timestamp'        => '1450171805.123',
+                                'level'            => 6,
+                               )
+    end
+
+    it 'includes default additional fields' do
+      expect(result).to include('_event'           => 'custom',
+                                '_service.name'    => service_name,
+                                '_service.version' => service_version,
+                               )
+    end
+  end
+
   describe '#call(severity, time, _progname, message)' do
     subject { super().call('INFO', time_anchor, nil, message) }
 
@@ -25,37 +43,32 @@ describe ServiceLogger::GELFFormatter do
       it 'uses the message as the short_message' do
         expect(result['short_message']).to eq(message)
       end
+
+      include_examples 'GELFFormatter fields' do
+        let(:short_message) { message }
+      end
     end
 
     context 'when message is a Hash' do
-      let(:message) do
-        {
-          short_message: 'Hello World',
-          event:    'http_request',
-          data:          {},
-        }
-      end
+      let(:message) { { short_message: 'Wooden house' } }
 
-      specify do
-        expect(result).to include('version'       => '1.1',
-                                  'host'          => host,
-                                  'short_message' => 'Hello World',
-                                  'full_message'  => '',
-                                 )
-      end
-
-      it 'formats the severity as standard syslog level' do
-        expect(result).to include('level' => 6)
-      end
-
-      it 'formats the time as unix timestamp with milliseconds' do
-        expect(result).to include('timestamp' => '1450171805.123')
+      include_examples 'GELFFormatter fields' do
+        let(:short_message) { message[:short_message] }
       end
 
       context 'when the message does not includes short_message key' do
         let(:message) { {} }
         it 'raises a KeyError' do
           expect { subject }.to raise_error(KeyError)
+        end
+      end
+
+      context 'when the message includes a type key' do
+        let(:message) do
+          super().merge(type: 'storm')
+        end
+        it 'uses the value' do
+          expect(result).to include('_event' => 'storm')
         end
       end
 

@@ -58,27 +58,32 @@ module ServiceLogger
     #   "_event":       "custom"
     # }'
     def call(severity, time, _progname, message)
+      timestamp = nil
       payload = {
         'version'          => VERSION,
         'host'             => @host,
         '_service.name'    => @service_name,
         '_service.version' => @service_version,
+        'level'            => severity_to_syslog_level(severity),
       }
 
       if message.is_a? String
-        payload.merge!('short_message' => message)
+        short_message = message
       else
         payload.merge!(
-          'short_message'    =>  message.fetch(:short_message),
-          'full_message'     => '',
-          'timestamp'        => unix_time_with_ms(message.fetch(:timestamp, time)),
-          'level'            => severity_to_syslog_level(severity),
-          '_event'      => message.fetch(:type, 'custom'),
+          'full_message' => '',
         )
         payload.merge! extract_data(message.delete(:data))
         payload.merge! extract_exception(message.delete(:exception))
+
+        short_message = message.fetch :short_message
+        timestamp     = message[:timestamp]
+        event         = message[:type]
       end
 
+      payload['short_message'] = short_message
+      payload['timestamp']     = unix_time_with_ms(timestamp || time)
+      payload['_event']        = event || 'custom'
       JSON.dump(payload)
     end
 
