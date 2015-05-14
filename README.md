@@ -37,9 +37,9 @@ Configuration
 target = Loga::GELFUPDLogDevice.new(host: '192.168.99.100')
 
 Loga.configure do |config|
-  config.service_name   = 'marketplace'
-  config.service_verion = 'v1.0.0' or SHA
-  config.device         = target
+  config.service_name    = 'marketplace'
+  config.service_version = 'v1.0.0' or SHA
+  config.device          = target
 end
 ```
 
