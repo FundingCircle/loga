@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceLogger::GELFFormatter do
+describe Loga::GELFFormatter do
   let(:service_name)    { 'demo_service' }
   let(:service_version) { '725e032a' }
   let(:host)            { 'www.example.com' }

@@ -1,7 +1,7 @@
-# ServiceLogger
+# Loga
 
 ## Description
-ServiceLogger defines a single log format, logger and middleware logger
+Loga defines a single log format, logger and middleware logger
 to faciliate log aggregation.
 
 It provides provides:
@@ -26,7 +26,7 @@ It provides provides:
 
 Add this line to your application's Gemfile:
 
-    gem 'service_logger'
+    gem 'loga'
 
 And then execute:
 
@@ -34,16 +34,16 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install service_logger
+    $ gem install loga
 
 ## Usage
 
 Configuration
 ```ruby
-# config/initializers/service_logger.rb
-target = ServiceLogger::GELFUPDLogDevice.new(host: '192.168.99.100')
+# config/initializers/loga.rb
+target = Loga::GELFUPDLogDevice.new(host: '192.168.99.100')
 
-ServiceLogger.configure do |config|
+Loga.configure do |config|
   config.service_name   = 'marketplace'
   config.service_verion = 'v1.0.0' or SHA
   config.device         = target
@@ -53,14 +53,14 @@ end
 Rails-less applications
 ```ruby
 # config.ru
-use ServiceLogger::Rack::Logger
+use Loga::Rack::Logger
 ```
 
 Rails applications
 ```ruby
 # config/application.rb
 config.middleware.insert_after Rack::MethodOverride,
-                               ServiceLogger::Rack::Logger
+                               Loga::Rack::Logger
 ```
 
 Sidekiq
@@ -69,16 +69,16 @@ Sidekiq
 Sidekiq.configure_server do |config|
   config.server_middleware do |chain|
     chain.insert_before Sidekiq::Middleware::Server::RetryJobs,
-                        ServiceLogger::Sidekiq::ServerLogger
+                        Loga::Sidekiq::ServerLogger
   end
   config.client_middleware do |chain|
-    chain.add ServiceLogger::Sidekiq::ClientLogger
+    chain.add Loga::Sidekiq::ClientLogger
   end
 end
 
 Sidekiq.configure_client do |config|
   config.client_middleware do |chain|
-    chain.add ServiceLogger::Sidekiq::ClientLogger
+    chain.add Loga::Sidekiq::ClientLogger
   end
 end
 ```
@@ -87,7 +87,7 @@ Custom events
 ```ruby
 # Anywhere in your application
 # Passing a String
-ServiceLogger.logger.info('Hello World')
+Loga.logger.info('Hello World')
 => '{
   "version":           "1.1",
   "host":              "example.com",
@@ -100,7 +100,7 @@ ServiceLogger.logger.info('Hello World')
 }'
 
 # Passing a Hash
-ServiceLogger.logger.info(
+Loga.logger.info(
   short_message: 'Hello World',               # REQUIRED
   full_message:  'Hello World and the Moon',  # OPTIONAL
   type:          'new_user',                  # OPTIONAL
@@ -145,7 +145,7 @@ Middleware augment the GELF payload with the `_event` key to label events.
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/service_logger/fork )
+1. Fork it ( https://github.com/[my-github-username]/loga/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceLogger::GELFUPDLogDevice do
+describe Loga::GELFUPDLogDevice do
   subject { described_class.new }
 
   describe '#write(message)' do

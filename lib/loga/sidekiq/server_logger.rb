@@ -1,9 +1,9 @@
-module ServiceLogger
+module Loga
   module Sidekiq
-    class ClientLogger
+    class ServerLogger
       include Utilities
 
-      def call(_worker, item, _queue, _redis_pool)
+      def call(_worker, item, _queue)
         started_at = Time.now
         exception  = nil
 
@@ -26,7 +26,7 @@ module ServiceLogger
           data['retried_at']  = extract_unix_timestamp(item['retried_at'])
 
           logger.public_send(exception ? :error : :info,
-                             type:          'job_enqueued',
+                             type:          'job_processed',
                              short_message: short_message(data),
                              data:          { 'job' => data },
                              timestamp:     started_at,
@@ -36,7 +36,7 @@ module ServiceLogger
       end
 
       def short_message(data)
-        format('%s Enqueued',
+        format('%s Processed',
                data['klass'],
               )
       end
@@ -47,7 +47,7 @@ module ServiceLogger
       end
 
       def logger
-        ServiceLogger.logger
+        Loga.logger
       end
     end
   end

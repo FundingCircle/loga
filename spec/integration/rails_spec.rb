@@ -26,7 +26,7 @@ end
 
 RailsApp::Application.configure do |config|
   config.middleware.insert_after Rack::MethodOverride,
-                                 ServiceLogger::Rack::Logger
+                                 Loga::Rack::Logger
 end
 
 describe 'Rack request logger with Rails' do
@@ -38,13 +38,13 @@ describe 'Rack request logger with Rails' do
   before do
     allow(Rails).to receive(:logger).and_return(rails_logger)
 
-    ServiceLogger.configure do |config|
+    Loga.configure do |config|
       config.service_name    = 'hello_world_app'
       config.service_version = '1.0'
       config.device      = target
     end
 
-    ServiceLogger::Logging.reset
+    Loga::Logging.reset
   end
   let(:target) { StringIO.new }
   let(:app)    { RailsApp::Application }

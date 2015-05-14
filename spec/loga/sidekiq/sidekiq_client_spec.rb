@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceLogger::Sidekiq::ServerLogger do
+describe Loga::Sidekiq::ClientLogger do
   let(:item)   { { 'class' => 'ExampleWorker' } }
   let(:logger) { double(:logger) }
 
@@ -17,14 +17,14 @@ describe ServiceLogger::Sidekiq::ServerLogger do
 
     context 'when an exception is raised' do
       it 'logs with severity ERROR' do
-        expect(logger).to receive(:error).with(type:      'job_processed',
+        expect(logger).to receive(:error).with(type:      'job_enqueued',
                                                data:      an_instance_of(Hash),
                                                timestamp: an_instance_of(Time),
-                                               short_message: 'ExampleWorker Processed',
+                                               short_message: 'ExampleWorker Enqueued',
                                                exception: exception,
                                               )
         begin
-          subject.call(nil, item, nil) do
+          subject.call(nil, item, nil, nil) do
             fail exception
           end
         rescue StandardError
@@ -38,13 +38,13 @@ describe ServiceLogger::Sidekiq::ServerLogger do
 
     context 'when no exception is raised' do
       it 'logs with severity INFO' do
-        expect(logger).to receive(:info).with(type:      'job_processed',
+        expect(logger).to receive(:info).with(type:      'job_enqueued',
                                               data:      an_instance_of(Hash),
                                               timestamp: an_instance_of(Time),
-                                              short_message: 'ExampleWorker Processed',
+                                              short_message: 'ExampleWorker Enqueued',
                                               exception: nil,
                                              )
-        subject.call(nil, item, nil) {}
+        subject.call(nil, item, nil, nil) {}
       end
     end
   end

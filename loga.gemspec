@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'service_logger/version'
+require 'loga/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'service_logger'
-  spec.version       = ServiceLogger::VERSION
+  spec.name          = 'loga'
+  spec.version       = Loga::VERSION
   spec.authors       = ['Funding Circle']
   spec.email         = ['engineering@fundingcircle.com']
   spec.summary       = 'Facilitate log aggregation via unified logging'

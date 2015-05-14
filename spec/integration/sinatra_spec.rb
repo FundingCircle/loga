@@ -7,20 +7,20 @@ describe 'Rack request logger with Sinatra' do
   after(:all)  { Timecop.return }
 
   before do
-    ServiceLogger.configure do |config|
+    Loga.configure do |config|
       config.service_name    = 'hello_world_app'
       config.service_version = '1.0'
       config.device          = target
     end
 
-    ServiceLogger::Logging.reset
+    Loga::Logging.reset
   end
 
   let(:target) { StringIO.new }
   let(:app) do
     Class.new(Sinatra::Base) do
       set :environment, :production
-      use ServiceLogger::Rack::Logger
+      use Loga::Rack::Logger
 
       error StandardError do
         status 500

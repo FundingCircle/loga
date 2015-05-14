@@ -1,7 +1,7 @@
-describe ServiceLogger do
+describe Loga do
   describe '.configuration' do
     subject { described_class.configuration }
-    specify { expect(subject).to be_instance_of(ServiceLogger::Configuration) }
+    specify { expect(subject).to be_instance_of(Loga::Configuration) }
 
     it 'memoizes the result' do
       expect(subject).to equal(subject)

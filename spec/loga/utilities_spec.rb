@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe ServiceLogger::Utilities do
-  subject { Object.new.extend(ServiceLogger::Utilities) }
+describe Loga::Utilities do
+  subject { Object.new.extend(Loga::Utilities) }
 
   describe '#unix_time_with_ms(time)' do
     subject { super().unix_time_with_ms(time_anchor) }

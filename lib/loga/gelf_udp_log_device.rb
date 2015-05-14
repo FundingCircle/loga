@@ -1,7 +1,7 @@
 require 'socket'
 require 'digest/md5'
 
-module ServiceLogger
+module Loga
   class GELFUPDLogDevice
     # TODO: improve options and documentation
     def initialize(options = {})

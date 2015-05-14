@@ -13,7 +13,7 @@ end
 
 Sidekiq.configure_client do |config|
   config.client_middleware do |chain|
-    chain.add ServiceLogger::Sidekiq::ClientLogger
+    chain.add Loga::Sidekiq::ClientLogger
   end
 end
 
@@ -22,13 +22,13 @@ describe 'Sidekiq client logger' do
   after(:all)  { Timecop.return }
 
   before do
-    ServiceLogger.configure do |config|
+    Loga.configure do |config|
       config.service_name    = 'hello_world_app'
       config.service_version = '1.0'
       config.device      = target
     end
 
-    ServiceLogger::Logging.reset
+    Loga::Logging.reset
   end
 
   let(:target) { StringIO.new }

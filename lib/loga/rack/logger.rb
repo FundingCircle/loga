@@ -1,6 +1,6 @@
 require 'rack/request'
 
-module ServiceLogger
+module Loga
   module Rack
     class Logger
       include Utilities
@@ -55,7 +55,7 @@ module ServiceLogger
       end
 
       def logger
-        ServiceLogger.logger
+        Loga.logger
       end
     end
   end

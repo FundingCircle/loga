@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceLogger::Rack::Logger do
+describe Loga::Rack::Logger do
   let(:env)    { Rack::MockRequest.env_for('/about_us?limit=1') }
   let(:app)    { double(:app) }
   let(:logger) { double(:logger) }

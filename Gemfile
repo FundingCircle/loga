@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in service_logger.gemspec
+# Specify your gem's dependencies in loga.gemspec
 gemspec

@@ -1,4 +1,4 @@
-require 'service_logger'
+require 'loga'
 require 'rack/test'
 require 'pry'
 require 'support/helpers'

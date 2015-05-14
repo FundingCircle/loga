@@ -1,7 +1,7 @@
 require 'logger'
 require 'json'
 
-module ServiceLogger
+module Loga
   # Graylog Extended Log Format (GELF) Formatter v1.1
   # Specification https://www.graylog.org/resources/gelf-2/
   class GELFFormatter < Logger::Formatter

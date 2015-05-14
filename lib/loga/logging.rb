@@ -1,13 +1,13 @@
 require 'logger'
 require 'socket'
 
-module ServiceLogger
+module Loga
   module Logging
     def self.initialize_logger
-      @logger           = Logger.new(ServiceLogger.configuration.device)
+      @logger           = Logger.new(Loga.configuration.device)
       @logger.formatter = GELFFormatter.new(
-        service_name:    ServiceLogger.configuration.service_name,
-        service_version: ServiceLogger.configuration.service_version,
+        service_name:    Loga.configuration.service_name,
+        service_version: Loga.configuration.service_version,
         host:            Socket.gethostname,
       )
       @logger.level     = Logger::INFO
