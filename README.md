@@ -11,16 +11,9 @@ It provides provides:
 - GELF log formatter
 - GELF log device
 
-## Road Map
+## Road Map to v1.0.0
 
-- [ ] CI setup with ruby 1.9 and 2.0
-- [ ] Setting to limit backtrace size
-- [ ] Setting to filter out sensitive request parameters
-- [x] Support standard Ruby logger message input
-- [ ] Hutch logging integration (Producer and Consumer)
-- [ ] ActionMailer integration (New events)
-- [ ] GELF additional fields naming retrospective
-- [ ] Hooks to augment data being logged
+Follow the [milestone](https://github.com/FundingCircle/loga/milestones/The%20road%20to%20v1.0.0)
 
 ## Installation
 
