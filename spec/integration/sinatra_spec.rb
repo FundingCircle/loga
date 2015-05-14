@@ -10,7 +10,7 @@ describe 'Rack request logger with Sinatra' do
     ServiceLogger.configure do |config|
       config.service_name    = 'hello_world_app'
       config.service_version = '1.0'
-      config.log_target      = target
+      config.device          = target
     end
 
     ServiceLogger::Logging.reset

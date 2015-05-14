@@ -11,14 +11,14 @@ module ServiceLogger
   Configuration = Struct.new(
     :service_name,
     :service_version,
-    :log_target,
+    :device,
   )
 
   def self.configuration
     @configuration ||= Configuration.new(
       service_name: '',
       service_version: '',
-      log_target: STDOUT,
+      device: STDOUT,
     )
   end
 

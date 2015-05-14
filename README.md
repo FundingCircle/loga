@@ -46,7 +46,7 @@ target = ServiceLogger::GELFUPDLogDevice.new(host: '192.168.99.100')
 ServiceLogger.configure do |config|
   config.service_name   = 'marketplace'
   config.service_verion = 'v1.0.0' or SHA
-  config.log_target     = target
+  config.device         = target
 end
 ```
 

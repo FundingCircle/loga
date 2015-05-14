@@ -4,7 +4,7 @@ require 'socket'
 module ServiceLogger
   module Logging
     def self.initialize_logger
-      @logger           = Logger.new(ServiceLogger.configuration.log_target)
+      @logger           = Logger.new(ServiceLogger.configuration.device)
       @logger.formatter = GELFFormatter.new(
         service_name:    ServiceLogger.configuration.service_name,
         service_version: ServiceLogger.configuration.service_version,
