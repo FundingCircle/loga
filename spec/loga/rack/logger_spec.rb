@@ -21,28 +21,34 @@ describe Loga::Rack::Logger do
         allow(app).to receive(:call).with(env).and_raise(exception)
       end
 
-      it 'logs with severity ERROR' do
+      it 'does not rescue the exception' do
+        expect { subject.call(env) }.to raise_error(StandardError)
+      end
+    end
+
+    context 'when an exception wrapped by ActionDispatch' do
+      let(:app) do
+        lambda do |env|
+          env['action_dispatch.exception'] = exception
+          [500, {}, '']
+        end
+      end
+
+      it 'logs the exception' do
         expect(logger).to receive(:error).with(type:      'http_request',
                                                data:      an_instance_of(Hash),
                                                timestamp: an_instance_of(Time),
                                                short_message: 'GET /about_us?limit=1',
                                                exception: exception,
                                               )
-        begin
-          subject.call(env)
-        rescue StandardError
-        end
-      end
-
-      it 'raises the rescued error' do
-        expect { subject.call(env) }.to raise_error(StandardError)
+        subject.call(env)
       end
     end
 
-    context 'when an exception is raised and wrapped by ActionDispatch::ShowExceptions' do
+    context 'when an exception wrapped by Sinatra' do
       let(:app) do
         lambda do |env|
-          env['action_dispatch.exception'] = exception
+          env['sinatra.error'] = exception
           [500, {}, '']
         end
       end
