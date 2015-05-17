@@ -35,11 +35,10 @@ describe Loga::GELFFormatter do
   describe '#call(severity, time, _progname, message)' do
     subject { super().call('INFO', time_anchor, nil, message) }
 
-    let(:result) { JSON.parse(subject) }
+    let(:result)  { JSON.parse(subject) }
+    let(:message) { 'Tree house magic' }
 
     context 'when message is a String' do
-      let(:message) { 'Tree house magic' }
-
       it 'uses the message as the short_message' do
         expect(result['short_message']).to eq(message)
       end
@@ -63,11 +62,24 @@ describe Loga::GELFFormatter do
         end
       end
 
+      context 'when the message includes full_message key' do
+        let(:full_message) { 'Extra long message' }
+        let(:message)      { super().merge(full_message: full_message) }
+
+        it 'populates full_message with the value' do
+          expect(result).to include('full_message' => full_message)
+        end
+      end
+
+      context 'when the message does not include a full_message key' do
+        specify { expect(result).to_not include('full_message') }
+      end
+
       context 'when the message includes a type key' do
         let(:message) do
           super().merge(type: 'storm')
         end
-        it 'uses the value' do
+        it 'populates _event with the value' do
           expect(result).to include('_event' => 'storm')
         end
       end
@@ -76,8 +88,11 @@ describe Loga::GELFFormatter do
         let(:message) do
           super().merge(data: { 'user_uuid' => 'abcd' })
         end
-        it 'merges the data key values with the message' do
+        it 'formats the the data key values' do
           expect(result).to include('_user_uuid' => 'abcd')
+        end
+        it 'does not include the original data key' do
+          expect(result).to_not include(:data)
         end
       end
 
@@ -100,6 +115,15 @@ describe Loga::GELFFormatter do
         it 'does not include the original exception key' do
           expect(result).to_not include(:exception)
         end
+      end
+    end
+
+    context 'when the message does not include an exception key' do
+      specify do
+        expect(result).to_not include('_exception.klass',
+                                      '_exception.message',
+                                      '_exception.backtrace',
+                                     )
       end
     end
   end

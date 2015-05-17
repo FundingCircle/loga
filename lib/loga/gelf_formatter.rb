@@ -70,11 +70,9 @@ module Loga
       if message.is_a? String
         short_message = message
       else
-        payload.merge!(
-          'full_message' => '',
-        )
-        payload.merge! extract_data(message.delete(:data))
-        payload.merge! extract_exception(message.delete(:exception))
+        payload.merge! extract_full_message(message[:full_message])
+        payload.merge! extract_data(message[:data])
+        payload.merge! extract_exception(message[:exception])
 
         short_message = message.fetch :short_message
         timestamp     = message[:timestamp]
@@ -120,6 +118,11 @@ module Loga
     end
 
     private
+
+    def extract_full_message(full_message)
+      return {} if full_message.nil?
+      { 'full_message' => full_message }
+    end
 
     def extract_exception(e)
       return {} if e.nil?
