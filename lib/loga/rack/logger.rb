@@ -16,7 +16,7 @@ module Loga
         data               = {}
         data['method']     = request.request_method
         data['path']       = request.path
-        data['params']     = request.params
+        data['params']     = sanitize_params(request.params)
         data['request_ip'] = request.ip
         data['user_agent'] = request.user_agent
 
@@ -50,6 +50,17 @@ module Loga
 
       def logger
         Loga.logger
+      end
+
+      def filter_parameters
+        Loga.configuration.filter_parameters
+      end
+
+      def sanitize_params(params)
+        (params || {}).each_key do |k|
+          params[k] = '[FILTERED]' if filter_parameters.include? k
+        end
+        params
       end
     end
   end

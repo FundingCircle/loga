@@ -41,7 +41,7 @@ describe 'Rack request logger with Rails' do
     Loga.configure do |config|
       config.service_name    = 'hello_world_app'
       config.service_version = '1.0'
-      config.device      = target
+      config.device          = target
     end
 
     Loga::Logging.reset

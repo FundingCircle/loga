@@ -12,13 +12,15 @@ module Loga
     :service_name,
     :service_version,
     :device,
+    :filter_parameters,
   )
 
   def self.configuration
     @configuration ||= Configuration.new(
-      service_name: '',
-      service_version: '',
-      device: STDOUT,
+      '',
+      '',
+      STDOUT,
+      [],
     )
   end
 
