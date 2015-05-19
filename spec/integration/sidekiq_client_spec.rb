@@ -45,7 +45,6 @@ describe 'Sidekiq client logger' do
         'version'           => '1.1',
         'host'              => be_a(String),
         'short_message'     => 'MySidekiqWorker Enqueued',
-        'full_message'      => '',
         'timestamp'         => '1450171805.123',
         'level'             => 6,
         '_event'            => 'job_enqueued',
