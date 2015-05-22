@@ -1,6 +1,7 @@
 # Loga
 
 ## Description
+
 Loga defines a single log format, logger and middleware logger
 to faciliate log aggregation.
 
@@ -121,6 +122,7 @@ Loga.logger.info(
 ```
 
 ## Event types
+
 Middleware augment the GELF payload with the `_event` key to label events.
 
 | event type        | description                       | middleware              |
@@ -136,6 +138,35 @@ Middleware augment the GELF payload with the `_event` key to label events.
 
 :warning: Coming up
 
+## Development with GrayLog
+
+Install GrayLog with docker.
+
+Requirements:
+ - `docker-machine`
+ - `docker-compose`
+
+```yml
+# docker-compose.yml
+graylog:
+  image: graylog2/allinone
+  ports:
+    - "9000:9000"
+    - "12201:12201"
+    - "12201:12201/udp"
+  volumes:
+    # Paths with Boot2docker
+    - /mnt/sda1/graylog/data:/var/opt/graylog/data
+    - /mnt/sda1/graylog/logs:/var/log/graylog
+```
+
+0. Start the cluster with `docker-compose up`
+0. Browse to `your.docker.machine.ip:9000` and login with the `admin`
+   user/password.
+0. Navigate to `System` -> `Inputs` where you can `Launch new input`
+   GELF UDP with default options.
+0. Send all the things
+
 ## Contributing
 
 1. Fork it ( https://github.com/FundingCircle/loga/fork )
@@ -145,6 +176,7 @@ Middleware augment the GELF payload with the `_event` key to label events.
 5. Create a new Pull Request
 
 ## Credits
+
 - [Sidekiq](https://github.com/mperham/sidekiq)
 - [Rails](https://github.com/rails/rails)
 - [RackLogstasher](https://github.com/alphagov/rack-logstasher)
