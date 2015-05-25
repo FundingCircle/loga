@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Loga do
   describe '.configuration' do
     subject { described_class.configuration }
