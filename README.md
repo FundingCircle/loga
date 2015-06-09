@@ -6,11 +6,9 @@ Loga defines a single log format, logger and middleware logger
 to faciliate log aggregation.
 
 It provides provides:
-- Rack logger middleware
+- Rack logger middleware to log HTTP requests
 - Sidekiq logger middleware to log jobs
 - Ruby logger
-- GELF log formatter
-- GELF log device
 
 ## Road Map to v1.0.0
 
@@ -35,20 +33,24 @@ Or install it yourself as:
 Configuration
 ```ruby
 # config/initializers/loga.rb
-target = Loga::GELFUPDLogDevice.new(host: '192.168.99.100')
 
 Loga.configure do |config|
   config.service_name    = 'marketplace'
   config.service_version = 'v1.0.0' or SHA
-  config.device          = target
+  config.devices         = {
+    type: :tcp, host: 'docker.local', port: 5005
+  }
 end
 ```
+See LogStashLogger [README](https://github.com/dwbutler/logstash-logger)
+to configure devices
 
 Rails-less applications
 ```ruby
 # config.ru
 use Loga::Rack::Logger
 ```
+NOTE: must have exception handler (e.g. action_dispatch.exception)
 
 Rails applications
 ```ruby
@@ -83,41 +85,42 @@ Custom events
 # Passing a String
 Loga.logger.info('Hello World')
 => '{
-  "version":           "1.1",
-  "host":              "example.com",
-  "short_message":     "Hello World",
-  "timestamp":         "1450171805.123",
-  "level":             "6",
-  "_service.name":     "hello_app",
-  "_service.version":  "abcdef",
-  "_event":            "unknown"
+  "@version":    "1.0",
+  "host":        "example.com",
+  "message":     "Hello World",
+  "@timestamp":  "2015-12-15T09:30:05.123+00:00",
+  "severity":    "INFO",
+  "service":     {
+    "name":      "hello_app",
+    "version":   "abcdef"
+  },
+  "type":        "default"
 }'
 
 # Passing a Hash
 Loga.logger.info(
-  short_message: 'Hello World',               # REQUIRED
-  full_message:  'Hello World and the Moon',  # OPTIONAL
-  type:          'new_user',                  # OPTIONAL
-  timestamp:     Time,                        # OPTIONAL
-  data:          {                            # OPTIONAL
-    'color' => 'red',
-    'user'  => {
-      'name' => 'Bob',
-    },
+  message:       'Hello World',  # REQUIRED
+  type:          'cron',         # OPTIONAL
+  timestamp:     Time,           # OPTIONAL
+  event:         {               # OPTIONAL
+    'color' =>   'red',
   },
-  exception:     Exception,                   # OPTIONAL
+  exception:     Exception,      # OPTIONAL
 )
 => '{
-  "version":           "1.1",
-  "host":              "example.com",
-  "short_message":     "GET /hello_world",
-  "timestamp":         "1450171805.123",
-  "level":             "6",
-  "_service.name":     "hello_app",
-  "_service.version":  "abcdef",
-  "_event":            "unknown",
-  "_color":            "red",
-  "_user.name":        "Bob"
+  "@version":    "1.0",
+  "host":        "example.com",
+  "message":     "Hello World",
+  "@timestamp":  "2015-12-15T09:30:05.123+00:00",
+  "severity":    "INFO",
+  "service":     {
+    "name":      "hello_app",
+    "version":   "abcdef"
+  },
+  "event":       {
+    "color":     "red"
+  },
+  "type":        "cron"
 }'
 ```
 
@@ -127,45 +130,9 @@ Middleware augment the GELF payload with the `_event` key to label events.
 
 | event type        | description                       | middleware              |
 |-------------------|-----------------------------------|-------------------------|
-| http_request      | HTTP request and response         | Rack                    |
-| job_enqueued      | Sidekiq client enqueues a job     | SidekiqClient           |
-| job_consumed      | Sidekiq worker consumes a job     | SidekiqServer           |
-| message_published | Publisher publishes a RMQ message | TODO                    |
-| message_consumed  | Consumer consumes a RMQ message   | TODO                    |
-| unknown           | Event within the application      | Logger (not middleware) |
-
-## Sample GELF
-
-:warning: Coming up
-
-## Development with GrayLog
-
-Install GrayLog with docker.
-
-Requirements:
- - `docker-machine`
- - `docker-compose`
-
-```yml
-# docker-compose.yml
-graylog:
-  image: graylog2/allinone
-  ports:
-    - "9000:9000"
-    - "12201:12201"
-    - "12201:12201/udp"
-  volumes:
-    # Paths with Boot2docker
-    - /mnt/sda1/graylog/data:/var/opt/graylog/data
-    - /mnt/sda1/graylog/logs:/var/log/graylog
-```
-
-0. Start the cluster with `docker-compose up`
-0. Browse to `your.docker.machine.ip:9000` and login with the `admin`
-   user/password.
-0. Navigate to `System` -> `Inputs` where you can `Launch new input`
-   GELF UDP with default options.
-0. Send all the things
+| request           | HTTP request and response         | Rack                    |
+| job               | Sidekiq  job                      | SidekiqClient           |
+| default           | Event within the application      | Logger (not middleware) |
 
 ## Contributing
 
@@ -177,6 +144,7 @@ graylog:
 
 ## Credits
 
+- [LogStashLogger](https://github.com/dwbutler/logstash-logger)
 - [Sidekiq](https://github.com/mperham/sidekiq)
 - [Rails](https://github.com/rails/rails)
 - [RackLogstasher](https://github.com/alphagov/rack-logstasher)

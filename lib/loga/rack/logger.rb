@@ -30,11 +30,11 @@ module Loga
           exception = env['action_dispatch.exception'] || env['sinatra.error']
 
           logger.public_send(exception ? :error : :info,
-                             type:          'http_request',
-                             short_message: short_message(data, smsg),
-                             data:          { request: data },
-                             timestamp:     started_at,
-                             exception:     exception,
+                             type:       'request',
+                             message:    short_message(data, smsg),
+                             event:      data,
+                             timestamp:  started_at,
+                             exception:  exception,
                             )
         end
       end

@@ -6,17 +6,21 @@ describe 'Rack request logger with Sinatra' do
   before(:all) { Timecop.freeze(time_anchor) }
   after(:all)  { Timecop.return }
 
+  let(:io) { StringIO.new }
   before do
+    Loga.reset
     Loga.configure do |config|
       config.service_name    = 'hello_world_app'
       config.service_version = '1.0'
-      config.device          = target
+      config.devices         = { type: :io, io: io }
     end
-
-    Loga::Logging.reset
+    Loga.initialize!
+  end
+  let(:json) do
+    io.rewind
+    JSON.parse(io.read)
   end
 
-  let(:target) { StringIO.new }
   let(:app) do
     Class.new(Sinatra::Base) do
       set :environment, :production
@@ -36,10 +40,6 @@ describe 'Rack request logger with Sinatra' do
       end
     end
   end
-  let(:json_line) do
-    target.rewind
-    JSON.parse(target.read)
-  end
 
   context 'when environment is production' do
     context 'when the request is successful' do
@@ -48,23 +48,29 @@ describe 'Rack request logger with Sinatra' do
             { username: 'yoshi' },
             'HTTP_USER_AGENT' => 'Chrome'
 
-        expect(json_line).to match(
-          'version'             => '1.1',
-          'host'                => be_a(String),
-          'short_message'       => 'GET /ok?username=yoshi',
-          'timestamp'           => '1450171805.123',
-          'level'               => 6,
-          '_event'              => 'http_request',
-          '_service.name'       => 'hello_world_app',
-          '_service.version'    => '1.0',
-          '_request.method'     => 'GET',
-          '_request.path'       => '/ok',
-          '_request.params'     => { 'username' => 'yoshi' },
-          '_request.request_ip' => '127.0.0.1',
-          '_request.user_agent' => 'Chrome',
-          '_request.status'     => 200,
-          '_request.request_id' => nil,
-          '_request.duration'   => be_an(Integer),
+        expect(json).to match(
+          '@version'   => '1',
+          'host'       => 'bird.example.com',
+          'message'    => 'GET /ok?username=yoshi',
+          '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+          'severity'   => 'INFO',
+          'type'       => 'request',
+          'service'    => {
+            'name' => 'hello_world_app',
+            'version' => '1.0',
+          },
+          'event' => {
+            'method' => 'GET',
+            'path'   => '/ok',
+            'params' => {
+              'username' => 'yoshi',
+            },
+            'request_ip' => '127.0.0.1',
+            'user_agent' => 'Chrome',
+            'status'     => 200,
+            'request_id' => nil,
+            'duration'   => 0,
+          },
         )
       end
     end
@@ -75,32 +81,38 @@ describe 'Rack request logger with Sinatra' do
             { username: 'yoshi' },
             'HTTP_USER_AGENT' => 'Chrome'
 
-        expect(json_line).to match(
-          'version'              => '1.1',
-          'host'                 => be_a(String),
-          'short_message'        => 'GET /error?username=yoshi',
-          'timestamp'            => '1450171805.123',
-          'level'                => 3,
-          '_event'               => 'http_request',
-          '_service.name'        => 'hello_world_app',
-          '_service.version'     => '1.0',
-          '_request.method'      => 'GET',
-          '_request.path'        => '/error',
-          '_request.params'      => { 'username' => 'yoshi' },
-          '_request.request_ip'  => '127.0.0.1',
-          '_request.user_agent'  => 'Chrome',
-          '_request.status'      => 500,
-          '_request.request_id'  => nil,
-          '_request.duration'    => be_an(Integer),
-          '_exception.klass'     => 'StandardError',
-          '_exception.message'   => 'Hello Sinatra Error',
-          '_exception.backtrace' => be_a(String),
+        expect(json).to match(
+          '@version'   => '1',
+          'host'       => 'bird.example.com',
+          'message'    => 'GET /error?username=yoshi',
+          '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+          'severity'   => 'ERROR',
+          'type'       => 'request',
+          'service'    => {
+            'name' => 'hello_world_app',
+            'version' => '1.0',
+          },
+          'event' => {
+            'method' => 'GET',
+            'path'   => '/error',
+            'params' => {
+              'username' => 'yoshi',
+            },
+            'request_ip' => '127.0.0.1',
+            'user_agent' => 'Chrome',
+            'status'     => 500,
+            'request_id' => nil,
+            'duration'   => 0,
+          },
+          'exception' => {
+            'klass'     => 'StandardError',
+            'message'   => 'Hello Sinatra Error',
+            'backtrace' => be_an(Array),
+          },
         )
-        expect(json_line).to include('_request.status')
       end
     end
   end
 
-  context 'when environment is development' do
-  end
+  pending 'when environment is development'
 end

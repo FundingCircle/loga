@@ -35,10 +35,10 @@ describe Loga::Rack::Logger do
       end
 
       it 'logs the exception' do
-        expect(logger).to receive(:error).with(type:      'http_request',
-                                               data:      an_instance_of(Hash),
+        expect(logger).to receive(:error).with(type:      'request',
+                                               event:     an_instance_of(Hash),
                                                timestamp: an_instance_of(Time),
-                                               short_message: 'GET /about_us?limit=1',
+                                               message:   'GET /about_us?limit=1',
                                                exception: exception,
                                               )
         subject.call(env)
@@ -54,10 +54,10 @@ describe Loga::Rack::Logger do
       end
 
       it 'logs the exception' do
-        expect(logger).to receive(:error).with(type:      'http_request',
-                                               data:      an_instance_of(Hash),
+        expect(logger).to receive(:error).with(type:      'request',
+                                               event:     an_instance_of(Hash),
                                                timestamp: an_instance_of(Time),
-                                               short_message: 'GET /about_us?limit=1',
+                                               message:   'GET /about_us?limit=1',
                                                exception: exception,
                                               )
         subject.call(env)
@@ -70,10 +70,10 @@ describe Loga::Rack::Logger do
       end
 
       it 'logs with severity INFO' do
-        expect(logger).to receive(:info).with(type:      'http_request',
-                                              data:      an_instance_of(Hash),
+        expect(logger).to receive(:info).with(type:      'request',
+                                              event:     an_instance_of(Hash),
                                               timestamp: an_instance_of(Time),
-                                              short_message: 'GET /about_us?limit=1',
+                                              message:   'GET /about_us?limit=1',
                                               exception: nil,
                                              )
         subject.call(env)
@@ -81,7 +81,7 @@ describe Loga::Rack::Logger do
     end
 
     context 'when filter parameter are present' do
-      let(:env)    { Rack::MockRequest.env_for('/about_us?limit=1&password=hello') }
+      let(:env) { Rack::MockRequest.env_for('/about_us?limit=1&password=hello') }
 
       before do
         allow(app).to receive(:call).with(env).and_return([200, {}, ''])
@@ -92,11 +92,9 @@ describe Loga::Rack::Logger do
         expect(logger).to receive(:info)
           .with(
             hash_including(
-              data: hash_including(
-                request: hash_including('params' => { 'limit' => '1',
-                                                      'password' => '[FILTERED]' },
-                                       ),
-              ),
+              event: hash_including('params' => { 'limit' => '1',
+                                                  'password' => '[FILTERED]' },
+                                   ),
             ),
           )
         subject.call(env)

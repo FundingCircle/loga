@@ -4,8 +4,11 @@ require 'socket'
 module Loga
   module Logging
     def self.initialize_logger
-      @logger           = Logger.new(Loga.configuration.device)
-      @logger.formatter = GELFFormatter.new(
+      @logger           = LogStashLogger.new([
+        { type: :stdout },
+        # { type: :tcp, host: 'docker.local', port: 3333 },
+      ])
+      @logger.formatter = LogStashFormatter.new(
         service_name:    Loga.configuration.service_name,
         service_version: Loga.configuration.service_version,
         host:            Socket.gethostname,
