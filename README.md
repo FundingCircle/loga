@@ -126,7 +126,7 @@ Loga.logger.info(
 
 ## Event types
 
-Middleware augment the GELF payload with the `_event` key to label events.
+Middleware augment payload with the `type` key to label events.
 
 | event type        | description                       | middleware              |
 |-------------------|-----------------------------------|-------------------------|
@@ -148,4 +148,3 @@ Middleware augment the GELF payload with the `_event` key to label events.
 - [Sidekiq](https://github.com/mperham/sidekiq)
 - [Rails](https://github.com/rails/rails)
 - [RackLogstasher](https://github.com/alphagov/rack-logstasher)
-- [gelf-rb](https://github.com/Graylog2/gelf-rb)
