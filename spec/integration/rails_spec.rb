@@ -30,25 +30,10 @@ RailsApp::Application.configure do |config|
 end
 
 describe 'Rack request logger with Rails' do
-  before(:all) { Timecop.freeze(time_anchor) }
-  after(:all)  { Timecop.return }
+  include_context 'loga initialize'
 
-  let(:rails_logger) { Logger.new(StringIO.new) }
-
-  let(:io) { StringIO.new }
   before do
-    allow(Rails).to receive(:logger).and_return(rails_logger)
-    Loga.reset
-    Loga.configure do |config|
-      config.service_name    = 'hello_world_app'
-      config.service_version = '1.0'
-      config.devices         = { type: :io, io: io }
-    end
-    Loga.initialize!
-  end
-  let(:json) do
-    io.rewind
-    JSON.parse(io.read)
+    allow(Rails).to receive(:logger).and_return(Logger.new(StringIO.new))
   end
 
   let(:app)    { RailsApp::Application }

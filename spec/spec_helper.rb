@@ -5,6 +5,7 @@ require 'loga'
 require 'rack/test'
 require 'pry'
 require 'support/helpers'
+require 'support/loga_initialize_shared'
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods

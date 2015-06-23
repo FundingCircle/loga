@@ -18,23 +18,7 @@ Sidekiq.configure_client do |config|
 end
 
 describe 'Sidekiq client logger' do
-  before(:all) { Timecop.freeze(time_anchor) }
-  after(:all)  { Timecop.return }
-
-  let(:io) { StringIO.new }
-  before do
-    Loga.reset
-    Loga.configure do |config|
-      config.service_name    = 'hello_world_app'
-      config.service_version = '1.0'
-      config.devices         = { type: :io, io: io }
-    end
-    Loga.initialize!
-  end
-  let(:json) do
-    io.rewind
-    JSON.parse(io.read)
-  end
+  include_context 'loga initialize'
 
   context 'when the job is successful' do
     it 'logs the job enqueue' do
