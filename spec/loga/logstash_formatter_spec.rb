@@ -36,7 +36,7 @@ describe Loga::LogStashFormatter do
     let(:json)   { JSON.parse(subject) }
 
     context 'when message is a String' do
-      it 'uses the message as the message' do
+      it 'uses the message as is' do
         expect(json['message']).to eq(message)
       end
       it 'includes default fields' do
