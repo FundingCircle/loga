@@ -2,7 +2,13 @@ require 'logstash-logger'
 
 module Loga
   class Configuration
-    attr_accessor :service_name, :service_version, :devices, :filter_parameters
+    attr_accessor :service_name,
+                  :service_version,
+                  :devices,
+                  :filter_parameters,
+                  :level,
+                  :host
+
     attr_reader :logger
 
     def initialize(opts = {})
@@ -15,8 +21,6 @@ module Loga
 
       options = defaults.merge(opts)
 
-      @service_name      = options[:service_name]
-      @service_version   = options[:service_name]
       @host              = options[:host]
       @devices           = options[:devices]
       @level             = options[:level]
