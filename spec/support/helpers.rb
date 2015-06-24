@@ -3,4 +3,8 @@ module Helpers
   def time_anchor
     Time.new(2015, 12, 15, 9, 30, 5.123)
   end
+
+  def hostname_anchor
+    'bird.example.com'
+  end
 end

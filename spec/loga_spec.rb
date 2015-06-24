@@ -1,17 +1,41 @@
 describe Loga do
+  before { described_class.reset }
+
   describe '.configuration' do
-    subject { described_class.configuration }
-    specify { expect(subject).to be_instance_of(Loga::Configuration) }
+    specify { expect(subject.configuration).to be_instance_of(Loga::Configuration) }
 
     it 'memoizes the result' do
-      expect(subject).to equal(subject)
+      expect(subject.configuration).to equal(subject.configuration)
     end
   end
 
-  pending '.configure'
+  describe '.configure' do
+    it 'can configure Loga' do
+      expect do
+        subject.configure { |c| c.service_name = 'loga' }
+      end.to change { subject.configuration.service_name }
+    end
+  end
+
+  describe '.initialize!' do
+    it 'initializes Loga' do
+      expect { subject.initialize! }.to_not raise_error
+    end
+  end
 
   describe '.logger' do
-    subject { described_class.logger }
-    specify { expect(subject).to be_kind_of(Logger) }
+    context 'when Loga is not initialized' do
+      specify { expect(subject.logger).to be_nil }
+    end
+    context 'when Loga is initialized' do
+      before { Loga.initialize! }
+      specify { expect(subject.logger).to be_kind_of(Logger) }
+    end
+  end
+
+  describe '.reset' do
+    it 'resets the configuration' do
+      expect { subject.reset }.to change { subject.configuration.object_id }
+    end
   end
 end

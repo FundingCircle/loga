@@ -18,48 +18,31 @@ Sidekiq.configure_client do |config|
 end
 
 describe 'Sidekiq client logger' do
-  before(:all) { Timecop.freeze(time_anchor) }
-  after(:all)  { Timecop.return }
-
-  before do
-    Loga.configure do |config|
-      config.service_name    = 'hello_world_app'
-      config.service_version = '1.0'
-      config.device      = target
-    end
-
-    Loga::Logging.reset
-  end
-
-  let(:target) { StringIO.new }
+  include_context 'loga initialize'
 
   context 'when the job is successful' do
-    let(:json_line) do
-      target.rewind
-      JSON.parse(target.read)
-    end
-
     it 'logs the job enqueue' do
       MySidekiqWorker.perform_async('Bob')
-      expect(json_line).to match(
-        'version'           => '1.1',
-        'host'              => be_a(String),
-        'short_message'     => 'MySidekiqWorker Enqueued',
-        'timestamp'         => '1450171805.123',
-        'level'             => 6,
-        '_event'            => 'job_enqueued',
-        '_service.name'     => 'hello_world_app',
-        '_service.version'  => '1.0',
-        '_job.enqueued_at'  => '1450171805.123',
-        '_job.jid'          => be_a(String),
-        '_job.params'       => ['Bob'],
-        '_job.klass'        => 'MySidekiqWorker',
-        '_job.queue'        => 'default',
-        '_job.retry'        => true,
-        '_job.duration'     => 0,
-        '_job.retried_at'   => nil,
-        '_job.failed_at'    => nil,
-        '_job.retry_count'  => nil,
+      expect(json).to match(
+        '@version'   => '1',
+        'host'       => 'bird.example.com',
+        'message'    => 'MySidekiqWorker Enqueued',
+        '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+        'severity'   => 'INFO',
+        'type'       => 'job',
+        'service'    => {
+          'name' => 'hello_world_app',
+          'version' => '1.0',
+        },
+        'event' => {
+          'retry' => true,
+          'queue' => 'default',
+          'params' => ['Bob'],
+          'jid' => be_a(String),
+          'enqueued_at' => 1_450_171_805.1230001,
+          'klass' => 'MySidekiqWorker',
+          'duration' => 0,
+        },
       )
     end
   end

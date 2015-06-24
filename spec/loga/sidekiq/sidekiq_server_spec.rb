@@ -17,10 +17,10 @@ describe Loga::Sidekiq::ServerLogger do
 
     context 'when an exception is raised' do
       it 'logs with severity ERROR' do
-        expect(logger).to receive(:error).with(type:      'job_processed',
-                                               data:      an_instance_of(Hash),
+        expect(logger).to receive(:error).with(type:      'job',
+                                               event:     an_instance_of(Hash),
                                                timestamp: an_instance_of(Time),
-                                               short_message: 'ExampleWorker Processed',
+                                               message:   'ExampleWorker Processed',
                                                exception: exception,
                                               )
         begin
@@ -38,10 +38,10 @@ describe Loga::Sidekiq::ServerLogger do
 
     context 'when no exception is raised' do
       it 'logs with severity INFO' do
-        expect(logger).to receive(:info).with(type:      'job_processed',
-                                              data:      an_instance_of(Hash),
+        expect(logger).to receive(:info).with(type:      'job',
+                                              event:     an_instance_of(Hash),
                                               timestamp: an_instance_of(Time),
-                                              short_message: 'ExampleWorker Processed',
+                                              message:   'ExampleWorker Processed',
                                               exception: nil,
                                              )
         subject.call(nil, item, nil) {}
