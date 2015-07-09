@@ -5,7 +5,7 @@
 Loga defines a single log format, logger and middleware logger
 to faciliate log aggregation.
 
-It provides provides:
+It provides:
 - Rack logger middleware to log HTTP requests
 - Sidekiq logger middleware to log jobs
 - Ruby logger
@@ -37,9 +37,9 @@ Configuration
 Loga.configure do |config|
   config.service_name    = 'marketplace'
   config.service_version = 'v1.0.0' or SHA
-  config.devices         = {
-    type: :tcp, host: 'docker.local', port: 5005
-  }
+  config.devices         = [
+    { type: :tcp, host: 'docker.local', port: 5005 }
+  ]
 end
 ```
 See LogStashLogger [README](https://github.com/dwbutler/logstash-logger)

@@ -10,7 +10,7 @@ describe Loga do
   end
 
   describe '.configure' do
-    it 'can configure Loga' do
+    it 'configures Loga' do
       expect do
         subject.configure { |c| c.service_name = 'loga' }
       end.to change { subject.configuration.service_name }
