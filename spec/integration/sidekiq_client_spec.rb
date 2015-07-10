@@ -17,7 +17,7 @@ Sidekiq.configure_client do |config|
   end
 end
 
-describe 'Sidekiq client logger' do
+describe 'Sidekiq client logger', timecop: true do
   include_context 'loga initialize'
 
   context 'when the job is successful' do

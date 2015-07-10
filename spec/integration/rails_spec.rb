@@ -29,7 +29,7 @@ RailsApp::Application.configure do |config|
                                  Loga::Rack::Logger
 end
 
-describe 'Rack request logger with Rails' do
+describe 'Rack request logger with Rails', timecop: true do
   include_context 'loga initialize'
 
   before do

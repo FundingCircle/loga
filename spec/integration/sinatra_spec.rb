@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'timecop'
 require 'sinatra'
 
-describe 'Rack request logger with Sinatra' do
+describe 'Rack request logger with Sinatra', timecop: true do
   include_context 'loga initialize'
 
   let(:app) do

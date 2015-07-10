@@ -2,10 +2,12 @@
 ENV['TZ'] = 'UTC'
 
 require 'loga'
-require 'rack/test'
 require 'pry'
+require 'rack/test'
+require 'rubocop'
 require 'support/helpers'
 require 'support/loga_initialize_shared'
+require 'support/timecop_shared.rb'
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
