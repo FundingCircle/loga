@@ -1,3 +1,6 @@
+require 'timecop'
+require 'spec_helper'
+
 describe Loga do
   before { described_class.reset }
 

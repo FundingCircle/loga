@@ -27,7 +27,7 @@ describe 'Sidekiq client logger', timecop: true do
         '@version'   => '1',
         'host'       => 'bird.example.com',
         'message'    => 'MySidekiqWorker Enqueued',
-        '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+        '@timestamp' => '2015-12-15T03:30:05.123Z',
         'severity'   => 'INFO',
         'type'       => 'job',
         'service'    => {
@@ -39,7 +39,7 @@ describe 'Sidekiq client logger', timecop: true do
           'queue' => 'default',
           'params' => ['Bob'],
           'jid' => be_a(String),
-          'enqueued_at' => 1_450_171_805.1230001,
+          'enqueued_at' => 1_450_150_205.1230001,
           'klass' => 'MySidekiqWorker',
           'duration' => 0,
         },

@@ -88,7 +88,7 @@ Loga.logger.info('Hello World')
   "@version":    "1.0",
   "host":        "example.com",
   "message":     "Hello World",
-  "@timestamp":  "2015-12-15T09:30:05.123+00:00",
+  "@timestamp":  "2015-12-15T03:30:05Z",
   "severity":    "INFO",
   "service":     {
     "name":      "hello_app",
@@ -111,7 +111,7 @@ Loga.logger.info(
   "@version":    "1.0",
   "host":        "example.com",
   "message":     "Hello World",
-  "@timestamp":  "2015-12-15T09:30:05.123+00:00",
+  "@timestamp":  "2015-12-15T03:30:05Z",
   "severity":    "INFO",
   "service":     {
     "name":      "hello_app",
@@ -133,6 +133,10 @@ Middleware augment payload with the `type` key to label events.
 | request           | HTTP request and response         | Rack                    |
 | job               | Sidekiq  job                      | SidekiqClient           |
 | default           | Event within the application      | Logger (not middleware) |
+
+## Caveat
+
+- Loga uses UTC timezone. Application specific timezone configuration is ignored.
 
 ## Contributing
 

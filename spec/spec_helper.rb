@@ -1,6 +1,3 @@
-# Set timezone to UTC
-ENV['TZ'] = 'UTC'
-
 require 'loga'
 require 'pry'
 require 'rack/test'
