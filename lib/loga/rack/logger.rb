@@ -1,5 +1,3 @@
-require 'rack/request'
-
 module Loga
   module Rack
     class Logger
@@ -11,7 +9,7 @@ module Loga
 
       def call(env)
         started_at = Time.now
-        request    = ::Rack::Request.new(env)
+        request    = Request.new(env)
 
         data               = {}
         data['method']     = request.request_method
@@ -22,9 +20,9 @@ module Loga
 
         smsg = { 'fullpath' => request.fullpath }
 
-        @app.call(env).tap do |status, headers, _body|
+        @app.call(env).tap do |status, _headers, _body|
           data['status']     = status
-          data['request_id'] = headers['X-Request-Id'] || env['action_dispatch.request_id']
+          data['request_id'] = request.uuid
           data['duration']   = duration_in_ms(started_at, Time.now)
 
           exception = env['action_dispatch.exception'] || env['sinatra.error']

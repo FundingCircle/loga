@@ -3,6 +3,7 @@ require 'loga/configuration'
 require 'loga/utilities'
 require 'loga/logstash_formatter.rb'
 require 'loga/rack/logger'
+require 'loga/rack/request'
 require 'loga/sidekiq/client_logger'
 require 'loga/sidekiq/server_logger'
 
