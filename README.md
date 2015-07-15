@@ -55,8 +55,8 @@ NOTE: must have exception handler (e.g. action_dispatch.exception)
 Rails applications
 ```ruby
 # config/application.rb
-config.middleware.insert_after Rack::MethodOverride,
-                               Loga::Rack::Logger
+config.middleware.insert_before Rails::Rack::Logger,
+                                Loga::Rack::Logger
 ```
 
 Sidekiq
