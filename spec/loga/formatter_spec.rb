@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Loga::LogStashFormatter do
+describe Loga::Formatter do
   let(:service_name)    { 'loga' }
   let(:service_version) { '725e032a' }
   let(:host)            { 'www.example.com' }

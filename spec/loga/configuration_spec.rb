@@ -25,7 +25,7 @@ describe Loga::Configuration do
     end
 
     it 'initializes the formatter with stiped service name and version' do
-      expect(Loga::LogStashFormatter).to receive(:new)
+      expect(Loga::Formatter).to receive(:new)
         .with(service_name: 'hello_world_app', service_version: '1.0', host: hostname_anchor)
       subject.initialize!
     end
