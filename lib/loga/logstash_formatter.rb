@@ -1,10 +1,10 @@
 require 'logger'
 require 'json'
+require 'active_support/tagged_logging'
 
 module Loga
   class LogStashFormatter < Logger::Formatter
-    # Support ActiveSupport tagged logger
-    include LogStashLogger::TaggedLogging::Formatter
+    include ActiveSupport::TaggedLogging::Formatter
 
     DEFAULT_TYPE = 'default'.freeze
 
@@ -36,6 +36,7 @@ module Loga
       event[:host]     = @host
       event[:severity] = severity
 
+      event.tags = current_tags
       # In case Time#to_json has been overridden
       event.timestamp = event.timestamp.utc.iso8601(3) if event.timestamp.is_a?(Time)
 

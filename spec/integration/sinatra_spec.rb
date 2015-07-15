@@ -56,6 +56,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
             'request_id' => '471a34dc',
             'duration'   => 0,
           },
+          'tags' => [],
         )
       end
     end
@@ -94,6 +95,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
             'message'   => 'Hello Sinatra Error',
             'backtrace' => be_an(Array),
           },
+          'tags' => [],
         )
       end
     end
