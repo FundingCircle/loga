@@ -37,7 +37,7 @@ module Loga
       event[:severity] = severity
 
       # In case Time#to_json has been overridden
-      event.timestamp = event.timestamp.iso8601(3) if event.timestamp.is_a?(Time)
+      event.timestamp = event.timestamp.utc.iso8601(3) if event.timestamp.is_a?(Time)
 
       event
     end

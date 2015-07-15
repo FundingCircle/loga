@@ -29,7 +29,7 @@ RailsApp::Application.configure do |config|
                                  Loga::Rack::Logger
 end
 
-describe 'Rack request logger with Rails' do
+describe 'Rack request logger with Rails', timecop: true do
   include_context 'loga initialize'
 
   before do
@@ -47,7 +47,7 @@ describe 'Rack request logger with Rails' do
         '@version'   => '1',
         'host'       => 'bird.example.com',
         'message'    => 'GET /ok?username=yoshi',
-        '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+        '@timestamp' => '2015-12-15T03:30:05.123Z',
         'severity'   => 'INFO',
         'type'       => 'request',
         'service'    => {
@@ -80,7 +80,7 @@ describe 'Rack request logger with Rails' do
         '@version'   => '1',
         'host'       => 'bird.example.com',
         'message'    => 'GET /error?username=yoshi',
-        '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+        '@timestamp' => '2015-12-15T03:30:05.123Z',
         'severity'   => 'ERROR',
         'type'       => 'request',
         'service'    => {

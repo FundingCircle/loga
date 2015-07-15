@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'timecop'
 require 'sinatra'
 
-describe 'Rack request logger with Sinatra' do
+describe 'Rack request logger with Sinatra', timecop: true do
   include_context 'loga initialize'
 
   let(:app) do
@@ -36,7 +36,7 @@ describe 'Rack request logger with Sinatra' do
           '@version'   => '1',
           'host'       => 'bird.example.com',
           'message'    => 'GET /ok?username=yoshi',
-          '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+          '@timestamp' => '2015-12-15T03:30:05.123Z',
           'severity'   => 'INFO',
           'type'       => 'request',
           'service'    => {
@@ -69,7 +69,7 @@ describe 'Rack request logger with Sinatra' do
           '@version'   => '1',
           'host'       => 'bird.example.com',
           'message'    => 'GET /error?username=yoshi',
-          '@timestamp' => '2015-12-15T09:30:05.123+00:00',
+          '@timestamp' => '2015-12-15T03:30:05.123Z',
           'severity'   => 'ERROR',
           'type'       => 'request',
           'service'    => {

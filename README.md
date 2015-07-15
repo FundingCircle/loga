@@ -5,7 +5,7 @@
 Loga defines a single log format, logger and middleware logger
 to faciliate log aggregation.
 
-It provides provides:
+It provides:
 - Rack logger middleware to log HTTP requests
 - Sidekiq logger middleware to log jobs
 - Ruby logger
@@ -37,9 +37,9 @@ Configuration
 Loga.configure do |config|
   config.service_name    = 'marketplace'
   config.service_version = 'v1.0.0' or SHA
-  config.devices         = {
-    type: :tcp, host: 'docker.local', port: 5005
-  }
+  config.devices         = [
+    { type: :tcp, host: 'docker.local', port: 5005 }
+  ]
 end
 ```
 See LogStashLogger [README](https://github.com/dwbutler/logstash-logger)
@@ -88,7 +88,7 @@ Loga.logger.info('Hello World')
   "@version":    "1.0",
   "host":        "example.com",
   "message":     "Hello World",
-  "@timestamp":  "2015-12-15T09:30:05.123+00:00",
+  "@timestamp":  "2015-12-15T03:30:05Z",
   "severity":    "INFO",
   "service":     {
     "name":      "hello_app",
@@ -111,7 +111,7 @@ Loga.logger.info(
   "@version":    "1.0",
   "host":        "example.com",
   "message":     "Hello World",
-  "@timestamp":  "2015-12-15T09:30:05.123+00:00",
+  "@timestamp":  "2015-12-15T03:30:05Z",
   "severity":    "INFO",
   "service":     {
     "name":      "hello_app",
@@ -133,6 +133,10 @@ Middleware augment payload with the `type` key to label events.
 | request           | HTTP request and response         | Rack                    |
 | job               | Sidekiq  job                      | SidekiqClient           |
 | default           | Event within the application      | Logger (not middleware) |
+
+## Caveat
+
+- Loga uses UTC timezone. Application specific timezone configuration is ignored.
 
 ## Contributing
 

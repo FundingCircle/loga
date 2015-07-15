@@ -18,13 +18,16 @@ describe Loga::LogStashFormatter do
     it 'includes default fields' do
       expect(json).to include('@version'   => '1',
                               'host'       => host,
-                              '@timestamp' => '2015-12-15T09:30:05.123+00:00',
                               'severity'   => severity,
                               'service'    => {
                                 'name'     => service_name,
                                 'version'  => service_version,
                               },
                              )
+    end
+
+    it 'outputs the timestamp in UTC' do
+      expect(json).to include('@timestamp' => '2015-12-15T03:30:05.123Z')
     end
   end
 
@@ -36,19 +39,8 @@ describe Loga::LogStashFormatter do
     let(:json)   { JSON.parse(subject) }
 
     context 'when message is a String' do
-      it 'uses the message as is' do
+      it 'uses the message as the message' do
         expect(json['message']).to eq(message)
-      end
-      it 'includes default fields' do
-        expect(json).to include('@version'   => '1',
-                                'host'       => host,
-                                '@timestamp' => '2015-12-15T09:30:05.123+00:00',
-                                'severity'   => severity,
-                                'service'    => {
-                                  'name'     => service_name,
-                                  'version'  => service_version,
-                                },
-                               )
       end
 
       include_examples 'default fields'
@@ -69,7 +61,7 @@ describe Loga::LogStashFormatter do
         let(:message) { super().merge(timestamp: time) }
 
         it 'uses the key :timestamp as the @timestamp' do
-          expect(json['@timestamp']).to eq('2010-12-15T09:30:05.323+00:00')
+          expect(json['@timestamp']).to eq('2010-12-15T09:30:05.323Z')
         end
       end
 
