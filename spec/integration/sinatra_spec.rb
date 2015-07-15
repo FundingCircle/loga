@@ -8,6 +8,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
   let(:app) do
     Class.new(Sinatra::Base) do
       set :environment, :production
+      use Loga::Rack::RequestId
       use Loga::Rack::Logger
 
       error StandardError do
@@ -30,7 +31,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
       it 'logs the request' do
         get '/ok',
             { username: 'yoshi' },
-            'HTTP_USER_AGENT' => 'Chrome'
+            'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
         expect(json).to match(
           '@version'   => '1',
@@ -52,7 +53,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
             'request_ip' => '127.0.0.1',
             'user_agent' => 'Chrome',
             'status'     => 200,
-            'request_id' => nil,
+            'request_id' => '471a34dc',
             'duration'   => 0,
           },
         )
@@ -63,7 +64,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
       it 'logs the request with the exception' do
         get '/error',
             { username: 'yoshi' },
-            'HTTP_USER_AGENT' => 'Chrome'
+            'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
         expect(json).to match(
           '@version'   => '1',
@@ -85,7 +86,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
             'request_ip' => '127.0.0.1',
             'user_agent' => 'Chrome',
             'status'     => 500,
-            'request_id' => nil,
+            'request_id' => '471a34dc',
             'duration'   => 0,
           },
           'exception' => {
