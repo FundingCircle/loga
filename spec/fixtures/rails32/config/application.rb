@@ -15,6 +15,8 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
+STREAM = StringIO.new unless defined?(STREAM)
+
 module Rails32
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
@@ -58,7 +60,10 @@ module Rails32
     # in your app. As such, your models will need to explicitly whitelist or blacklist accessible
     # parameters by using an attr_accessible or attr_protected declaration.
     # config.active_record.whitelist_attributes = true
-
-    config.middleware.insert_after Rails::Rack::Logger, Loga::Rack::Logger, [:uuid]
+    config.log_tags = [:uuid]
+    config.loga.service_name = 'hello_world_app'
+    config.loga.service_version = '1.0'
+    config.loga.host = 'bird.example.com'
+    config.loga.device = STREAM
   end
 end

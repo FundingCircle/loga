@@ -11,6 +11,8 @@ require "action_mailer/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+STREAM = StringIO.new unless defined?(STREAM)
+
 module Rails40
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
@@ -24,7 +26,10 @@ module Rails40
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
-
-    config.middleware.insert_after Rails::Rack::Logger, Loga::Rack::Logger, [:uuid]
+    config.log_tags = [:uuid]
+    config.loga.service_name = 'hello_world_app'
+    config.loga.service_version = '1.0'
+    config.loga.host = 'bird.example.com'
+    config.loga.device = STREAM
   end
 end

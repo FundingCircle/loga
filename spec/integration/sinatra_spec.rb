@@ -20,7 +20,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
     Class.new(Sinatra::Base) do
       set :environment, :production
       use Loga::Rack::RequestId
-      use Loga::Rack::Logger
+      use Loga::Rack::Logger, Loga.logger, [:uuid]
 
       error StandardError do
         status 500
@@ -61,7 +61,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
           '_request.status'     => 200,
           '_request.request_id' => '471a34dc',
           '_request.duration'   => 0,
-          '_tags'               => [],
+          '_tags'               => ['471a34dc'],
         )
       end
     end
@@ -92,7 +92,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
           '_exception.klass'     => 'StandardError',
           '_exception.message'   => 'Hello Sinatra Error',
           '_exception.backtrace' => be_a(String),
-          '_tags'               => [],
+          '_tags'               => ['471a34dc'],
         )
       end
     end

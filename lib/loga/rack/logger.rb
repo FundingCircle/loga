@@ -3,8 +3,10 @@ module Loga
     class Logger
       include Utilities
 
-      def initialize(app, taggers = nil)
+      attr_reader :logger, :taggers
+      def initialize(app, logger = nil, taggers = nil)
         @app     = app
+        @logger  = logger
         @taggers = taggers || []
       end
 
@@ -54,23 +56,19 @@ module Loga
               )
       end
 
-      def logger
-        Loga.logger
-      end
-
       def filter_parameters
         Loga.configuration.filter_parameters
       end
 
       def sanitize_params(params)
         (params || {}).each_key do |k|
-          params[k] = '[FILTERED]' if filter_parameters.include? k
+          params[k] = '[FILTERED]' if filter_parameters.map(&:to_s).include? k
         end
         params
       end
 
       def compute_tags(request)
-        @taggers.collect do |tag|
+        taggers.collect do |tag|
           case tag
           when Proc
             tag.call(request)
