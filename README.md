@@ -7,7 +7,6 @@ to faciliate log aggregation.
 
 It provides:
 - Rack logger middleware to log HTTP requests
-- Sidekiq logger middleware to log jobs
 - Ruby logger
 
 ## Road Map to v1.0.0
@@ -57,26 +56,6 @@ Rails applications
 # config/application.rb
 config.middleware.insert_before Rails::Rack::Logger,
                                 Loga::Rack::Logger
-```
-
-Sidekiq
-```ruby
-# config/initializers/sidekiq.rb
-Sidekiq.configure_server do |config|
-  config.server_middleware do |chain|
-    chain.insert_before Sidekiq::Middleware::Server::RetryJobs,
-                        Loga::Sidekiq::ServerLogger
-  end
-  config.client_middleware do |chain|
-    chain.add Loga::Sidekiq::ClientLogger
-  end
-end
-
-Sidekiq.configure_client do |config|
-  config.client_middleware do |chain|
-    chain.add Loga::Sidekiq::ClientLogger
-  end
-end
 ```
 
 Custom events
@@ -131,7 +110,6 @@ Middleware augment payload with the `type` key to label events.
 | event type        | description                       | middleware              |
 |-------------------|-----------------------------------|-------------------------|
 | request           | HTTP request and response         | Rack                    |
-| job               | Sidekiq  job                      | SidekiqClient           |
 | default           | Event within the application      | Logger (not middleware) |
 
 ## Caveat
@@ -149,6 +127,5 @@ Middleware augment payload with the `type` key to label events.
 ## Credits
 
 - [LogStashLogger](https://github.com/dwbutler/logstash-logger)
-- [Sidekiq](https://github.com/mperham/sidekiq)
 - [Rails](https://github.com/rails/rails)
 - [RackLogstasher](https://github.com/alphagov/rack-logstasher)
