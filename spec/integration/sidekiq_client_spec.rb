@@ -43,6 +43,7 @@ describe 'Sidekiq client logger', timecop: true do
           'klass' => 'MySidekiqWorker',
           'duration' => 0,
         },
+        'tags' => [],
       )
     end
   end

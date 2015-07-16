@@ -25,8 +25,8 @@ module RailsApp
 end
 
 RailsApp::Application.configure do |config|
-  config.middleware.insert_after Rack::MethodOverride,
-                                 Loga::Rack::Logger
+  config.middleware.insert_before Rails::Rack::Logger,
+                                  Loga::Rack::Logger
 end
 
 describe 'Rack request logger with Rails', timecop: true do
@@ -66,6 +66,7 @@ describe 'Rack request logger with Rails', timecop: true do
           'status'     => 200,
           'duration'   => 0,
         },
+        'tags' => [],
       )
     end
   end
@@ -104,6 +105,7 @@ describe 'Rack request logger with Rails', timecop: true do
           'message' => 'Hello Rails Error',
           'backtrace' => be_a(Array),
         },
+        'tags' => [],
       )
     end
   end

@@ -100,5 +100,24 @@ describe Loga::Rack::Logger do
         subject.call(env)
       end
     end
+
+    context 'when the logger is tagged' do
+      let(:logger) { double(:logger, tagged: true) }
+
+      before do
+        allow(subject).to receive(:call_app).with(any_args).and_return(:response)
+        allow(subject).to receive(:compute_tags).with(any_args).and_return(:tag)
+        allow(logger).to receive(:tagged).with('hello') do |&block|
+          block.call
+        end
+      end
+
+      it 'yields the app with tags' do
+        expect(logger).to receive(:tagged).with(:tag) do |&block|
+          expect(block.call).to eq(:response)
+        end
+        subject.call(env)
+      end
+    end
   end
 end
