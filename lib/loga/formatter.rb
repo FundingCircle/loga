@@ -1,10 +1,10 @@
 require 'logger'
 require 'json'
-require 'active_support/tagged_logging'
 
 module Loga
   class Formatter < Logger::Formatter
     include TaggedLogging::Formatter
+
     GELF_VERSION = '1.1'.freeze
     SYSLOG_LEVEL_MAPPING = {
       'DEBUG'   => 7,

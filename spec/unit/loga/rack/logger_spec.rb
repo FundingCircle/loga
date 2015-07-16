@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'rack/test'
 
 describe Loga::Rack::Logger do
   let(:env)    { Rack::MockRequest.env_for('/about_us?limit=1') }

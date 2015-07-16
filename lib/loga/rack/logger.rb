@@ -33,7 +33,7 @@ module Loga
 
         smsg = { 'fullpath' => request.fullpath }
 
-        @app.call(env).tap { |status, _headers, _body| data['status'] = status }
+        @app.call(env).tap { |status, _headers, _body| data['status'] = status.to_i }
       ensure
         data['duration'] = duration_in_ms(started_at, Time.now)
         exception        = env['action_dispatch.exception'] || env['sinatra.error']

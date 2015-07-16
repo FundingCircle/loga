@@ -1,42 +1,15 @@
 require 'spec_helper'
-require 'timecop'
-require 'action_controller/railtie'
-
-ENV['RAILS_ENV'] = 'production'
-module RailsApp
-  class Application < Rails::Application
-    config.secret_key_base = '572c86f5ede338bd8aba8dae0fd3a326aabababc98d1e6ce34b9f5'
-
-    routes.draw do
-      get '/ok'    => 'rails_app/static#ok'
-      get '/error' => 'rails_app/static#error'
-    end
-  end
-
-  class StaticController < ActionController::Base
-    def ok
-      render text: 'Hello Rails'
-    end
-
-    def error
-      fail StandardError, 'Hello Rails Error'
-    end
-  end
-end
-
-RailsApp::Application.configure do |config|
-  config.middleware.insert_before Rails::Rack::Logger,
-                                  Loga::Rack::Logger
-end
 
 describe 'Rack request logger with Rails', timecop: true do
-  include_context 'loga initialize'
-
-  before do
-    allow(Rails).to receive(:logger).and_return(Logger.new(StringIO.new))
+  let(:json) do
+    STREAM.rewind
+    res = JSON.parse(STREAM.read)
+    STREAM.close
+    STREAM.reopen
+    res
   end
 
-  let(:app) { RailsApp::Application }
+  let(:app) { Rails.application }
 
   context 'when the request is successful' do
     it 'logs the request' do

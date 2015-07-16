@@ -1,9 +1,20 @@
 require 'spec_helper'
-require 'timecop'
-require 'sinatra'
 
 describe 'Rack request logger with Sinatra', timecop: true do
-  include_context 'loga initialize'
+  let(:io) { StringIO.new }
+  before do
+    Loga.reset
+    Loga.configure do |config|
+      config.service_name    = 'hello_world_app'
+      config.service_version = '1.0'
+      config.device          = io
+    end
+    Loga.initialize!
+  end
+  let(:json) do
+    io.rewind
+    JSON.parse(io.read)
+  end
 
   let(:app) do
     Class.new(Sinatra::Base) do
