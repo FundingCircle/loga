@@ -93,9 +93,12 @@ describe Loga::Rack::Logger do
           .with(
             hash_including(
               event: hash_including(
-                request: hash_including('params' => { 'limit' => '1',
-                                                      'password' => '[FILTERED]' },
-                                       ),
+                request: hash_including(
+                  'params' => {
+                    'limit' => '1',
+                    'password' => '[FILTERED]',
+                  },
+                ),
               ),
             ),
           )
