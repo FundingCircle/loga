@@ -41,7 +41,7 @@ module Loga
         logger.public_send(exception ? :error : :info,
                            type:       'request',
                            message:    message(data, smsg),
-                           event:      data,
+                           event:      { request: data },
                            timestamp:  started_at,
                            exception:  exception,
                           )
