@@ -31,5 +31,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop',  '~> 0.30.0'
   spec.add_development_dependency 'sinatra',  '~> 1.4.0'
   spec.add_development_dependency 'rails',    '~> 4.1.0'
-  spec.add_development_dependency 'sidekiq',  '~> 3.0.1'
 end

@@ -5,8 +5,6 @@ require 'loga/logstash_formatter.rb'
 require 'loga/rack/logger'
 require 'loga/rack/request'
 require 'loga/rack/request_id'
-require 'loga/sidekiq/client_logger'
-require 'loga/sidekiq/server_logger'
 
 module Loga
   def self.configuration
