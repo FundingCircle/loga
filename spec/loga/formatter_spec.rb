@@ -65,8 +65,8 @@ describe Loga::Formatter do
       include_examples 'default fields'
 
       context 'when message includes a key :timestamp' do
-        let(:time)  { Time.new(2010, 12, 15, 9, 30, 5.323) }
-        let(:time_unix) { BigDecimal.new('1292405405.323') }
+        let(:time) { Time.new(2010, 12, 15, 9, 30, 5.323, '+02:00') }
+        let(:time_unix) { BigDecimal.new('1292398205.323') }
         let(:message) { super().merge(timestamp: time) }
 
         it 'uses the key :timestamp as the timestamp' do
