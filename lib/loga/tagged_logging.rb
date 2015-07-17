@@ -1,6 +1,6 @@
 require 'logger'
 
-# rubocop:disable Metrics/LineLength, Lint/AssignmentInCondition, Style/GuardClause
+# rubocop:disable Lint/UnusedMethodArgument, Style/CaseEquality, Style/IfUnlessModifier
 module Loga
   # This is a duplication of the ActiveSupport::TaggedLogging.
   module TaggedLogging
@@ -74,4 +74,4 @@ module Loga
     end
   end
 end
-# rubocop:enable Metrics/LineLength, Lint/AssignmentInCondition, Style/GuardClause
+# rubocop:enable Lint/UnusedMethodArgument, Style/CaseEquality, Style/IfUnlessModifier
