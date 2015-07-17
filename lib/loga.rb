@@ -1,6 +1,7 @@
 require 'loga/version'
 require 'loga/configuration'
 require 'loga/utilities'
+require 'loga/tagged_logging'
 require 'loga/formatter'
 require 'loga/rack/logger'
 require 'loga/rack/request'

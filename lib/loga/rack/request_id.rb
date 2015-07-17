@@ -1,7 +1,5 @@
 # Shamelessly copied from ActionDispatch::RequestId
 require 'securerandom'
-require 'active_support/core_ext/string/access'
-require 'active_support/core_ext/object/blank'
 
 # rubocop:disable Metrics/LineLength, Lint/AssignmentInCondition, Style/GuardClause
 module Loga
