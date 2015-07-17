@@ -33,7 +33,7 @@ module Loga
 
       @logger           = LogStashLogger.new(@devices)
       @logger.level     = @level
-      @logger.formatter = LogStashFormatter.new(
+      @logger.formatter = Formatter.new(
         service_name:    @service_name,
         service_version: @service_version,
         host:            @host,
