@@ -110,8 +110,7 @@ Middleware augment payload with the `type` key to label events.
 
 ## Caveat
 
-- Loga formats timestamps in seconds since UNIX epoch with 3 decimal places
-  for milliseconds. Which is in accordance with GELF 1.1 specification.
+- Loga uses UTC timezone. Application specific timezone configuration is ignored.
 
 ## Contributing
 
