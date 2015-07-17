@@ -36,13 +36,9 @@ Configuration
 Loga.configure do |config|
   config.service_name    = 'marketplace'
   config.service_version = 'v1.0.0' or SHA
-  config.devices         = [
-    { type: :tcp, host: 'docker.local', port: 5005 }
-  ]
+  config.device          = STDOUT or any instance of IO
 end
 ```
-See LogStashLogger [README](https://github.com/dwbutler/logstash-logger)
-to configure devices
 
 Rails-less applications
 ```ruby

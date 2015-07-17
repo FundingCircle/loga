@@ -3,7 +3,7 @@ require 'json'
 require 'active_support/tagged_logging'
 
 module Loga
-  class LogStashFormatter < Logger::Formatter
+  class Formatter < Logger::Formatter
     include ActiveSupport::TaggedLogging::Formatter
 
     DEFAULT_TYPE = 'default'.freeze

@@ -92,9 +92,14 @@ describe Loga::Rack::Logger do
         expect(logger).to receive(:info)
           .with(
             hash_including(
-              event: hash_including('params' => { 'limit' => '1',
-                                                  'password' => '[FILTERED]' },
-                                   ),
+              event: hash_including(
+                request: hash_including(
+                  'params' => {
+                    'limit' => '1',
+                    'password' => '[FILTERED]',
+                  },
+                ),
+              ),
             ),
           )
         subject.call(env)

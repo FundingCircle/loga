@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Loga::LogStashFormatter do
+describe Loga::Formatter do
   let(:service_name)    { 'loga' }
   let(:service_version) { '725e032a' }
   let(:host)            { 'www.example.com' }
@@ -57,7 +57,8 @@ describe Loga::LogStashFormatter do
       include_examples 'default fields'
 
       context 'when message includes a key :timestamp' do
-        let(:time)  { Time.new(2010, 12, 15, 9, 30, 5.323) }
+        let(:time) { Time.new(2010, 12, 15, 9, 30, 5.323, '+02:00') }
+        let(:time_unix) { BigDecimal.new('1292398205.323') }
         let(:message) { super().merge(timestamp: time) }
 
         it 'uses the key :timestamp as the @timestamp' do

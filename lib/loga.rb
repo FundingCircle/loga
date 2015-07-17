@@ -1,7 +1,7 @@
 require 'loga/version'
 require 'loga/configuration'
 require 'loga/utilities'
-require 'loga/logstash_formatter.rb'
+require 'loga/formatter'
 require 'loga/rack/logger'
 require 'loga/rack/request'
 require 'loga/rack/request_id'

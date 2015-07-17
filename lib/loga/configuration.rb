@@ -1,10 +1,8 @@
-require 'logstash-logger'
-
 module Loga
   class Configuration
     attr_accessor :service_name,
                   :service_version,
-                  :devices,
+                  :device,
                   :filter_parameters,
                   :level,
                   :host
@@ -15,14 +13,14 @@ module Loga
       defaults = {
         host:  Socket.gethostname,
         level: Logger::INFO,
-        devices: [{ type: :stdout }],
+        device: STDOUT,
         filter_parameters: [],
       }
 
       options = defaults.merge(opts)
 
       @host              = options[:host]
-      @devices           = options[:devices]
+      @device            = options[:device]
       @level             = options[:level]
       @filter_parameters = options[:filter_parameters]
     end
@@ -31,9 +29,9 @@ module Loga
       @service_name.to_s.strip!
       @service_version.to_s.strip!
 
-      @logger           = LogStashLogger.new(@devices)
+      @logger           = ActiveSupport::TaggedLogging.new(Logger.new(@device))
       @logger.level     = @level
-      @logger.formatter = LogStashFormatter.new(
+      @logger.formatter = Formatter.new(
         service_name:    @service_name,
         service_version: @service_version,
         host:            @host,
