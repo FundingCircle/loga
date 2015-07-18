@@ -34,7 +34,7 @@ describe 'Rack request logger with Rails', timecop: true do
         '_request.status'     => 200,
         '_request.request_id' => '471a34dc',
         '_request.duration'   => 0,
-        '_tags'               => [],
+        '_tags'               => ['471a34dc'],
       )
     end
   end
@@ -65,7 +65,7 @@ describe 'Rack request logger with Rails', timecop: true do
         '_exception.klass'     => 'StandardError',
         '_exception.message'   => 'Hello Rails Error',
         '_exception.backtrace' => be_a(String),
-        '_tags'               => [],
+        '_tags'               => ['471a34dc'],
       )
     end
   end
