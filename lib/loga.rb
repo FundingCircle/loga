@@ -1,4 +1,5 @@
 require 'loga/version'
+require 'loga/tagged_logging'
 require 'loga/configuration'
 require 'loga/utilities'
 require 'loga/formatter'

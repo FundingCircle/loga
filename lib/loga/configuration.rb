@@ -29,7 +29,7 @@ module Loga
       @service_name.to_s.strip!
       @service_version.to_s.strip!
 
-      @logger           = ActiveSupport::TaggedLogging.new(Logger.new(@device))
+      @logger           = TaggedLogging.new(Logger.new(@device))
       @logger.level     = @level
       @logger.formatter = Formatter.new(
         service_name:    @service_name,
