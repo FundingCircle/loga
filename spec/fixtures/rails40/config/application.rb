@@ -25,6 +25,6 @@ module Rails40
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    config.middleware.insert_before Rails::Rack::Logger, Loga::Rack::Logger
+    config.middleware.insert_after Rails::Rack::Logger, Loga::Rack::Logger, [:uuid]
   end
 end
