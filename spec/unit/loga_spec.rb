@@ -1,4 +1,3 @@
-require 'timecop'
 require 'spec_helper'
 
 describe Loga do

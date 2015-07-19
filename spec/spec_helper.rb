@@ -1,16 +1,35 @@
-require 'loga'
 require 'pry'
-require 'rack/test'
-require 'rubocop'
 require 'support/helpers'
-require 'support/loga_initialize_shared'
-require 'support/timecop_shared.rb'
+require 'support/timecop_shared'
+require 'rack/test'
+
+class Socket
+  def self.gethostname
+    'bird.example.com'
+  end
+end
+
+case ENV['BUNDLE_GEMFILE']
+when /rails/
+  rspec_pattern = 'integration/rails_spec.rb'
+  /(?<appraisal>rails\d{2})\.gemfile/ =~ ENV['BUNDLE_GEMFILE']
+  ENV['RAILS_ENV'] ||= 'production'
+  require 'rails'
+  require File.expand_path("../fixtures/#{appraisal}/config/environment.rb",  __FILE__)
+when /sinatra/
+  rspec_pattern = 'integration/sinatra_spec.rb'
+  require 'sinatra'
+  require 'loga'
+when /unit/
+  rspec_pattern = 'unit/**/*_spec.rb'
+  require 'loga'
+else
+  fail 'BUNDLE_GEMFILE is unknown. Ensure the appraisal is present in Appraisals'
+end
 
 RSpec.configure do |config|
-  config.include Rack::Test::Methods
   config.include Helpers
+  config.include Rack::Test::Methods
 
-  config.before do
-    allow(Socket).to receive(:gethostname).and_return(hostname_anchor)
-  end
+  config.pattern = rspec_pattern
 end
