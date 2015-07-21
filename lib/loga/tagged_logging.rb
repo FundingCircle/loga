@@ -1,4 +1,8 @@
-# Shamelessly copied from ActiveSupport::TaggedLogging
+# Copy of ActiveSupport::TaggedLogging
+#
+# Copyright and license information: https://github.com/rails/rails/blob/master/activesupport/MIT-LICENSE
+# Original contributors: https://github.com/rails/rails/commits/master/activesupport/lib/active_support/tagged_logging.rb
+
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/blank'
 require 'logger'
