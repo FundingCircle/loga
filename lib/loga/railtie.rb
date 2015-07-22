@@ -1,24 +1,20 @@
+require 'loga'
+
 module Loga
   class Railtie < Rails::Railtie
-    config.loga = ActiveSupport::OrderedOptions.new
-
-    # Consider using Loga::Configuration object instead
-    config.loga.device = STDOUT
-    config.loga.silence_rails_rack_logger = true
+    config.loga = Loga::Configuration.new
 
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
-      io = config.loga.device
+      if Rails::VERSION::MAJOR > 3
+        config.loga.device.sync = app.config.autoflush_log
+      else
+        config.loga.device.sync = true
+      end
 
-      io.sync = app.config.autoflush_log if Rails::VERSION::MAJOR > 3
+      config.loga.level = Logger.const_get(app.config.log_level.to_s.upcase)
+      config.loga.initialize!
 
-      logger = Loga::TaggedLogging.new(Logger.new(io))
-      logger.formatter = Loga::Formatter.new(host:            config.loga.host,
-                                             service_name:    config.loga.service_name,
-                                             service_version: config.loga.service_version)
-
-      logger.level = Logger.const_get(app.config.log_level.to_s.upcase)
-
-      app.config.logger = logger
+      app.config.logger = config.loga.logger
     end
 
     config.after_initialize do |app|
