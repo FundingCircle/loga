@@ -1,3 +1,6 @@
+require 'logger'
+require 'socket'
+
 module Loga
   class Configuration
     attr_accessor :service_name,
@@ -9,20 +12,15 @@ module Loga
 
     attr_reader :logger
 
-    def initialize(opts = {})
-      defaults = {
-        host:  Socket.gethostname,
-        level: Logger::INFO,
-        device: STDOUT,
-        filter_parameters: [],
-      }
-
-      options = defaults.merge(opts)
-
-      @host              = options[:host]
-      @device            = options[:device]
-      @level             = options[:level]
-      @filter_parameters = options[:filter_parameters]
+    def initialize
+      @host              = begin
+                             Socket.gethostname
+                           rescue Exception
+                             'unknown.host'
+                           end
+      @device            = STDOUT
+      @level             = Logger::INFO
+      @filter_parameters = []
     end
 
     def initialize!
@@ -37,6 +35,10 @@ module Loga
         host:            @host,
       )
       @logger
+    end
+
+    def configure
+      yield self
     end
   end
 end

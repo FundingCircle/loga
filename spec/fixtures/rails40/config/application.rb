@@ -27,9 +27,11 @@ module Rails40
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
     config.log_tags = [:uuid]
-    config.loga.service_name = 'hello_world_app'
-    config.loga.service_version = '1.0'
-    config.loga.host = 'bird.example.com'
-    config.loga.device = STREAM
+    config.loga.configure do |loga|
+      loga.service_name = 'hello_world_app'
+      loga.service_version = '1.0'
+      loga.host = 'bird.example.com'
+      loga.device = STREAM
+    end
   end
 end
