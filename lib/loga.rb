@@ -6,6 +6,7 @@ require 'loga/formatter'
 require 'loga/rack/logger'
 require 'loga/rack/request'
 require 'loga/rack/request_id'
+require 'loga/railtie' if defined?(Rails)
 
 module Loga
   def self.configuration
