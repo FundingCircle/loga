@@ -78,12 +78,18 @@ describe 'Integration with Rails', timecop: true do
       end
     end
 
-    context 'when the request includes a filtered parameter' do
-      it 'uses Rails filter_parameters configuration' do
-        get '/ok', password: 'password123'
+    describe 'when the request includes a filtered parameter' do
+      before { get '/ok', password: 'password123' }
 
+      it 'filters the parameter from the params hash' do
         expect(json).to include(
           '_request.params' => { 'password' => '[FILTERED]' },
+        )
+      end
+
+      it 'filters the parameter from the message' do
+        expect(json).to include(
+          'short_message' => 'GET /ok?password=[FILTERED]',
         )
       end
     end

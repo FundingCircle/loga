@@ -6,10 +6,9 @@ describe Loga::Rack::Logger do
   let(:app)    { double(:app) }
   let(:logger) { double(:logger) }
 
-  subject { described_class.new(app) }
+  subject { described_class.new(app, logger) }
 
   before do
-    allow(subject).to receive(:logger).and_return(logger)
     allow(logger).to receive(:info)
     allow(logger).to receive(:error)
   end
@@ -77,29 +76,6 @@ describe Loga::Rack::Logger do
                                               message:   'GET /about_us?limit=1',
                                               exception: nil,
                                              )
-        subject.call(env)
-      end
-    end
-
-    context 'when filter parameter are present' do
-      let(:env) { Rack::MockRequest.env_for('/about_us?limit=1&password=hello') }
-
-      before do
-        allow(app).to receive(:call).with(env).and_return([200, {}, ''])
-        allow(subject).to receive(:filter_parameters).and_return(%w(password username))
-      end
-
-      it 'filters the parameters' do
-        expect(logger).to receive(:info)
-          .with(
-            hash_including(
-              event: hash_including(
-                request: hash_including('params' => { 'limit' => '1',
-                                                      'password' => '[FILTERED]' },
-                                       ),
-              ),
-            ),
-          )
         subject.call(env)
       end
     end

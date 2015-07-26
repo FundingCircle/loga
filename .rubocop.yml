@@ -7,3 +7,6 @@ AllCops:
 Style/TrailingComma:
   Enabled: true
   EnforcedStyleForMultiline: comma
+
+Style/BlockDelimiters:
+  Enabled: false
