@@ -13,9 +13,7 @@ describe Loga do
 
   describe '.configure' do
     it 'configures Loga' do
-      expect do
-        subject.configure { |c| c.service_name = 'loga' }
-      end.to change { subject.configuration.service_name }
+      expect { |b| subject.configure(&b) }.to yield_with_args(subject.configuration)
     end
   end
 
