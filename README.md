@@ -115,11 +115,25 @@ Middleware augment payload with the `type` key to label events.
 
 ## Contributing
 
+### Overview
+
 1. Fork it ( https://github.com/FundingCircle/loga/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+### Running tests
+
+This project uses [`appraisal`](https://github.com/thoughtbot/appraisal/tree/v2.0.2) to run tests against different versions of dependencies (e.g. Rails, Sinatra).
+
+Once you have run bundle, you can install the test dependencies with `bundle exec appraisal install`.
+
+Run all tests with `bundle exec appraisal rspec`.
+
+You can run tests for one appraisal with `bundle exec appraisal appraisal-name rspec`.
+
+Refer to the [Appraisals](https://github.com/FundingCircle/loga/blob/master/Appraisals) file for a complete lists of appraisals.
 
 ## Credits
 
