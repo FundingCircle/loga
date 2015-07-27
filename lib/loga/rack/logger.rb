@@ -4,14 +4,15 @@ module Loga
       include Utilities
 
       attr_reader :logger, :taggers
-      def initialize(app, logger = nil, taggers = nil)
-        @app     = app
-        @logger  = logger
-        @taggers = taggers || []
+      def initialize(app, logger = nil, taggers = nil, request_klass = Request)
+        @app           = app
+        @logger        = logger
+        @taggers       = taggers || []
+        @request_klass = request_klass
       end
 
       def call(env)
-        request = Request.new(env)
+        request = @request_klass.new(env)
 
         if logger.respond_to?(:tagged)
           logger.tagged(compute_tags(request)) { call_app(request, env) }
@@ -27,44 +28,26 @@ module Loga
 
         data               = {}
         data['method']     = request.request_method
-        data['params']     = sanitize_params(request.params)
+        data['params']     = request.filtered_parameters
         data['path']       = request.path
         data['request_id'] = request.uuid
         data['request_ip'] = request.ip
         data['user_agent'] = request.user_agent
-
-        smsg = { 'fullpath' => request.fullpath }
-
+        original_filtered_path = request.filtered_path
         @app.call(env).tap { |status, _headers, _body| data['status'] = status.to_i }
       ensure
         data['duration'] = duration_in_ms(started_at, Time.now)
         exception        = env['action_dispatch.exception'] || env['sinatra.error']
 
+        message = "#{request.request_method} #{original_filtered_path}"
+
         logger.public_send(exception ? :error : :info,
                            type:       'request',
-                           message:    message(data, smsg),
+                           message:    message,
                            event:      { request: data },
                            timestamp:  started_at,
                            exception:  exception,
                           )
-      end
-
-      def message(data, smsg)
-        format('%s %s',
-               data['method'],
-               smsg['fullpath'],
-              )
-      end
-
-      def filter_parameters
-        Loga.configuration.filter_parameters
-      end
-
-      def sanitize_params(params)
-        (params || {}).each_key do |k|
-          params[k] = '[FILTERED]' if filter_parameters.map(&:to_s).include? k
-        end
-        params
       end
 
       def compute_tags(request)

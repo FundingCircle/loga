@@ -5,9 +5,10 @@ describe 'Rack request logger with Sinatra', timecop: true do
   before do
     Loga.reset
     Loga.configure do |config|
-      config.service_name    = 'hello_world_app'
-      config.service_version = '1.0'
-      config.device          = io
+      config.service_name      = 'hello_world_app'
+      config.service_version   = '1.0'
+      config.filter_parameters = [:password]
+      config.device            = io
     end
     Loga.initialize!
   end
@@ -98,5 +99,19 @@ describe 'Rack request logger with Sinatra', timecop: true do
     end
   end
 
-  pending 'when environment is development'
+  describe 'when the request includes a filtered parameter' do
+    before { get '/ok', password: 'password123' }
+
+    it 'filters the parameter from the params hash' do
+      expect(json).to include(
+        '_request.params' => { 'password' => '[FILTERED]' },
+      )
+    end
+
+    it 'filters the parameter from the message' do
+      expect(json).to include(
+        'short_message' => 'GET /ok?password=[FILTERED]',
+      )
+    end
+  end
 end

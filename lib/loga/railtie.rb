@@ -17,15 +17,12 @@ module Loga
       app.config.logger = config.loga.logger
     end
 
-    config.after_initialize do |app|
-      Loga.configuration.filter_parameters = app.config.filter_parameters
-    end
-
     initializer :loga_middleware do |app|
       app.middleware.insert_after Rails::Rack::Logger,
                                   Loga::Rack::Logger,
                                   app.config.logger,
-                                  app.config.log_tags
+                                  app.config.log_tags,
+                                  ActionDispatch::Request
 
       if config.loga.silence_rails_rack_logger
         case Rails::VERSION::MAJOR
