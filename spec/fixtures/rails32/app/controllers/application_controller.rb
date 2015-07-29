@@ -6,6 +6,6 @@ class ApplicationController < ActionController::Base
   end
 
   def error
-    fail StandardError, 'Hello Rails Error'
+    nil.name
   end
 end

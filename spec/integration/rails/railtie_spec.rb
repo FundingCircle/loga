@@ -1,13 +1,12 @@
 require 'ostruct'
 
-describe Loga::Railtie do
-  let(:app)         { Rails.application }
-  let(:middlewares) { app.middleware.middlewares }
+RSpec.describe Loga::Railtie do
+  let(:app)          { Rails.application }
+  let(:middlewares)  { app.middleware.middlewares }
+  let(:initializers) { described_class.initializers }
 
-  let(:initializer) { Loga::Railtie.initializers.find { |i| i.name == name } }
-
-  describe name = :loga_initialize_logger do
-    let(:name) { name }
+  describe 'loga_initialize_logger' do
+    let(:initializer) { initializers.find { |i| i.name == :loga_initialize_logger } }
 
     let(:app)    { OpenStruct.new(config: config) }
     let(:config) { OpenStruct.new(loga: loga, log_level: :info) }
