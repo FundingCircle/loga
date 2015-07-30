@@ -19,4 +19,10 @@ describe 'Integration with Rails', timecop: true do
   let(:json) { json_entries.last }
 
   include_examples 'request logger'
+
+  let(:json_response) { JSON.parse(last_response.body) }
+  it 'preserves rails parameters' do
+    get '/show'
+    expect(json_response).to eq('action' => 'show', 'controller' => 'application')
+  end
 end

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe Loga::Rack::Request do
-  let(:options) { {} }
-  let(:path)    { '/' }
-  let(:env)     { Rack::MockRequest.env_for(path, options) }
+  let(:options)   { {} }
+  let(:full_path) { '/' }
+  let(:env)       { Rack::MockRequest.env_for(full_path, options) }
 
   subject { described_class.new(env) }
 
@@ -26,35 +26,43 @@ describe Loga::Rack::Request do
     end
   end
 
-  describe '#filtered_path' do
+  describe '#original_path' do
+    let(:path)    { 'users/5/oranges' }
+    let(:options) { { 'loga.request.original_path' => path } }
+
+    it 'returns path based on loga request env' do
+      expect(subject.original_path).to eq(path)
+    end
+  end
+
+  describe '#filtered_full_path' do
     let(:config) { double :config, filter_parameters: [:password] }
+
+    let(:path)         { '/hello' }
+    let(:query)        { { 'password' => 123, 'color' => 'red' }  }
+    let(:query_string) { Rack::Utils.build_query(query) }
+    let(:full_path)    { "#{ path}?#{query_string}" }
+
+    let(:options) { { 'loga.request.original_path' => path } }
 
     before do
       allow(Loga).to receive(:configuration).and_return(config)
     end
 
     context 'request with sensitive parameters' do
-      let(:path) { '/hello?password=123&color=red' }
-
       it 'returns the path with sensitive parameters filtered' do
-        expect(subject.filtered_path).to eq('/hello?password=[FILTERED]&color=red')
-      end
-    end
-
-    context 'request with no parameters' do
-      let(:path) { '/hello' }
-
-      it 'returns the path as is' do
-        expect(subject.filtered_path).to eq('/hello')
+        expect(subject.filtered_full_path).to eq('/hello?password=[FILTERED]&color=red')
       end
     end
 
     it 'memoizes the result' do
-      expect(subject.filtered_path).to equal(subject.filtered_path)
+      expect(subject.filtered_full_path).to equal(subject.filtered_full_path)
     end
   end
 
   describe '#filtered_parameters' do
+    pending 'returns both query and form filered parameters'
+
     it 'memoizes the result' do
       expect(subject.filtered_parameters).to equal(subject.filtered_parameters)
     end
