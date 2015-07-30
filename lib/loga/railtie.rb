@@ -15,7 +15,7 @@ module Loga
           end.initialize!
 
           loga.logger
-        rescue Exception
+        rescue
           STDERR.write('Loga could not be initialized. ' \
                        'Using default Rails logger.')
           nil
