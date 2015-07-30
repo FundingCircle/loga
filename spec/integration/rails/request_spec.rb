@@ -94,13 +94,4 @@ describe 'Integration with Rails', timecop: true do
       end
     end
   end
-
-  describe 'Railtie' do
-    let(:middlewares) { app.middleware.middlewares }
-
-    it 'inserts Loga::Rack::Logger middleware after Rails::Rack::Logger' do
-      expect(middlewares.index(Loga::Rack::Logger))
-        .to eq(middlewares.index(Rails::Rack::Logger) + 1)
-    end
-  end
 end

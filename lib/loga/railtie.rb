@@ -2,21 +2,50 @@ require 'loga'
 
 module Loga
   class Railtie < Rails::Railtie
+    class InitializeLogger
+      def initialize(app)
+        @app = app
+      end
+
+      def call
+        app.config.logger = begin
+          loga.tap do |config|
+            config.device.sync = sync
+            config.level = constantized_log_level
+          end.initialize!
+
+          loga.logger
+        rescue Exception
+          STDERR.write('Loga could not be initialized. ' \
+                       'Using default Rails logger.')
+          nil
+        end
+      end
+
+      private
+
+      attr_reader :app
+
+      def loga
+        app.config.loga
+      end
+
+      def sync
+        Rails::VERSION::MAJOR > 3 ? app.config.autoflush_log : true
+      end
+
+      def constantized_log_level
+        Logger.const_get(app.config.log_level.to_s.upcase)
+      end
+    end
+
     config.loga = Loga::Configuration.new
 
+    # Reset Loga default device
+    config.loga.device = nil
+
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
-      if config.loga.enable
-        if Rails::VERSION::MAJOR > 3
-          config.loga.device.sync = app.config.autoflush_log
-        else
-          config.loga.device.sync = true
-        end
-
-        config.loga.level = Logger.const_get(app.config.log_level.to_s.upcase)
-        config.loga.initialize!
-
-        app.config.logger = config.loga.logger
-      end
+      InitializeLogger.new(app).call if app.config.loga.enable
     end
 
     initializer :loga_middleware do |app|

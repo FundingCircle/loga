@@ -11,7 +11,7 @@ end
 
 case ENV['BUNDLE_GEMFILE']
 when /rails/
-  rspec_pattern = 'integration/rails_spec.rb'
+  rspec_pattern = 'integration/rails/**/*_spec.rb'
   /(?<appraisal>rails\d{2})\.gemfile/ =~ ENV['BUNDLE_GEMFILE']
   ENV['RAILS_ENV'] ||= 'production'
   require 'rails'
