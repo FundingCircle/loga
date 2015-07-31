@@ -61,6 +61,8 @@ module Loga
           when 4 then require 'loga/ext/rails/rack/logger4.rb'
           end
         end
+
+        app.config.colorize_logging = false
       end
     end
   end
