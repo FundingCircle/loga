@@ -35,6 +35,15 @@ describe 'Rack request logger with Sinatra', timecop: true do
       get '/error' do
         nil.name
       end
+
+      post '/users' do
+        content_type :json
+        params.to_json
+      end
+
+      get '/new' do
+        redirect '/ok'
+      end
     end
   end
 

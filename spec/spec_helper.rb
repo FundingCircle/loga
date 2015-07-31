@@ -19,6 +19,7 @@ when /rails/
   require File.expand_path("../fixtures/#{appraisal}/config/environment.rb",  __FILE__)
 when /sinatra/
   rspec_pattern = 'integration/sinatra_spec.rb'
+  require 'json'
   require 'sinatra'
   require 'loga'
 when /unit/

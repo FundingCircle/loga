@@ -53,8 +53,7 @@ module Loga
         app.middleware.insert_after Rails::Rack::Logger,
                                     Loga::Rack::Logger,
                                     app.config.logger,
-                                    app.config.log_tags,
-                                    ActionDispatch::Request
+                                    app.config.log_tags
 
         if config.loga.silence_rails_rack_logger
           case Rails::VERSION::MAJOR
