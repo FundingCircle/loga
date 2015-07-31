@@ -1,9 +1,10 @@
 Rails40::Application.routes.draw do
-  get 'ok' => 'application#ok'
-  get 'error' => 'application#error'
-  get 'show' => 'application#show'
-  post 'users' => 'application#create'
-  get 'new' => 'application#new'
+  get 'ok'        => 'application#ok'
+  get 'error'     => 'application#error'
+  get 'show'      => 'application#show'
+  post 'users'    => 'application#create'
+  get 'new'       => 'application#new'
+  put 'users/:id' => 'application#update'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

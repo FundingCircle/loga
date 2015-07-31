@@ -46,4 +46,27 @@ RSpec.describe Loga::Railtie do
   it 'disables colorized logging' do
     expect(app.config.colorize_logging).to eq(false)
   end
+
+  describe 'instrumentation' do
+    let(:listeners)   do
+      ActiveSupport::Notifications.notifier.listeners_for(notification)
+    end
+    let(:subscribers) do
+      listeners.map { |l| l.instance_variable_get(:@delegate).class }
+    end
+
+    context 'ActionView' do
+      [
+        'render_collection.action_view',
+        'render_partial.action_view',
+        'render_template.action_view',
+      ].each do |notification|
+        let(:notification) { notification }
+
+        it 'removes ActionView::LogSubscriber' do
+          expect(subscribers).to_not include(ActionView::LogSubscriber)
+        end
+      end
+    end
+  end
 end
