@@ -64,6 +64,26 @@ describe Loga::Rack::Logger do
       end
     end
 
+    context 'when the exception is ActionController::RoutingError' do
+      let(:exception) { double(class: 'ActionController::RoutingError') }
+      let(:app) do
+        lambda do |env|
+          env['action_dispatch.exception'] = exception
+          [404, {}, '']
+        end
+      end
+
+      it 'does not log the exception' do
+        expect(logger).to receive(:info).with(type:      'request',
+                                              event:     an_instance_of(Hash),
+                                              timestamp: an_instance_of(Time),
+                                              message:   'GET /about_us?limit=1',
+                                              exception: nil,
+                                             )
+        subject.call(env)
+      end
+    end
+
     context 'when no exception is raised' do
       before do
         allow(app).to receive(:call).with(env).and_return([200, {}, ''])

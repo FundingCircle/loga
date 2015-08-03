@@ -23,12 +23,21 @@ module Loga
 
       private
 
+      attr_reader :data, :env, :request, :started_at
+
       def call_app(request, env)
-        started_at = Time.now
-        data = {}
+        @data       = {}
+        @env        = env
+        @request    = request
+        @started_at = Time.now
 
         @app.call(env).tap { |status, _headers, _body| data['status'] = status.to_i }
       ensure
+        set_data
+        send_message
+      end
+
+      def set_data
         data['method']     = request.request_method
         data['path']       = request.original_path
         data['params']     = request.filtered_parameters
@@ -36,17 +45,31 @@ module Loga
         data['request_ip'] = request.ip
         data['user_agent'] = request.user_agent
         data['duration']   = duration_in_ms(started_at, Time.now)
-        exception          = env['action_dispatch.exception'] || env['sinatra.error']
+      end
 
+      def send_message
         message = "#{request.request_method} #{request.filtered_full_path}"
-
-        logger.public_send(exception ? :error : :info,
-                           type:       'request',
-                           message:    message,
-                           event:      { request: data },
-                           timestamp:  started_at,
-                           exception:  exception,
+        logger.public_send(compute_level,
+                           type:      'request',
+                           message:   message,
+                           event:     { request: data },
+                           timestamp: started_at,
+                           exception: fetch_exception,
                           )
+      end
+
+      def compute_level
+        fetch_exception ? :error : :info
+      end
+
+      def fetch_exception
+        (env['action_dispatch.exception'] || env['sinatra.error']).tap do |e|
+          return filtered_exceptions.include?(e.class.to_s) ? nil : e
+        end
+      end
+
+      def filtered_exceptions
+        %w(ActionController::RoutingError Sinatra::NotFound)
       end
 
       def compute_tags(request)
