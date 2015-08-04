@@ -14,12 +14,18 @@ describe Loga::Formatter do
 
   subject { described_class.new(options) }
 
-  shared_examples 'default fields' do
-    it 'includes default fields' do
-      expect(json).to include('version'          => '1.1',
-                              'host'             => host,
+  shared_examples 'valid GELF message' do
+    it 'includes the required fields' do
+      expect(json).to include('version'       => '1.1',
+                              'host'          => host,
+                              'short_message' => be_a(String),
+                              'timestamp'     => be_a(Float),
                               'level'         => 6,
-                              '_service.name'    => service_name,
+                             )
+    end
+
+    it 'includes Loga additional fields' do
+      expect(json).to include('_service.name'    => service_name,
                               '_service.version' => service_version,
                               '_tags'            => [],
                              )
@@ -42,7 +48,7 @@ describe Loga::Formatter do
         expect(json['short_message']).to eq(message)
       end
 
-      include_examples 'default fields'
+      include_examples 'valid GELF message'
     end
 
     context 'when message is a nil' do
@@ -51,7 +57,7 @@ describe Loga::Formatter do
         expect(json['short_message']).to eq('')
       end
 
-      include_examples 'default fields'
+      include_examples 'valid GELF message'
     end
 
     context 'when message is a Hash' do
@@ -62,7 +68,7 @@ describe Loga::Formatter do
           expect(json['short_message']).to eq(message[:message])
         end
       end
-      include_examples 'default fields'
+      include_examples 'valid GELF message'
 
       context 'when message includes a key :timestamp' do
         let(:time) { Time.new(2010, 12, 15, 9, 30, 5.323, '+02:00') }
