@@ -2,9 +2,10 @@ require 'spec_helper'
 require 'rack/test'
 
 describe Loga::Rack::Logger do
-  let(:env)    { Rack::MockRequest.env_for('/about_us?limit=1') }
-  let(:app)    { double(:app) }
-  let(:logger) { double(:logger) }
+  let(:env)     { Rack::MockRequest.env_for('/about_us?limit=1', options) }
+  let(:options) { {} }
+  let(:app)     {  ->(_env) { [response_status, {}, ''] } }
+  let(:logger)  { double(:logger) }
 
   subject { described_class.new(app, logger) }
 
@@ -13,13 +14,50 @@ describe Loga::Rack::Logger do
     allow(logger).to receive(:error)
   end
 
+  shared_examples 'logs the event' do |details|
+    let(:level) { details[:level] }
+
+    before do
+      allow(subject).to receive(:started_at).and_return(:timestamp)
+      allow(subject).to receive(:duration_in_ms).with(any_args).and_return(:duration)
+    end
+
+    it 'instantiates a Loga::Event' do
+      expect(Loga::Event).to receive(:new).with(
+        data:      {
+          request: {
+            'status'     => response_status,
+            'method'     => 'GET',
+            'path'       => '/about_us',
+            'params'     => { 'limit' => '1' },
+            'request_id' => nil,
+            'request_ip' => nil,
+            'user_agent' => nil,
+            'duration'   => :duration,
+          },
+        },
+        exception: logged_exception,
+        message:   'GET /about_us?limit=1',
+        timestamp: :timestamp,
+        type:      'request',
+      )
+
+      subject.call(env)
+    end
+
+    it "logs the Loga::Event with severity #{details[:level]}" do
+      expect(logger).to receive(level).with(an_instance_of(Loga::Event))
+      subject.call(env)
+    end
+  end
+
   describe '#call(env)' do
-    let(:exception) { StandardError.new }
+    let(:exception)        { StandardError.new }
+    let(:logged_exception) { nil }
+    let(:response_status)  { 200 }
 
     context 'when an exception is raised' do
-      before do
-        allow(app).to receive(:call).with(env).and_raise(exception)
-      end
+      let(:app) {  ->(_env) { fail exception } }
 
       it 'does not rescue the exception' do
         expect { subject.call(env) }.to raise_error(StandardError)
@@ -27,77 +65,31 @@ describe Loga::Rack::Logger do
     end
 
     context 'when an exception wrapped by ActionDispatch' do
-      let(:app) do
-        lambda do |env|
-          env['action_dispatch.exception'] = exception
-          [500, {}, '']
-        end
-      end
+      let(:response_status)  { 500 }
+      let(:logged_exception) { exception }
+      let(:options)          { { 'action_dispatch.exception' => exception } }
 
-      it 'logs the exception' do
-        expect(logger).to receive(:error).with(type:      'request',
-                                               event:     an_instance_of(Hash),
-                                               timestamp: an_instance_of(Time),
-                                               message:   'GET /about_us?limit=1',
-                                               exception: exception,
-                                              )
-        subject.call(env)
-      end
+      include_examples 'logs the event', level: :error
     end
 
     context 'when an exception wrapped by Sinatra' do
-      let(:app) do
-        lambda do |env|
-          env['sinatra.error'] = exception
-          [500, {}, '']
-        end
-      end
+      let(:response_status)  { 500 }
+      let(:logged_exception) { exception }
+      let(:options)          { { 'sinatra.error' => exception } }
 
-      it 'logs the exception' do
-        expect(logger).to receive(:error).with(type:      'request',
-                                               event:     an_instance_of(Hash),
-                                               timestamp: an_instance_of(Time),
-                                               message:   'GET /about_us?limit=1',
-                                               exception: exception,
-                                              )
-        subject.call(env)
-      end
+      include_examples 'logs the event', level: :error
     end
 
     context 'when the exception is ActionController::RoutingError' do
-      let(:exception) { double(class: 'ActionController::RoutingError') }
-      let(:app) do
-        lambda do |env|
-          env['action_dispatch.exception'] = exception
-          [404, {}, '']
-        end
-      end
+      let(:response_status) { 404 }
+      let(:exception)       { double(class: 'ActionController::RoutingError') }
+      let(:options)         { { 'action_dispatch.exception' => exception } }
 
-      it 'does not log the exception' do
-        expect(logger).to receive(:info).with(type:      'request',
-                                              event:     an_instance_of(Hash),
-                                              timestamp: an_instance_of(Time),
-                                              message:   'GET /about_us?limit=1',
-                                              exception: nil,
-                                             )
-        subject.call(env)
-      end
+      include_examples 'logs the event', level: :info
     end
 
     context 'when no exception is raised' do
-      before do
-        allow(app).to receive(:call).with(env).and_return([200, {}, ''])
-      end
-
-      it 'logs with severity INFO' do
-        expect(logger).to receive(:info).with(type:      'request',
-                                              event:     an_instance_of(Hash),
-                                              timestamp: an_instance_of(Time),
-                                              message:   'GET /about_us?limit=1',
-                                              exception: nil,
-                                             )
-        subject.call(env)
-      end
+      include_examples 'logs the event', level: :info
     end
 
     context 'when the logger is tagged' do

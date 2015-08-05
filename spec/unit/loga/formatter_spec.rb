@@ -4,7 +4,7 @@ describe Loga::Formatter do
   let(:service_name)    { 'loga' }
   let(:service_version) { '725e032a' }
   let(:host)            { 'www.example.com' }
-  let(:options) do
+  let(:params) do
     {
       service_name:    service_name,
       service_version: service_version,
@@ -12,7 +12,7 @@ describe Loga::Formatter do
     }
   end
 
-  subject { described_class.new(options) }
+  subject { described_class.new(params) }
 
   shared_examples 'valid GELF message' do
     it 'includes the required fields' do
@@ -43,91 +43,126 @@ describe Loga::Formatter do
     let(:message)  { 'Tree house magic' }
     let(:json)     { JSON.parse(subject) }
 
-    context 'when message is a String' do
-      it 'uses the message as the short_message' do
+    context 'when the message parameter is a String' do
+      it 'the short_message is that String' do
         expect(json['short_message']).to eq(message)
       end
 
       include_examples 'valid GELF message'
     end
 
-    context 'when message is a nil' do
+    context 'when the message parameter is a nil' do
       let(:message) { nil }
-      it 'uses the message as the short_message' do
+      it 'the short_message is empty' do
         expect(json['short_message']).to eq('')
       end
 
       include_examples 'valid GELF message'
     end
 
-    context 'when message is a Hash' do
+    context 'when message parameter is a Hash' do
       let(:message) { { message: 'Wooden house' } }
 
-      context 'when message includes a key :message' do
-        it 'uses the key :message as the short_message' do
-          expect(json['short_message']).to eq(message[:message])
-        end
+      it 'the short_message is a String reprentation of that Hash' do
+        expect(json['short_message']).to eq('{:message=>"Wooden house"}')
       end
+
+      include_examples 'valid GELF message'
+    end
+
+    context 'when message parameter is an Object' do
+      let(:message) { Object.new }
+
+      it 'the short_message is a String reprentation of that Object' do
+        expect(json['short_message']).to match(/#<Object:\dx\h+>/)
+      end
+
+      include_examples 'valid GELF message'
+    end
+
+    context 'when the message parameter is a Loga::Event' do
+      let(:options) { { message: 'Wooden house' } }
+      let(:message) { Loga::Event.new(options) }
+
       include_examples 'valid GELF message'
 
-      context 'when message includes a key :timestamp' do
-        let(:time) { Time.new(2010, 12, 15, 9, 30, 5.323, '+02:00') }
-        let(:time_unix) { BigDecimal.new('1292398205.323') }
-        let(:message) { super().merge(timestamp: time) }
+      it 'the short_message is the Event message' do
+        expect(json['short_message']).to eq(message.message)
+      end
 
-        it 'uses the key :timestamp as the timestamp' do
-          expect(json['timestamp']).to eq(time_unix)
+      context 'when the Event has a timestamp' do
+        let(:time)         { Time.new(2010, 12, 15, 9, 30, 5.323, '+02:00') }
+        let(:time_in_unix) { BigDecimal.new('1292398205.323') }
+        let(:options)      { { timestamp: time } }
+
+        it 'uses the Event timestamp' do
+          expect(json['timestamp']).to eq(time_in_unix)
         end
       end
 
-      describe ':type' do
-        context 'when present' do
-          let(:type)  { 'request' }
-          let(:message) { super().merge(type: type) }
+      context 'when the Event has a type' do
+        let(:options)    { { type: 'request' } }
 
-          specify { expect(json['_type']).to eq(type) }
+        specify { expect(json['_type']).to eq(message.type) }
+      end
+
+      context 'when the Event no type' do
+        specify { expect(json).to_not include('_type') }
+      end
+
+      context 'when the Event has an exception' do
+        let(:backtrace) { %w(a b) }
+        let(:exception) do
+          StandardError.new('Foo Error').tap { |e| e.set_backtrace backtrace }
         end
-        context 'when absent' do
-          specify { expect(json['_type']).to eq('default') }
+        let(:options)   { { exception: exception } }
+
+        specify { expect(json['_exception.klass']).to eq('StandardError') }
+        specify { expect(json['_exception.message']).to eq('Foo Error') }
+        specify { expect(json['_exception.backtrace']).to eq("a\nb") }
+
+        context 'when the backtrace is larger than 10 lines' do
+          let(:backtrace) { ('a'..'z').to_a }
+          it 'truncates the backtrace' do
+            expect(json['_exception.backtrace']).to eq("a\nb\nc\nd\ne\nf\ng\nh\ni\nj")
+          end
         end
       end
 
-      describe ':exception' do
-        context 'when present' do
-          let(:backtrace) { %w(a b) }
-          let(:exception) do
-            StandardError.new('Foo Error').tap { |e| e.set_backtrace backtrace }
-          end
-          let(:message) do
-            super().merge(exception: exception)
-          end
-
-          specify { expect(json['_exception.klass']).to eq('StandardError') }
-          specify { expect(json['_exception.message']).to eq('Foo Error') }
-          specify { expect(json['_exception.backtrace']).to eq("a\nb") }
-
-          context 'when the backtrace is larger than 10 lines' do
-            let(:backtrace) { ('a'..'z').to_a }
-            it 'truncates the backtrace' do
-              expect(json['_exception.backtrace']).to eq("a\nb\nc\nd\ne\nf\ng\nh\ni\nj")
-            end
-          end
-        end
-        context 'when absent' do
-          specify { expect(json).to_not include(/_exception.+/) }
-        end
+      context 'when the Event has no exception' do
+        specify { expect(json).to_not include(/_exception.+/) }
       end
 
-      describe ':event' do
-        context 'when present' do
-          let(:event) { { user_id: 1 } }
-          let(:message) { super().merge(event: event) }
+      context 'when the Event has data' do
+        let(:options) do
+          {
+            data: {
+              user_id: 1,
+              user: {
+                email: 'hello@world.com',
+                address: {
+                  postcode: 'ABCD',
+                },
+              },
+            },
+          }
+        end
 
-          specify { expect(json['_user_id']).to eq(1) }
+        specify { expect(json['_user_id']).to eq(1) }
+        specify { expect(json['_user.email']).to eq('hello@world.com') }
+        specify { expect(json['_user.address']).to eq('postcode' => 'ABCD') }
+      end
+
+      context 'when the Event data contains fiels identical to the formatter fields' do
+        let(:options) do
+          {
+            data: {
+              service: { name: 'Malicious Tags' },
+            },
+          }
         end
-        context 'when absent' do
-          specify { expect(json).to_not include('_event') }
-        end
+
+        include_examples 'valid GELF message'
       end
     end
 

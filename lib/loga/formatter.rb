@@ -23,31 +23,40 @@ module Loga
     end
 
     def call(severity, time, _progname, message)
-      event = compute_extra_fields(
-        message_extra_fields(message).merge!(base_extra_fields),
-      )
+      event = build_event(time, message)
+      payload = format_additional_fields(event.data)
 
-      event[:short_message] = compute_message(message)
-      event[:timestamp]     = compute_timestamp(message, time)
-      event[:host]          = @host
-      event[:level]         = compute_level(severity)
-      event[:version]       = GELF_VERSION
+      payload[:short_message] = event.message
+      payload[:timestamp]     = compute_timestamp(event.timestamp)
+      payload[:host]          = @host
+      payload[:level]         = compute_level(severity)
+      payload[:version]       = GELF_VERSION
 
-      "#{event.to_json}\n"
+      "#{payload.to_json}\n"
     end
 
     private
 
-    def compute_message(message)
-      (message.is_a?(Hash) ? message[:message] : message).to_s
+    def build_event(time, data)
+      event = case data
+              when Loga::Event
+                data
+              else
+                Loga::Event.new(message: data.to_s)
+              end
+
+      event.timestamp ||= time
+      event.data ||= {}
+      event.data.tap do |hash|
+        hash.merge! compute_exception(event.exception)
+        hash.merge! compute_type(event.type)
+        # Overwrite hash with Loga's additional fields
+        hash.merge! loga_additional_fields
+      end
+      event
     end
 
-    def compute_timestamp(message, time)
-      timestamp = if message.is_a?(Hash) && message[:timestamp].is_a?(Time)
-                    message[:timestamp]
-                  else
-                    time
-                  end
+    def compute_timestamp(timestamp)
       (timestamp.to_f * 1000).floor / 1000.0
     end
 
@@ -55,7 +64,7 @@ module Loga
       SYSLOG_LEVEL_MAPPING[severity]
     end
 
-    def compute_extra_fields(fields)
+    def format_additional_fields(fields)
       fields.each_with_object({}) do |(main_key, values), hash|
         if values.is_a?(Hash)
           values.each do |sub_key, sub_values|
@@ -64,27 +73,25 @@ module Loga
         else
           hash["_#{main_key}"] = values
         end
-        hash
       end
     end
 
-    def message_extra_fields(message)
-      return {} unless message.is_a?(Hash)
-      event        = message[:event] || {}
-      event[:type] = message[:type] || DEFAULT_TYPE
-
-      exception = message[:exception]
-      if exception
-        event[:exception] = {
+    def compute_exception(exception)
+      return {} unless exception
+      {
+        exception: {
           klass:     exception.class.to_s,
           message:   exception.message,
           backtrace: exception.backtrace.first(10).join("\n"),
-        }
-      end
-      event
+        },
+      }
     end
 
-    def base_extra_fields
+    def compute_type(type)
+      type ? { type: type } : {}
+    end
+
+    def loga_additional_fields
       {
         service: {
           name:    @service_name,

@@ -48,14 +48,18 @@ module Loga
       end
 
       def send_message
-        message = "#{request.request_method} #{request.filtered_full_path}"
-        logger.public_send(compute_level,
-                           type:      'request',
-                           message:   message,
-                           event:     { request: data },
-                           timestamp: started_at,
-                           exception: fetch_exception,
-                          )
+        event = Loga::Event.new(
+          data:       { request: data },
+          exception:  fetch_exception,
+          message:    compute_message,
+          timestamp:  started_at,
+          type:       'request',
+        )
+        logger.public_send(compute_level, event)
+      end
+
+      def compute_message
+        "#{request.request_method} #{request.filtered_full_path}"
       end
 
       def compute_level
