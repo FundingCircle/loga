@@ -42,4 +42,8 @@ RSpec.describe Loga::Railtie do
     expect(middlewares.index(Loga::Rack::Logger))
       .to eq(middlewares.index(Rails::Rack::Logger) + 1)
   end
+
+  it 'disables colorized logging' do
+    expect(app.config.colorize_logging).to eq(false)
+  end
 end
