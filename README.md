@@ -17,86 +17,81 @@ Follow the [milestone](https://github.com/FundingCircle/loga/milestones/The%20ro
 
 Add this line to your application's Gemfile:
 
-    gem 'loga'
+    gem 'loga', git: 'git@github.com:FundingCircle/loga.git'
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install loga
-
 ## Usage
 
-Configuration
+Loga integrates well with Rails and Sinatra frameworks. It also works in projects
+using plain Ruby.
+
+### Rails applications
+
+In Rails applications initialization and middleware insertion is catered by
+the Railtie.
+
 ```ruby
-# config/initializers/loga.rb
+# config/environments/production.rb
+...
+config.loga.configure do |loga|
+  loga.service_name    = 'marketplace'
+  loga.service_version = 'v1.0.0' or SHA
+  config.device        = STDOUT or any instance of IO
+end
+...
+```
+
+### Ruby and Sinatra/Rack applications
+
+In Ruby applications Loga must be required and configured.
+
+```ruby
+# .../initializers/loga.rb
+require 'loga'
 
 Loga.configure do |config|
-  config.service_name    = 'marketplace'
-  config.service_version = 'v1.0.0' or SHA
-  config.device          = STDOUT or any instance of IO
+  config.service_name      = 'marketplace'
+  config.service_version   = 'v1.0.0' or SHA
+  config.device            = STDOUT or any instance of IO
 end
-```
+Loga.initialize!
 
-Rails-less applications
+```
+Log requests in Rack applications with Loga middleware.
+
+`RequestId` and `Logger` must be inserted early in the middleware chain.
+
 ```ruby
 # config.ru
-use Loga::Rack::Logger
-```
-NOTE: must have exception handler (e.g. action_dispatch.exception)
+use Loga::Rack::RequestId
+use Loga::Rack::Logger, Loga.logger
 
-Rails applications
-```ruby
-# config/application.rb
-config.middleware.insert_after Rails::Rack::Logger,
-                               Loga::Rack::Logger
+user Marketplace
+run Sinatra::Application
 ```
 
-Custom events
+
+## Sample output
+
 ```ruby
 # Anywhere in your application
-# Passing a String
 Loga.logger.info('Hello World')
-=> '{
-  "@version":    "1.0",
-  "host":        "example.com",
-  "message":     "Hello World",
-  "@timestamp":  "2015-12-15T03:30:05Z",
-  "severity":    "INFO",
-  "service":     {
-    "name":      "hello_app",
-    "version":   "abcdef"
-  },
-  "type":        "default"
-}'
-
-# Passing a Hash
-Loga.logger.info(
-  message:       'Hello World',  # REQUIRED
-  type:          'cron',         # OPTIONAL
-  timestamp:     Time,           # OPTIONAL
-  event:         {               # OPTIONAL
-    'color' =>   'red',
-  },
-  exception:     Exception,      # OPTIONAL
-)
-=> '{
-  "@version":    "1.0",
-  "host":        "example.com",
-  "message":     "Hello World",
-  "@timestamp":  "2015-12-15T03:30:05Z",
-  "severity":    "INFO",
-  "service":     {
-    "name":      "hello_app",
-    "version":   "abcdef"
-  },
-  "event":       {
-    "color":     "red"
-  },
-  "type":        "cron"
-}'
+```
+```json
+//GELF Output
+{
+  "version":           "1.1",
+  "host":              "example.com",
+  "short_message":     "Hello World",
+  "timestamp":         1450150205.123,
+  "level":             6,
+  "_service.name":     "marketplace",
+  "_service.version":  "v1.0.0",
+  "_tags":             []
+}
 ```
 
 ## Event types
@@ -106,7 +101,6 @@ Middleware augment payload with the `type` key to label events.
 | event type        | description                       | middleware              |
 |-------------------|-----------------------------------|-------------------------|
 | request           | HTTP request and response         | Rack                    |
-| default           | Event within the application      | Logger (not middleware) |
 
 ## Caveat
 
