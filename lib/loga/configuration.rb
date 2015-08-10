@@ -1,5 +1,7 @@
 require 'logger'
 require 'socket'
+require 'active_support'
+require 'active_support/core_ext/object/blank'
 
 module Loga
   class Configuration
@@ -19,6 +21,7 @@ module Loga
       @device            = STDOUT
       @level             = Logger::INFO
       @filter_parameters = []
+      @service_version   = :git
 
       # Rails specific configuration
       @enable            = true
@@ -27,7 +30,7 @@ module Loga
 
     def initialize!
       @service_name.to_s.strip!
-      @service_version.to_s.strip!
+      @service_version = compute_service_version
 
       @logger           = TaggedLogging.new(Logger.new(@device))
       @logger.level     = @level
@@ -44,6 +47,28 @@ module Loga
     end
 
     private
+
+    class GitRevisionStrategy
+      DEFAULT_REVISION = 'unknown.sha'.freeze
+
+      def self.call
+        revision = fetch_revision   if binary_available?
+        revision = DEFAULT_REVISION if revision.blank?
+        revision
+      end
+
+      def self.binary_available?
+        system 'which -s git'
+      end
+
+      def self.fetch_revision
+        `git rev-parse HEAD`.strip
+      end
+    end
+
+    def compute_service_version
+      service_version == :git ? GitRevisionStrategy.call : service_version.strip
+    end
 
     def gethostname
       Socket.gethostname

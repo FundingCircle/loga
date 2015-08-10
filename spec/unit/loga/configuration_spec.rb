@@ -8,7 +8,7 @@ describe Loga::Configuration do
       specify { expect(subject.device).to eq(STDOUT) }
       specify { expect(subject.filter_parameters).to eq([]) }
       specify { expect(subject.service_name).to eq(nil) }
-      specify { expect(subject.service_version).to eq(nil) }
+      specify { expect(subject.service_version).to eq(:git) }
     end
 
     context 'when hostname cannot be resolved' do
@@ -36,6 +36,14 @@ describe Loga::Configuration do
               service_version: '1.0',
               host: hostname_anchor)
       subject.initialize!
+    end
+
+    context 'when service_version is :git' do
+      before { subject.service_version = :git }
+      it 'computes the service_version with git' do
+        subject.initialize!
+        expect(subject.service_version).to match(/\h+/)
+      end
     end
   end
 
