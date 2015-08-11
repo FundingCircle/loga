@@ -27,14 +27,6 @@ RSpec.describe Loga::Railtie do
       it 'initializes the logger' do
         expect(config.logger).to be_a(Logger)
       end
-
-      context 'when the log device is nil' do
-        let(:loga) { Loga::Configuration.new.tap { |c| c.device = nil } }
-
-        it 'is not initialized' do
-          expect(config.logger).to be_nil
-        end
-      end
     end
   end
 
