@@ -8,6 +8,7 @@ module Loga
     attr_accessor :service_name,
                   :service_version,
                   :device,
+                  :sync,
                   :filter_parameters,
                   :level,
                   :host,
@@ -18,8 +19,9 @@ module Loga
 
     def initialize
       @host              = gethostname
-      @device            = STDOUT
-      @level             = Logger::INFO
+      @device            = nil
+      @sync              = true
+      @level             = :info
       @filter_parameters = []
       @service_version   = :git
 
@@ -32,14 +34,7 @@ module Loga
       @service_name.to_s.strip!
       @service_version = compute_service_version
 
-      @logger           = TaggedLogging.new(Logger.new(@device))
-      @logger.level     = @level
-      @logger.formatter = Formatter.new(
-        service_name:    @service_name,
-        service_version: @service_version,
-        host:            @host,
-      )
-      @logger
+      initialize_logger
     end
 
     def configure
@@ -68,6 +63,28 @@ module Loga
 
     def compute_service_version
       service_version == :git ? GitRevisionStrategy.call : service_version.strip
+    end
+
+    def initialize_logger
+      device.sync = sync
+
+      logger           = Logger.new(device)
+      logger.formatter = Formatter.new(
+        service_name:    service_name,
+        service_version: service_version,
+        host:            host,
+      )
+      logger.level     = constantized_log_level
+    rescue
+      logger           = Logger.new(STDERR)
+      logger.level     = Logger::ERROR
+      logger.error 'Loga could not be initialized'
+    ensure
+      @logger          = TaggedLogging.new(logger)
+    end
+
+    def constantized_log_level
+      Logger.const_get(level.to_s.upcase)
     end
 
     def gethostname

@@ -8,18 +8,12 @@ module Loga
       end
 
       def call
-        app.config.logger = begin
-          loga.tap do |config|
-            config.device.sync = sync
-            config.level = constantized_log_level
-          end.initialize!
-
-          loga.logger
-        rescue
-          STDERR.write('Loga could not be initialized. ' \
-                       'Using default Rails logger.')
-          nil
+        loga.tap do |config|
+          config.sync  = sync
+          config.level = app.config.log_level
         end
+        loga.initialize!
+        app.config.logger = loga.logger
       end
 
       private
@@ -40,9 +34,6 @@ module Loga
     end
 
     config.loga = Loga::Configuration.new
-
-    # Reset Loga default device
-    config.loga.device = nil
 
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
       InitializeLogger.new(app).call if app.config.loga.enable
