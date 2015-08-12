@@ -22,4 +22,9 @@ class ApplicationController < ActionController::Base
   def new
     redirect_to :ok
   end
+
+  def update
+    @id = params[:id]
+    render '/user'
+  end
 end
