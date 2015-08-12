@@ -70,15 +70,15 @@ run Sinatra::Application
 
 ### Configuration
 
-```ruby
-<loga configuration object>.configure do |loga|
-  loga.service_name    = 'marketplace'
-  loga.service_version = 'v1.0.0' or strategy # default :git
-  loga.device           = STDOUT or any instance of IO
-end
-```
-
-The service_version :git strategy fetches the git revision of the application.
+| Option          | Type          | Default | Description                                                                                        |
+|-----------------|---------------|---------|----------------------------------------------------------------------------------------------------|
+| host            | String        | nil     | Service hostname. When nil the hostname is computed with `Socket.gethostname`                      |
+| service_version | String/Symbol | :get    | Service version is embedded in every message. When Symbol the version is computed with a strategy. |
+| service_name    | String        | nil     | Service name is embedded in every message                                                          |
+| device          | IO            | nil     | The device the logger writes to                                                                    |
+| sync            | Boolean       | true    | Sync IO                                                                                            |
+| level           | Symbol        | :info   | The level to logger logs at                                                                        |
+| enabled         | Boolean       | true    | Enable/Disable Loga in Rails                                                                       |
 
 ## Sample output
 

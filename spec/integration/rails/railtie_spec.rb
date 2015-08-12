@@ -14,7 +14,7 @@ RSpec.describe Loga::Railtie do
     before { initializer.run(app) }
 
     context 'when loga is disabled' do
-      let(:loga) { Loga::Configuration.new.tap { |c| c.enable = false } }
+      let(:loga) { Loga::Configuration.new.tap { |c| c.enabled = false } }
 
       it 'is not initialized' do
         expect(config.logger).to be_nil

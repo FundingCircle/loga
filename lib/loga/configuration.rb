@@ -12,7 +12,7 @@ module Loga
                   :filter_parameters,
                   :level,
                   :host,
-                  :enable,
+                  :enabled,
                   :silence_rails_rack_logger
 
     attr_reader :logger
@@ -26,7 +26,7 @@ module Loga
       @service_version   = :git
 
       # Rails specific configuration
-      @enable            = true
+      @enabled           = true
       @silence_rails_rack_logger = true
     end
 
