@@ -36,7 +36,7 @@ module Loga
     config.loga = Loga::Configuration.new
 
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
-      InitializeLogger.new(app).call if app.config.loga.enable
+      InitializeLogger.new(app).call if app.config.loga.enabled
     end
 
     class InitializeMiddleware
@@ -71,7 +71,7 @@ module Loga
     end
 
     initializer :loga_initialize_middleware do |app|
-      InitializeMiddleware.new(app).call if app.config.loga.enable
+      InitializeMiddleware.new(app).call if app.config.loga.enabled
       app.config.colorize_logging = false
     end
 
@@ -107,7 +107,7 @@ module Loga
     end
 
     config.after_initialize do |app|
-      InitializeInstrumentation.new.call if app.config.loga.enable
+      InitializeInstrumentation.new.call if app.config.loga.enabled
     end
   end
 end
