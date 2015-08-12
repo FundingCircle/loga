@@ -37,9 +37,7 @@ the Railtie.
 # config/environments/production.rb
 ...
 config.loga.configure do |loga|
-  loga.service_name    = 'marketplace'
-  loga.service_version = 'v1.0.0' or SHA
-  config.device        = STDOUT or any instance of IO
+  # See configuration section
 end
 ...
 ```
@@ -52,13 +50,10 @@ In Ruby applications Loga must be required and configured.
 # .../initializers/loga.rb
 require 'loga'
 
-Loga.configure do |config|
-  config.service_name      = 'marketplace'
-  config.service_version   = 'v1.0.0' or SHA
-  config.device            = STDOUT or any instance of IO
+Loga.configure do |loga|
+  # See configuration section
 end
 Loga.initialize!
-
 ```
 Log requests in Rack applications with Loga middleware.
 
@@ -73,6 +68,17 @@ user Marketplace
 run Sinatra::Application
 ```
 
+### Configuration
+
+```ruby
+<loga configuration object>.configure do |loga|
+  loga.service_name    = 'marketplace'
+  loga.service_version = 'v1.0.0' or strategy # default :git
+  loga.device           = STDOUT or any instance of IO
+end
+```
+
+The service_version :git strategy fetches the git revision of the application.
 
 ## Sample output
 
