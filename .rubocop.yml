@@ -10,3 +10,6 @@ Style/TrailingComma:
 
 Style/BlockDelimiters:
   Enabled: false
+
+Style/FormatString:
+  Enabled: false

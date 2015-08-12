@@ -8,7 +8,7 @@ RSpec.shared_examples 'request logger' do
       expect(json).to match(
         'version'             => '1.1',
         'host'                => 'bird.example.com',
-        'short_message'       => 'GET /ok?username=yoshi',
+        'short_message'       => 'GET /ok?username=yoshi 200 in 0ms',
         'timestamp'           => 1_450_150_205.123,
         'level'               => 6,
         '_type'               => 'request',
@@ -38,7 +38,7 @@ RSpec.shared_examples 'request logger' do
       expect(json).to match(
         'version'             => '1.1',
         'host'                => 'bird.example.com',
-        'short_message'       => 'POST /users?username=yoshi',
+        'short_message'       => 'POST /users?username=yoshi 200 in 0ms',
         'timestamp'           => 1_450_150_205.123,
         'level'               => 6,
         '_type'               => 'request',
@@ -69,7 +69,7 @@ RSpec.shared_examples 'request logger' do
       expect(json).to match(
         'version'             => '1.1',
         'host'                => 'bird.example.com',
-        'short_message'       => 'GET /new',
+        'short_message'       => 'GET /new 302 in 0ms',
         'timestamp'           => 1_450_150_205.123,
         'level'               => 6,
         '_type'               => 'request',
@@ -97,7 +97,7 @@ RSpec.shared_examples 'request logger' do
       expect(json).to match(
         'version'              => '1.1',
         'host'                 => 'bird.example.com',
-        'short_message'        => 'GET /error?username=yoshi',
+        'short_message'        => 'GET /error?username=yoshi 500 in 0ms',
         'timestamp'            => 1_450_150_205.123,
         'level'                => 3,
         '_type'                => 'request',
@@ -126,7 +126,7 @@ RSpec.shared_examples 'request logger' do
       expect(json).to match(
         'version'              => '1.1',
         'host'                 => 'bird.example.com',
-        'short_message'        => 'GET /not_found',
+        'short_message'        => 'GET /not_found 404 in 0ms',
         'timestamp'            => 1_450_150_205.123,
         'level'                => 6,
         '_type'                => 'request',
@@ -156,7 +156,7 @@ RSpec.shared_examples 'request logger' do
 
     it 'filters the parameter from the message' do
       expect(json).to include(
-        'short_message' => 'GET /ok?password=[FILTERED]',
+        'short_message' => 'GET /ok?password=[FILTERED] 200 in 0ms',
       )
     end
   end
