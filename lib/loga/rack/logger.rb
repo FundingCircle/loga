@@ -59,7 +59,12 @@ module Loga
       end
 
       def compute_message
-        "#{request.request_method} #{request.filtered_full_path}"
+        '%{method} %{filtered_full_path} %{status} in %{duration}ms' % {
+          method:             request.request_method,
+          filtered_full_path: request.filtered_full_path,
+          status:             data['status'],
+          duration:           data['duration'],
+        }
       end
 
       def compute_level

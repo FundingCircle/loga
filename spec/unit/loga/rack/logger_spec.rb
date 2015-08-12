@@ -19,7 +19,7 @@ describe Loga::Rack::Logger do
 
     before do
       allow(subject).to receive(:started_at).and_return(:timestamp)
-      allow(subject).to receive(:duration_in_ms).with(any_args).and_return(:duration)
+      allow(subject).to receive(:duration_in_ms).with(any_args).and_return(5)
     end
 
     it 'instantiates a Loga::Event' do
@@ -33,11 +33,11 @@ describe Loga::Rack::Logger do
             'request_id' => nil,
             'request_ip' => nil,
             'user_agent' => nil,
-            'duration'   => :duration,
+            'duration'   => 5,
           },
         },
         exception: logged_exception,
-        message:   'GET /about_us?limit=1',
+        message:   %r{^GET \/about_us\?limit=1 #{response_status} in \d+ms$},
         timestamp: :timestamp,
         type:      'request',
       )
