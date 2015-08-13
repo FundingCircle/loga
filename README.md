@@ -73,7 +73,7 @@ run Sinatra::Application
 | Option          | Type          | Default | Description                                                                                        |
 |-----------------|---------------|---------|----------------------------------------------------------------------------------------------------|
 | host            | String        | nil     | Service hostname. When nil the hostname is computed with `Socket.gethostname`                      |
-| service_version | String/Symbol | :get    | Service version is embedded in every message. When Symbol the version is computed with a strategy. |
+| service_version | String/Symbol | :git    | Service version is embedded in every message. When Symbol the version is computed with a strategy. |
 | service_name    | String        | nil     | Service name is embedded in every message                                                          |
 | device          | IO            | nil     | The device the logger writes to                                                                    |
 | sync            | Boolean       | true    | Sync IO                                                                                            |
