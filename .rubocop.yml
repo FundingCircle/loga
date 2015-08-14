@@ -13,3 +13,6 @@ Style/BlockDelimiters:
 
 Style/FormatString:
   Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
