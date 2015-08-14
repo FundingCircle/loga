@@ -1,8 +1,11 @@
+require 'codeclimate-test-reporter'
 require 'pry'
 require 'support/helpers'
 require 'support/timecop_shared'
 require 'support/request_spec'
 require 'rack/test'
+
+CodeClimate::TestReporter.start if ENV.fetch('CODECLIMATE_REPO_TOKEN', nil)
 
 class Socket
   def self.gethostname
