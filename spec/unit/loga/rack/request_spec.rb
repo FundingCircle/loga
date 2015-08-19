@@ -41,7 +41,7 @@ describe Loga::Rack::Request do
     let(:path)         { '/hello' }
     let(:query)        { { 'password' => 123, 'color' => 'red' }  }
     let(:query_string) { Rack::Utils.build_query(query) }
-    let(:full_path)    { "#{ path}?#{query_string}" }
+    let(:full_path)    { "#{path}?#{query_string}" }
 
     let(:options) { { 'loga.request.original_path' => path } }
 

@@ -1,4 +1,5 @@
 require 'rack/request'
+require 'rack/utils'
 
 module Loga
   module Rack
@@ -48,20 +49,20 @@ module Loga
       end
 
       def filter_hash(hash)
-        hash.each_with_object({}) do |(k, v), acc|
-          acc[k] = filter_parameters.include?(k) ? '[FILTERED]' : v
+        parameter_filter.filter(hash)
+      end
+
+      KV_RE   = '[^&;=]+'
+      PAIR_RE = /(#{KV_RE})=(#{KV_RE})/
+      def filtered_query_string
+        query_string.gsub(PAIR_RE) do |_|
+          parameter_filter.filter([[$1, $2]]).first.join('=')
         end
       end
 
-      def filtered_query_string
-        filtered_query_hash.inject([]) { |acc, param|
-          acc << param.join('=')
-        }.join('&')
-      end
-
-      def filter_parameters
+      def parameter_filter
         @filter_parameters ||=
-          (loga_filter_parameters | action_dispatch_filter_params).map(&:to_s)
+          ParameterFilter.new(loga_filter_parameters | action_dispatch_filter_params)
       end
 
       def loga_filter_parameters

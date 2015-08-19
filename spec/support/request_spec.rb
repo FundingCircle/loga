@@ -146,18 +146,38 @@ RSpec.shared_examples 'request logger' do
   end
 
   describe 'when the request includes a filtered parameter' do
-    before { get '/ok', password: 'password123' }
+    before { get '/ok', params }
 
-    it 'filters the parameter from the params hash' do
-      expect(json).to include(
-        '_request.params' => { 'password' => '[FILTERED]' },
-      )
+    context 'when params is shallow' do
+      let(:params) { { password: 'password123' } }
+
+      it 'filters the parameter from the params hash' do
+        expect(json).to include(
+          '_request.params' => { 'password' => '[FILTERED]' },
+        )
+      end
+
+      it 'filters the parameter from the message' do
+        expect(json).to include(
+          'short_message' => 'GET /ok?password=[FILTERED] 200 in 0ms',
+        )
+      end
     end
 
-    it 'filters the parameter from the message' do
-      expect(json).to include(
-        'short_message' => 'GET /ok?password=[FILTERED] 200 in 0ms',
-      )
+    context 'when params is nested' do
+      let(:params) { { users: [password: 'password123'] } }
+
+      it 'filters the parameter from the params hash' do
+        expect(json).to include(
+          '_request.params' => { 'users' => ['password' => '[FILTERED]'] },
+        )
+      end
+
+      it 'filters the parameter from the message' do
+        expect(json).to include(
+          'short_message' => 'GET /ok?users[][password]=[FILTERED] 200 in 0ms',
+        )
+      end
     end
   end
 end
