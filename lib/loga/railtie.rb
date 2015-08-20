@@ -40,6 +40,21 @@ module Loga
     end
 
     class InitializeMiddleware
+      module ExceptionsCatcher
+        # Sets up an alias chain to catch exceptions when Rails middleware does
+        def self.included(base) #:nodoc:
+          base.send(:alias_method, :render_exception_without_loga, :render_exception)
+          base.send(:alias_method, :render_exception, :render_exception_with_loga)
+        end
+
+        private
+
+        def render_exception_with_loga(env, exception)
+          env['loga.exception'] = exception
+          render_exception_without_loga(env, exception)
+        end
+      end
+
       def initialize(app)
         @app = app
       end
@@ -47,12 +62,23 @@ module Loga
       def call
         insert_loga_rack_logger
         disable_rails_rack_logger
+        insert_exceptions_catcher
       end
 
       private
 
       attr_reader :app
 
+      def insert_exceptions_catcher
+        if defined?(ActionDispatch::DebugExceptions)
+          ActionDispatch::DebugExceptions.send(:include, ExceptionsCatcher)
+        elsif defined?(ActionDispatch::ShowExceptions)
+          ActionDispatch::ShowExceptions.send(:include, ExceptionsCatcher)
+        end
+      end
+
+      # Removes start of request log
+      # (e.g. Started GET "/users" for 127.0.0.1 at 2015-12-24 23:59:00 +0000)
       def disable_rails_rack_logger
         return unless app.config.loga.silence_rails_rack_logger
 
