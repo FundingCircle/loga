@@ -19,7 +19,6 @@ describe 'Rack request logger with Sinatra', timecop: true do
 
   let(:app) do
     Class.new(Sinatra::Base) do
-      set :environment, :production
       use Loga::Rack::RequestId
       use Loga::Rack::Logger, Loga.logger, [:uuid]
 

@@ -8,7 +8,10 @@ dependencies:
     - rvm-exec 2.2.2 bundle exec appraisal install -j 4
 test:
   override:
-    - rvm-exec 1.9.3-p392 bundle exec appraisal rspec
-    - rvm-exec 2.0.0-p353 bundle exec appraisal rspec
-    - rvm-exec 2.2.2 bundle exec appraisal rspec
+    - RACK_ENV=development rvm-exec 1.9.3-p392 bundle exec appraisal rspec
+    - RACK_ENV=production  rvm-exec 1.9.3-p392 bundle exec appraisal rspec
+    - RACK_ENV=development rvm-exec 2.0.0-p353 bundle exec appraisal rspec
+    - RACK_ENV=production  rvm-exec 2.0.0-p353 bundle exec appraisal rspec
+    - RACK_ENV=development rvm-exec 2.2.2      bundle exec appraisal rspec
+    - RACK_ENV=production  rvm-exec 2.2.2      bundle exec appraisal rspec
     - rvm-exec 2.2.2 bundle exec rubocop

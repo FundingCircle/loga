@@ -17,7 +17,6 @@ case ENV['BUNDLE_GEMFILE']
 when /rails/
   rspec_pattern = 'integration/rails/**/*_spec.rb'
   /(?<appraisal>rails\d{2})\.gemfile/ =~ ENV['BUNDLE_GEMFILE']
-  ENV['RAILS_ENV'] ||= 'production'
   require 'rails'
   require File.expand_path("../fixtures/#{appraisal}/config/environment.rb",  __FILE__)
 when /sinatra/
