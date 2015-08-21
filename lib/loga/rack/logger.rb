@@ -72,9 +72,13 @@ module Loga
       end
 
       def fetch_exception
-        (env['action_dispatch.exception'] || env['sinatra.error']).tap do |e|
+        framework_exception.tap do |e|
           return filtered_exceptions.include?(e.class.to_s) ? nil : e
         end
+      end
+
+      def framework_exception
+        env['loga.exception'] || env['action_dispatch.exception'] || env['sinatra.error']
       end
 
       def filtered_exceptions

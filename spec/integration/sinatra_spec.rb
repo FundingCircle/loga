@@ -19,11 +19,14 @@ describe 'Rack request logger with Sinatra', timecop: true do
 
   let(:app) do
     Class.new(Sinatra::Base) do
-      set :environment, :production
+      # Disable show_exceptions and rely on user defined exception handlers
+      # (e.i. the error blocks)
+      set :show_exceptions, false
+
       use Loga::Rack::RequestId
       use Loga::Rack::Logger, Loga.logger, [:uuid]
 
-      error StandardError do
+      error do
         status 500
         body 'Ooops'
       end

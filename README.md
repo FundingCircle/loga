@@ -134,6 +134,8 @@ Run all tests with `bundle exec appraisal rspec`.
 
 You can run tests for one appraisal with `bundle exec appraisal appraisal-name rspec`.
 
+With Rack applications prepend RACK\_ENV to switch between environments `RACK_ENV=production bundle exec appraisal rspec`
+
 Refer to the [Appraisals](https://github.com/FundingCircle/loga/blob/master/Appraisals) file for a complete lists of appraisals.
 
 ## Credits
