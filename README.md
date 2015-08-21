@@ -9,10 +9,6 @@ It provides:
 - Rack logger middleware to log HTTP requests
 - Ruby logger
 
-## Road Map to v1.0.0
-
-Follow the [milestone](https://github.com/FundingCircle/loga/milestones/The%20road%20to%20v1.0.0)
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -112,6 +108,11 @@ Middleware augment payload with the `type` key to label events.
 
 - Loga formats timestamps in seconds since UNIX epoch with 3 decimal places
   for milliseconds. Which is in accordance with GELF 1.1 specification.
+
+
+## Road Map
+
+Consult the [milestones](https://github.com/FundingCircle/loga/milestones).
 
 ## Contributing
 
