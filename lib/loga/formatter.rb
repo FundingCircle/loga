@@ -37,12 +37,12 @@ module Loga
 
     private
 
-    def build_event(time, data)
-      event = case data
+    def build_event(time, message)
+      event = case message
               when Loga::Event
-                data
+                message
               else
-                Loga::Event.new(message: data.to_s)
+                Loga::Event.new(message: message)
               end
 
       event.timestamp ||= time
