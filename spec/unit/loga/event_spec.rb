@@ -2,23 +2,18 @@ require 'spec_helper'
 
 RSpec.describe Loga::Event do
   describe 'initialize' do
-    let(:options) { {} }
-
-    context 'when initialized with an empty hash' do
-      it 'accepts an optional hash' do
-        expect(described_class.new(options)).to be_a(Loga::Event)
+    context 'no message is passed' do
+      it 'sets message to an empty string' do
+        expect(subject.message).to eq ''
       end
     end
 
-    context 'when initialized with a hash including a message' do
-      let(:message) {  double(:message) }
-      let(:options) {  { message: message } }
+    context 'message is passed' do
+      let(:message) { "stuff \xC2".force_encoding 'ASCII-8BIT' }
+      let(:subject) { described_class.new message: message }
 
-      before { allow(message).to receive(:to_s) }
-
-      it 'calls to_s on the message' do
-        expect(message).to receive(:to_s)
-        described_class.new(options)
+      it 'sanitizes the input to be UTF-8 convertable' do
+        expect(subject.message.to_json).to eq '"stuff ?"'
       end
     end
   end
