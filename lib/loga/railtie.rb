@@ -1,4 +1,5 @@
 require 'loga'
+require 'action_view/log_subscriber'
 
 module Loga
   class Railtie < Rails::Railtie
