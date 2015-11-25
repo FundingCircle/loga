@@ -111,7 +111,7 @@ module Loga
       def remove_existing_log_subscriptions
         ActiveSupport::LogSubscriber.log_subscribers.each do |subscriber|
           case subscriber
-          when ActionView::LogSubscriber
+          when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
             unsubscribe(:action_view, subscriber)
           end
         end
