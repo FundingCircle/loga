@@ -19,6 +19,7 @@ tmp
 *.so
 *.o
 *.a
+*.gem
 mkmf.log
 spec/fixtures/**/*.log
 gemfiles/*.lock
