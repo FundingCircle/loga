@@ -143,3 +143,5 @@ Refer to the [Appraisals](https://github.com/FundingCircle/loga/blob/master/Appr
 - [LogStashLogger](https://github.com/dwbutler/logstash-logger)
 - [Rails](https://github.com/rails/rails)
 - [RackLogstasher](https://github.com/alphagov/rack-logstasher)
+
+Copyright (c) 2015 Funding Circle. All rights reserved.

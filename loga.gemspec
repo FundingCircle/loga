@@ -11,7 +11,6 @@ Gem::Specification.new do |spec|
   spec.summary       = 'Facilitate log aggregation via unified logging'
   spec.description   = 'Log all the things through middleware and respecting the same format'
   spec.homepage      = ''
-  spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }
