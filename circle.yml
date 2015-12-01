@@ -15,3 +15,9 @@ test:
     - RACK_ENV=development rvm-exec 2.2.2      bundle exec appraisal rspec
     - RACK_ENV=production  rvm-exec 2.2.2      bundle exec appraisal rspec
     - rvm-exec 2.2.2 bundle exec rubocop
+deployment:
+  gemfury:
+    tag: /.*/
+    commands:
+      - "gem build loga.gemspec"
+      - "curl -F package=@$(ls -t1 loga-*.gem | head -1) ${GEMFURY_PUSH_URI}"
