@@ -9,9 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Funding Circle']
   spec.email         = ['engineering@fundingcircle.com']
   spec.summary       = 'Facilitate log aggregation via unified logging'
-  spec.description   = 'Log all the things through middleware and respecting the same format'
-  spec.homepage      = ''
-  spec.license       = 'MIT'
+  spec.description   = 'Log aggregation through unified logging middleware, while respecting the original log format.'
+  spec.homepage      = 'https://github.com/FundingCircle/loga'
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }
