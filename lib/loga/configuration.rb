@@ -53,7 +53,7 @@ module Loga
       end
 
       def self.binary_available?
-        system 'which -s git'
+        system 'which git'
       end
 
       def self.fetch_revision
