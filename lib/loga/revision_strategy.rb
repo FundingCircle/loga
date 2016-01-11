@@ -13,7 +13,7 @@ module Loga
 
       def fetch_from_git
         sha1_hash = `git rev-parse --short HEAD`
-        $?.exitstatus == 0 ? sha1_hash.strip : false
+        $CHILD_STATUS.exitstatus == 0 ? sha1_hash.strip : false
       end
 
       def read_from_file
