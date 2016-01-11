@@ -2,7 +2,11 @@ require 'spec_helper'
 
 describe Loga::RevisionStrategy do
   describe '.call' do
-    context 'called with :git' do
+    it 'uses :git as default argument' do
+      expect(Loga::RevisionStrategy.call).to match(/\h+/)
+    end
+
+    context 'called with :git argument' do
       it 'fetches the service version from git' do
         expect(Loga::RevisionStrategy.call(:git)).to match(/\h+/)
       end

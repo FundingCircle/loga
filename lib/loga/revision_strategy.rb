@@ -5,7 +5,7 @@ module Loga
     DEFAULT_REVISION = 'unknown.sha'.freeze
 
     class << self
-      def call(service_version)
+      def call(service_version = :git)
         if service_version == :git
           fetch_from_git || read_from_file || DEFAULT_REVISION
         else
