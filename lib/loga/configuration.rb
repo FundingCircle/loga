@@ -43,26 +43,8 @@ module Loga
 
     private
 
-    class GitRevisionStrategy
-      DEFAULT_REVISION = 'unknown.sha'.freeze
-
-      def self.call
-        revision = fetch_revision   if binary_available?
-        revision = DEFAULT_REVISION if revision.blank?
-        revision
-      end
-
-      def self.binary_available?
-        system 'which git'
-      end
-
-      def self.fetch_revision
-        `git rev-parse HEAD`.strip
-      end
-    end
-
     def compute_service_version
-      service_version == :git ? GitRevisionStrategy.call : service_version.strip
+      RevisionStrategy.call(service_version)
     end
 
     def initialize_logger
