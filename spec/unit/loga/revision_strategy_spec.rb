@@ -6,6 +6,10 @@ describe Loga::RevisionStrategy do
       expect(Loga::RevisionStrategy.call).to match(/\h+/)
     end
 
+    it "returns 'unknown.sha' when argument is empty string" do
+      expect(Loga::RevisionStrategy.call('')).to eq('unknown.sha')
+    end
+
     context 'called with :git argument' do
       it 'fetches the service version from git' do
         expect(Loga::RevisionStrategy.call(:git)).to match(/\h+/)

@@ -7,6 +7,8 @@ module Loga
       def call(service_version = :git)
         if service_version == :git
           fetch_from_git || read_from_file || DEFAULT_REVISION
+        elsif service_version.empty?
+          DEFAULT_REVISION
         else
           service_version.strip
         end
