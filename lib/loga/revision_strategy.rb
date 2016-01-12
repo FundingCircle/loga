@@ -1,4 +1,6 @@
 # rubocop:disable Style/SpecialGlobalVars
+require 'active_support/core_ext/object/blank'
+
 module Loga
   class RevisionStrategy
     DEFAULT_REVISION = 'unknown.sha'.freeze
@@ -7,7 +9,7 @@ module Loga
       def call(service_version = :git)
         if service_version == :git
           fetch_from_git || read_from_file || DEFAULT_REVISION
-        elsif service_version.empty?
+        elsif service_version.blank?
           DEFAULT_REVISION
         else
           service_version.strip
