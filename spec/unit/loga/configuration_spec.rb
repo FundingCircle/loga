@@ -44,14 +44,6 @@ describe Loga::Configuration do
       subject.initialize!
     end
 
-    context 'when service_version is :git' do
-      before { subject.service_version = :git }
-      it 'computes the service_version with git' do
-        subject.initialize!
-        expect(subject.service_version).to match(/\h+/)
-      end
-    end
-
     describe 'logger' do
       let(:logdev) { subject.logger.instance_variable_get(:@logdev) }
 
