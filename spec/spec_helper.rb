@@ -28,7 +28,7 @@ when /unit/
   rspec_pattern = 'unit/**/*_spec.rb'
   require 'loga'
 else
-  fail 'BUNDLE_GEMFILE is unknown. Ensure the appraisal is present in Appraisals'
+  raise 'BUNDLE_GEMFILE is unknown. Ensure the appraisal is present in Appraisals'
 end
 
 RSpec.configure do |config|
