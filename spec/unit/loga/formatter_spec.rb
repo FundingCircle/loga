@@ -20,15 +20,13 @@ describe Loga::Formatter do
                               'host'          => host,
                               'short_message' => be_a(String),
                               'timestamp'     => be_a(Float),
-                              'level'         => 6,
-                             )
+                              'level'         => 6)
     end
 
     it 'includes Loga additional fields' do
       expect(json).to include('_service.name'    => service_name,
                               '_service.version' => service_version,
-                              '_tags'            => [],
-                             )
+                              '_tags'            => [])
     end
 
     it 'outputs the timestamp in seconds since UNIX epoch' do

@@ -5,7 +5,11 @@ AllCops:
     - 'spec/fixtures/**/*'
     - '*.gemspec'
 
-Style/TrailingComma:
+Style/TrailingCommaInLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInArguments:
   Enabled: true
   EnforcedStyleForMultiline: comma
 
@@ -16,4 +20,10 @@ Style/FormatString:
   Enabled: false
 
 Style/PerlBackrefs:
+  Enabled: false
+
+Style/ExtraSpacing:
+  Enabled: false
+
+Style/SpaceAroundOperators:
   Enabled: false

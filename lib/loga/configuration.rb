@@ -29,7 +29,7 @@ module Loga
     end
 
     def initialize!
-      @service_name.to_s.strip!
+      @service_name = service_name.to_s.strip
       @service_version = compute_service_version
 
       initialize_logger

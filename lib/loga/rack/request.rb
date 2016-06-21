@@ -52,7 +52,7 @@ module Loga
         parameter_filter.filter(hash)
       end
 
-      KV_RE   = '[^&;=]+'
+      KV_RE   = '[^&;=]+'.freeze
       PAIR_RE = /(#{KV_RE})=(#{KV_RE})/
       def filtered_query_string
         query_string.gsub(PAIR_RE) do |_|
