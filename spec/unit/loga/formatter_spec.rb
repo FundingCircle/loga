@@ -26,7 +26,7 @@ describe Loga::Formatter do
     it 'includes Loga additional fields' do
       expect(json).to include('_service.name'    => service_name,
                               '_service.version' => service_version,
-                              '_tags'            => [])
+                              '_tags'            => '')
     end
 
     it 'outputs the timestamp in seconds since UNIX epoch' do

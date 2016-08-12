@@ -97,7 +97,7 @@ module Loga
           name:    @service_name,
           version: @service_version,
         },
-        tags: current_tags,
+        tags: current_tags.join(' '),
       }
     end
   end
