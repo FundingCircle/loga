@@ -17,8 +17,13 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(/^(test|spec|features)/)
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activesupport', '>= 2.3.8'
-  spec.add_dependency 'rack'
+  if RUBY_VERSION < '2.2'
+    spec.add_dependency 'activesupport', '>= 2.3.8', '< 5.0'
+    spec.add_dependency 'rack', '< 2.0'
+  else
+    spec.add_dependency 'activesupport', '>= 2.3.8'
+    spec.add_dependency 'rack'
+  end
 
   spec.add_development_dependency 'appraisal', '~> 2.0.2'
   spec.add_development_dependency 'bundler', '~> 1.6'
