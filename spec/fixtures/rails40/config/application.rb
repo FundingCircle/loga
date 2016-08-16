@@ -26,7 +26,7 @@ module Rails40
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
-    config.log_tags = [:uuid]
+    config.log_tags = [ :uuid, 'TEST_TAG' ]
     config.loga.configure do |loga|
       loga.service_name = 'hello_world_app'
       loga.service_version = '1.0'

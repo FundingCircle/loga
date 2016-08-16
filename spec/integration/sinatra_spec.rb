@@ -24,7 +24,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
       set :show_exceptions, false
 
       use Loga::Rack::RequestId
-      use Loga::Rack::Logger, Loga.logger, [:uuid]
+      use Loga::Rack::Logger, Loga.logger, [:uuid, 'TEST_TAG']
 
       error do
         status 500

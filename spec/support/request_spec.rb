@@ -22,7 +22,7 @@ RSpec.shared_examples 'request logger' do
         '_request.status'     => 200,
         '_request.request_id' => '471a34dc',
         '_request.duration'   => 0,
-        '_tags'               => ['471a34dc'],
+        '_tags'               => '471a34dc TEST_TAG',
       )
     end
   end
@@ -52,7 +52,7 @@ RSpec.shared_examples 'request logger' do
         '_request.status'     => 200,
         '_request.request_id' => '471a34dc',
         '_request.duration'   => 0,
-        '_tags'               => ['471a34dc'],
+        '_tags'               => '471a34dc TEST_TAG',
       )
     end
 
@@ -83,7 +83,7 @@ RSpec.shared_examples 'request logger' do
         '_request.status'     => 302,
         '_request.request_id' => '471a34dc',
         '_request.duration'   => 0,
-        '_tags'               => ['471a34dc'],
+        '_tags'               => '471a34dc TEST_TAG',
       )
     end
   end
@@ -114,7 +114,7 @@ RSpec.shared_examples 'request logger' do
         '_exception.klass'     => 'NoMethodError',
         '_exception.message'   => "undefined method `name' for nil:NilClass",
         '_exception.backtrace' => be_a(String),
-        '_tags'               => ['471a34dc'],
+        '_tags'               => '471a34dc TEST_TAG',
       )
     end
   end
@@ -140,7 +140,7 @@ RSpec.shared_examples 'request logger' do
         '_request.status'      => 404,
         '_request.request_id'  => '471a34dc',
         '_request.duration'    => 0,
-        '_tags'               => ['471a34dc'],
+        '_tags'               => '471a34dc TEST_TAG',
       )
     end
   end

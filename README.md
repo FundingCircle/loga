@@ -92,7 +92,7 @@ Loga.logger.info('Hello World')
   "level":             6,
   "_service.name":     "marketplace",
   "_service.version":  "v1.0.0",
-  "_tags":             []
+  "_tags":             ""
 }
 ```
 
