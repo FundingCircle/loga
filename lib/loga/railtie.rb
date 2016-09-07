@@ -63,6 +63,7 @@ module Loga
         insert_loga_rack_logger
         disable_rails_rack_logger
         insert_exceptions_catcher
+        disable_action_dispatch_debug_exceptions
       end
 
       private
@@ -86,6 +87,10 @@ module Loga
         when 3 then require 'loga/ext/rails/rack/logger3.rb'
         when 4 then require 'loga/ext/rails/rack/logger4.rb'
         end
+      end
+
+      def disable_action_dispatch_debug_exceptions
+        require 'loga/ext/rails/rack/debug_exceptions.rb'
       end
 
       def insert_loga_rack_logger

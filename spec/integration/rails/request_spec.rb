@@ -39,4 +39,12 @@ describe 'Integration with Rails', timecop: true do
       expect(action_view_notifications).to be_empty
     end
   end
+
+  describe 'when request causes ActionDispatch 404' do
+    it 'does not log ActionDispatch::DebugExceptions' do
+      get '/not_found', {}, 'HTTP_X_REQUEST_ID' => '471a34dc'
+      expect(json_entries.count).to eq(1)
+      expect(json['short_message']).to eq('GET /not_found 404 in 0ms')
+    end
+  end
 end
