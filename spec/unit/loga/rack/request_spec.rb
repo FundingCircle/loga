@@ -26,6 +26,17 @@ describe Loga::Rack::Request do
     end
   end
 
+  describe '#request_id' do
+    let(:action_dispatch_request_id) { 'ABCD' }
+    let(:options) do
+      { 'action_dispatch.request_id' => action_dispatch_request_id }
+    end
+
+    it 'aliases to uuid' do
+      expect(subject.request_id).to eq(subject.uuid)
+    end
+  end
+
   describe '#original_path' do
     let(:path)    { 'users/5/oranges' }
     let(:options) { { 'loga.request.original_path' => path } }

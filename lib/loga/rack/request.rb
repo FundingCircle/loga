@@ -15,6 +15,8 @@ module Loga
         @uuid ||= env[ACTION_DISPATCH_REQUEST_ID]
       end
 
+      alias request_id uuid
+
       def original_path
         env['loga.request.original_path']
       end
