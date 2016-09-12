@@ -114,6 +114,9 @@ module Loga
       private
 
       def remove_existing_log_subscriptions
+        ActionView::Base       if defined?(ActionView::Base)
+        ActionController::Base if defined?(ActionController::Base)
+
         ActiveSupport::LogSubscriber.log_subscribers.each do |subscriber|
           case subscriber
           when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
