@@ -86,7 +86,8 @@ module Loga
 
         case Rails::VERSION::MAJOR
         when 3 then require 'loga/ext/rails/rack/logger3.rb'
-        when 4 then require 'loga/ext/rails/rack/logger4.rb'
+        else
+          require 'loga/ext/rails/rack/logger.rb'
         end
       end
 
