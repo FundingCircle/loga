@@ -5,6 +5,7 @@ module Loga
   module Rack
     class Request < ::Rack::Request
       ACTION_DISPATCH_REQUEST_ID = 'action_dispatch.request_id'.freeze
+      ACTION_CONTROLLER_INSTANCE = 'action_controller.instance'.freeze
 
       def initialize(env)
         super
@@ -16,6 +17,14 @@ module Loga
       end
 
       alias request_id uuid
+
+      def action_controller
+        "#{action_controller_instance.class}##{action_controller_instance.action_name}"
+      end
+
+      def action_controller_instance
+        @action_controller_instance ||= env[ACTION_CONTROLLER_INSTANCE]
+      end
 
       def original_path
         env['loga.request.original_path']

@@ -26,6 +26,11 @@ describe 'Integration with Rails', timecop: true do
     expect(json_response).to eq('action' => 'show', 'controller' => 'application')
   end
 
+  it 'includes the controller name and action' do
+    get '/ok'
+    expect(json).to include('_request.controller' => 'ApplicationController#ok')
+  end
+
   describe 'LogSubscriber' do
     context 'ActionController' do
       let(:action_controller_notifications) do
