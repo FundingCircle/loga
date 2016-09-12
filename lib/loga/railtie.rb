@@ -123,6 +123,8 @@ module Loga
           case subscriber
           when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
             unsubscribe(:action_view, subscriber)
+          when defined?(ActionController::LogSubscriber) && ActionController::LogSubscriber
+            unsubscribe(:action_controller, subscriber)
           end
         end
       end

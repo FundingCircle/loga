@@ -60,5 +60,30 @@ RSpec.describe Loga::Railtie do
         end
       end
     end
+
+    context 'ActionController' do
+      [
+        'exist_fragment?.action_controller',
+        'expire_fragment.action_controller',
+        'expire_page.action_controller',
+        'halted_callback.action_controller',
+        'logger.action_controller',
+        'process_action.action_controller',
+        'read_fragment.action_controller',
+        'redirect_to.action_controller',
+        'send_data.action_controller',
+        'send_file.action_controller',
+        'start_processing.action_controller',
+        'unpermitted_parameters.action_controller',
+        'write_fragment.action_controller',
+        'write_page.action_controller',
+      ].each do |notification|
+        let(:notification) { notification }
+
+        it 'removes ActionController::LogSubscriber' do
+          expect(subscribers).to_not include(ActionController::LogSubscriber)
+        end
+      end
+    end
   end
 end
