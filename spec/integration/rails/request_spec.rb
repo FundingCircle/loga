@@ -26,17 +26,32 @@ describe 'Integration with Rails', timecop: true do
     expect(json_response).to eq('action' => 'show', 'controller' => 'application')
   end
 
-  context 'when a template is rendered' do
-    let(:action_view_notifications) do
-      json_entries.select { |e| e.to_json =~ /Rendered/ }
+  it 'includes the controller name and action' do
+    get '/ok'
+    expect(json).to include('_request.controller' => 'ApplicationController#ok')
+  end
+
+  describe 'LogSubscriber' do
+    context 'ActionController' do
+      let(:action_controller_notifications) do
+        json_entries.select { |e| e.to_json =~ /Processing by|Completed/ }
+      end
+
+      it 'silences ActionController::LogSubscriber' do
+        get '/show'
+        expect(action_controller_notifications).to be_empty
+      end
     end
 
-    before { put '/users/5' }
+    context 'ActionView' do
+      let(:action_view_notifications) do
+        json_entries.select { |e| e.to_json =~ /Rendered/ }
+      end
 
-    specify { expect(last_response.status).to eq(200) }
-
-    it 'silences ActionView::LogSubscriber' do
-      expect(action_view_notifications).to be_empty
+      it 'silences ActionView::LogSubscriber' do
+        put '/users/5'
+        expect(action_view_notifications).to be_empty
+      end
     end
   end
 

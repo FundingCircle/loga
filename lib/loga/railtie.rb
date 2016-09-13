@@ -49,9 +49,10 @@ module Loga
 
         private
 
-        def render_exception_with_loga(env, exception)
+        def render_exception_with_loga(arg, exception)
+          env = arg.is_a?(ActionDispatch::Request) ? arg.env : arg
           env['loga.exception'] = exception
-          render_exception_without_loga(env, exception)
+          render_exception_without_loga(arg, exception)
         end
       end
 
@@ -85,7 +86,8 @@ module Loga
 
         case Rails::VERSION::MAJOR
         when 3 then require 'loga/ext/rails/rack/logger3.rb'
-        when 4 then require 'loga/ext/rails/rack/logger4.rb'
+        else
+          require 'loga/ext/rails/rack/logger.rb'
         end
       end
 
@@ -113,14 +115,21 @@ module Loga
 
       private
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def remove_existing_log_subscriptions
+        ActionView::Base       if defined?(ActionView::Base)
+        ActionController::Base if defined?(ActionController::Base)
+
         ActiveSupport::LogSubscriber.log_subscribers.each do |subscriber|
           case subscriber
           when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
             unsubscribe(:action_view, subscriber)
+          when defined?(ActionController::LogSubscriber) && ActionController::LogSubscriber
+            unsubscribe(:action_controller, subscriber)
           end
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def unsubscribe(component, subscriber)
         events = subscriber.public_methods(false).reject { |method| method.to_s == 'call' }

@@ -51,4 +51,9 @@ describe 'Rack request logger with Sinatra', timecop: true do
   end
 
   include_examples 'request logger'
+
+  it 'does not include the controller name and action' do
+    get '/ok'
+    expect(json).to_not include('_request.controller')
+  end
 end

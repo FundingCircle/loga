@@ -5,6 +5,14 @@ describe Loga::Rack::Request do
   let(:full_path) { '/' }
   let(:env)       { Rack::MockRequest.env_for(full_path, options) }
 
+  let(:action_controller_class) do
+    ApplicationController = Class.new do
+      def action_name
+        'index'
+      end
+    end
+  end
+
   subject { described_class.new(env) }
 
   describe '#uuid' do
@@ -23,6 +31,46 @@ describe Loga::Rack::Request do
       it 'returns nil' do
         expect(subject.uuid).to be_nil
       end
+    end
+  end
+
+  describe '#action_controller_instance' do
+    let(:action_controller_instance) { action_controller_class.new }
+
+    context 'when ACTION_CONTROLLER_INSTANCE is present' do
+      let(:options) do
+        { 'action_controller.instance' => action_controller_instance }
+      end
+      it 'returns the instance' do
+        expect(subject.action_controller_instance).to eq(action_controller_instance)
+      end
+    end
+
+    context 'when ACTION_DISPATCH_REQUEST_ID blank' do
+      it 'returns nil' do
+        expect(subject.action_controller_instance).to be_nil
+      end
+    end
+  end
+
+  describe '#action_controller' do
+    let(:options) do
+      { 'action_controller.instance' => action_controller_class.new }
+    end
+
+    it 'returns the controller with the action_name' do
+      expect(subject.action_controller).to eq('ApplicationController#index')
+    end
+  end
+
+  describe '#request_id' do
+    let(:action_dispatch_request_id) { 'ABCD' }
+    let(:options) do
+      { 'action_dispatch.request_id' => action_dispatch_request_id }
+    end
+
+    it 'aliases to uuid' do
+      expect(subject.request_id).to eq(subject.uuid)
     end
   end
 
