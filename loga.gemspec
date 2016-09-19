@@ -10,6 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['engineering@fundingcircle.com']
   spec.summary       = 'Facilitate log aggregation via unified logging'
   spec.description   = 'Log aggregation through unified logging middleware, while respecting the original log format.'
+  spec.license       = 'BSD-3-Clause'
   spec.homepage      = 'https://github.com/FundingCircle/loga'
 
   spec.files         = `git ls-files -z`.split("\x0")
