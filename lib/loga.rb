@@ -22,11 +22,11 @@ module Loga
     @configuration
   end
 
-  def self.configure(options)
+  def self.configure(options, framework_options = {})
     unless @configuration.nil?
       raise ConfigurationError, 'Loga has already been configured'
     end
-    @configuration ||= Configuration.new(options)
+    @configuration ||= Configuration.new(options, framework_options).tap(&:initialize!)
   end
 
   def self.logger

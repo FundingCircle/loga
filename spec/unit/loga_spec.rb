@@ -7,12 +7,21 @@ describe Loga do
   let(:config_missing_msg) do
     'Loga has not been configured. Configure with Loga.configure(options)'
   end
-  let(:options) { { service_name: 'hello_world_app' } }
+  let(:options)           { { service_name: 'hello_world_app' } }
+  let(:framework_options) { { format: 'gelf' } }
 
   describe '.configure' do
     it 'configures Loga' do
-      expect(Loga::Configuration).to receive(:new).with(options).and_call_original
+      expect(Loga::Configuration).to receive(:new).with(options, {}).and_call_original
       subject.configure(options)
+    end
+
+    context 'when framework options provided' do
+      it 'configures Loga' do
+        expect(Loga::Configuration)
+          .to receive(:new).with(options, framework_options).and_call_original
+        subject.configure(options, framework_options)
+      end
     end
 
     context 'when configure twice' do
