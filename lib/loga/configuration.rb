@@ -1,3 +1,4 @@
+require 'active_support/core_ext/object/blank'
 require 'logger'
 require 'socket'
 
@@ -5,33 +6,33 @@ module Loga
   class Configuration
     ServiceNameMissingError = Class.new(StandardError)
 
-    DEFAULTS = {
-      device:            -> { STDOUT },
-      filter_parameters: -> { [] },
-      formatter:         -> { ENV['LOGA_FORMATTER'] },
-      host: lambda do
-        begin
-          Socket.gethostname
-        rescue Exception
-          'unknown.host'
-        end
-      end,
-      level:             -> { :info },
-      service_name:      -> { raise ServiceNameMissingError },
-      service_version:   -> { :git },
-      sync:              -> { true },
-      enabled:           -> { true },
-      silence_rails_rack_logger: -> { true },
-    }.freeze
+    DEFAULT_KEYS = %i(
+      device
+      enabled
+      filter_parameters
+      formatter
+      host
+      level
+      service_name
+      service_version
+      silence_rails_rack_logger
+      sync
+    ).freeze
 
-    private_constant :DEFAULTS
-    attr_accessor(*DEFAULTS.keys)
+    attr_accessor(*DEFAULT_KEYS)
     attr_reader :logger
+    private_constant :DEFAULT_KEYS
 
-    def initialize(options = {})
-      DEFAULTS.each do |attribute, value|
-        public_send("#{attribute}=", options.fetch(attribute) { value.call })
+    def initialize(user_options = {}, framework_options = {})
+      options = default_options.merge(framework_options)
+                               .merge(environment_options)
+                               .merge(user_options)
+
+      DEFAULT_KEYS.each do |attribute|
+        public_send("#{attribute}=", options[attribute])
       end
+
+      raise ServiceNameMissingError if service_name.blank?
     end
 
     def initialize!
@@ -44,6 +45,23 @@ module Loga
     end
 
     private
+
+    def default_options
+      {
+        device:                    STDOUT,
+        enabled:                   true,
+        filter_parameters:         [],
+        host:                      gethostname,
+        level:                     :info,
+        service_version:           :git,
+        silence_rails_rack_logger: true,
+        sync:                      true,
+      }
+    end
+
+    def environment_options
+      ENV['LOGA_FORMATTER'].blank? ? {} : { formatter: ENV['LOGA_FORMATTER'] }
+    end
 
     def compute_service_version
       RevisionStrategy.call(service_version)
@@ -69,6 +87,12 @@ module Loga
 
     def constantized_log_level
       Logger.const_get(level.to_s.upcase)
+    end
+
+    def gethostname
+      Socket.gethostname
+    rescue Exception
+      'unknown.host'
     end
   end
 end

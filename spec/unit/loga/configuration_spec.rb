@@ -19,13 +19,15 @@ describe Loga::Configuration do
       specify { expect(subject.formatter).to eq(nil) }
     end
 
-    context 'when hostname cannot be resolved' do
-      before do
-        allow(Socket).to receive(:gethostname).and_raise(Exception)
-      end
+    describe 'hostname' do
+      context 'when hostname cannot be resolved' do
+        before do
+          allow(Socket).to receive(:gethostname).and_raise(Exception)
+        end
 
-      it 'uses a default hostname' do
-        expect(subject.host).to eq('unknown.host')
+        it 'uses a default hostname' do
+          expect(subject.host).to eq('unknown.host')
+        end
       end
     end
 
@@ -42,7 +44,7 @@ describe Loga::Configuration do
     end
 
     describe 'formatter' do
-      context 'when initialized with formatter' do
+      context 'when initialized with user options' do
         let(:options) { super().merge(formatter: 'gelf') }
 
         it 'sets the formatter' do
@@ -50,7 +52,7 @@ describe Loga::Configuration do
         end
       end
 
-      context 'when LOGA_FORMATTER is specified' do
+      context 'when initialized via ENV' do
         before do
           allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('gelf')
         end
@@ -60,15 +62,37 @@ describe Loga::Configuration do
         end
       end
 
-      context 'when initialized with options and LOGA_FORMATTER is specified' do
+      context 'when initialized via framework options' do
+        subject { described_class.new(options, framework_options) }
+        let(:framework_options) { { formatter: 'gelf' } }
+
+        it 'sets the formatter' do
+          expect(subject.formatter).to eq('gelf')
+        end
+      end
+
+      context 'when initialized with user options and ENV' do
         let(:options) { super().merge(formatter: 'gelf') }
 
         before do
           allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('plain')
         end
 
-        it 'prefers the options' do
+        it 'prefers user option' do
           expect(subject.formatter).to eq('gelf')
+        end
+      end
+
+      context 'when initialized with ENV and framework options' do
+        subject { described_class.new(options, framework_options) }
+        let(:framework_options) { { formatter: 'gelf' } }
+
+        before do
+          allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('plain')
+        end
+
+        it 'prefers env' do
+          expect(subject.formatter).to eq('plain')
         end
       end
     end
