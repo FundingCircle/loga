@@ -19,7 +19,7 @@ module Loga
       alias request_id uuid
 
       def action_controller
-        "#{action_controller_instance.class}##{action_controller_instance.action_name}"
+        "#{action_controller_instance.class.name}##{action_controller_instance.action_name}"
       end
 
       def action_controller_instance
