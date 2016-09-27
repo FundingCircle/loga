@@ -6,7 +6,11 @@ describe Loga::Rack::Request do
   let(:env)       { Rack::MockRequest.env_for(full_path, options) }
 
   let(:action_controller_class) do
-    ApplicationController = Class.new do
+    Class.new do
+      def self.name
+        'ApplicationController'
+      end
+
       def action_name
         'index'
       end
