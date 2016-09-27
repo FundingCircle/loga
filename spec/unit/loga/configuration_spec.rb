@@ -1,20 +1,22 @@
 require 'spec_helper'
 
 describe Loga::Configuration do
-  subject do
-    described_class.new.tap { |config| config.device = STDOUT }
+  let(:options) do
+    { service_name: 'hello_world_app' }
   end
 
+  subject { described_class.new(options) }
+
   describe 'initialize' do
-    subject { described_class.new }
     context 'defaults' do
       specify { expect(subject.host).to eq(hostname_anchor) }
       specify { expect(subject.level).to eq(:info) }
-      specify { expect(subject.device).to eq(nil) }
+      specify { expect(subject.device).to eq(STDOUT) }
       specify { expect(subject.sync).to eq(true) }
       specify { expect(subject.filter_parameters).to eq([]) }
-      specify { expect(subject.service_name).to eq(nil) }
+      specify { expect(subject.service_name).to eq('hello_world_app') }
       specify { expect(subject.service_version).to eq(:git) }
+      specify { expect(subject.formatter).to eq(nil) }
     end
 
     context 'when hostname cannot be resolved' do
@@ -26,17 +28,61 @@ describe Loga::Configuration do
         expect(subject.host).to eq('unknown.host')
       end
     end
-  end
 
-  describe '#initialize!' do
-    before do
-      subject.tap do |config|
-        config.service_name    = ' hello_world_app '
-        config.service_version = " 1.0\n"
+    describe 'service_name' do
+      context 'when service name is missing' do
+        let(:options) do
+          { service_: 'hello_world_app' }
+        end
+
+        it 'raises an error' do
+          expect { subject }.to raise_error(described_class::ServiceNameMissingError)
+        end
       end
     end
 
-    it 'initializes the formatter with stiped service name and version' do
+    describe 'formatter' do
+      context 'when initialized with formatter' do
+        let(:options) { super().merge(formatter: 'gelf') }
+
+        it 'sets the formatter' do
+          expect(subject.formatter).to eq('gelf')
+        end
+      end
+
+      context 'when LOGA_FORMATTER is specified' do
+        before do
+          allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('gelf')
+        end
+
+        it 'sets the formatter' do
+          expect(subject.formatter).to eq('gelf')
+        end
+      end
+
+      context 'when initialized with options and LOGA_FORMATTER is specified' do
+        let(:options) { super().merge(formatter: 'gelf') }
+
+        before do
+          allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('plain')
+        end
+
+        it 'prefers the options' do
+          expect(subject.formatter).to eq('gelf')
+        end
+      end
+    end
+  end
+
+  describe '#initialize!' do
+    let(:options) do
+      {
+        service_name: ' hello_world_app ',
+        service_version: " 1.0\n",
+      }
+    end
+
+    it 'initializes the formatter with stripped service name and version' do
       expect(Loga::Formatter).to receive(:new)
         .with(service_name: 'hello_world_app',
               service_version: '1.0',
@@ -104,12 +150,6 @@ describe Loga::Configuration do
 
     context 'when not initialized' do
       specify { expect(subject.logger).to be_nil }
-    end
-  end
-
-  describe '#configure' do
-    it 'yields self' do
-      expect { |b| subject.configure(&b) }.to yield_with_args(subject)
     end
   end
 end
