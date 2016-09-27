@@ -3,40 +3,44 @@ require 'socket'
 
 module Loga
   class Configuration
-    attr_accessor :service_name,
-                  :service_version,
-                  :device,
-                  :sync,
-                  :filter_parameters,
-                  :level,
-                  :host,
-                  :enabled,
-                  :silence_rails_rack_logger
+    ServiceNameMissingError = Class.new(StandardError)
 
+    DEFAULTS = {
+      device:            -> { STDOUT },
+      filter_parameters: -> { [] },
+      formatter:         -> { ENV['LOGA_FORMATTER'] },
+      host: lambda do
+        begin
+          Socket.gethostname
+        rescue Exception
+          'unknown.host'
+        end
+      end,
+      level:             -> { :info },
+      service_name:      -> { raise ServiceNameMissingError },
+      service_version:   -> { :git },
+      sync:              -> { true },
+      enabled:           -> { true },
+      silence_rails_rack_logger: -> { true },
+    }.freeze
+
+    private_constant :DEFAULTS
+    attr_accessor(*DEFAULTS.keys)
     attr_reader :logger
 
-    def initialize
-      @host              = gethostname
-      @device            = nil
-      @sync              = true
-      @level             = :info
-      @filter_parameters = []
-      @service_version   = :git
-
-      # Rails specific configuration
-      @enabled           = true
-      @silence_rails_rack_logger = true
+    def initialize(options = {})
+      DEFAULTS.each do |attribute, value|
+        public_send("#{attribute}=", options.fetch(attribute) { value.call })
+      end
     end
 
     def initialize!
-      @service_name = service_name.to_s.strip
       @service_version = compute_service_version
-
       initialize_logger
     end
 
-    def configure
-      yield self
+    def service_name=(name)
+      @service_name = name.to_s.strip
     end
 
     private
@@ -65,12 +69,6 @@ module Loga
 
     def constantized_log_level
       Logger.const_get(level.to_s.upcase)
-    end
-
-    def gethostname
-      Socket.gethostname
-    rescue Exception
-      'unknown.host'
     end
   end
 end

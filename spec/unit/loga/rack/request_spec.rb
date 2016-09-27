@@ -13,6 +13,12 @@ describe Loga::Rack::Request do
     end
   end
 
+  let(:config) { instance_double Loga::Configuration, filter_parameters: [:password] }
+
+  before do
+    allow(Loga).to receive(:configuration).and_return(config)
+  end
+
   subject { described_class.new(env) }
 
   describe '#uuid' do
@@ -84,18 +90,12 @@ describe Loga::Rack::Request do
   end
 
   describe '#filtered_full_path' do
-    let(:config) { double :config, filter_parameters: [:password] }
-
     let(:path)         { '/hello' }
     let(:query)        { { 'password' => 123, 'color' => 'red' }  }
     let(:query_string) { Rack::Utils.build_query(query) }
     let(:full_path)    { "#{path}?#{query_string}" }
 
     let(:options) { { 'loga.request.original_path' => path } }
-
-    before do
-      allow(Loga).to receive(:configuration).and_return(config)
-    end
 
     context 'request with sensitive parameters' do
       it 'returns the path with sensitive parameters filtered' do

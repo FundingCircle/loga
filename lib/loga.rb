@@ -12,16 +12,21 @@ require 'loga/rack/request_id'
 require 'loga/railtie' if defined?(Rails)
 
 module Loga
+  ConfigurationError = Class.new(StandardError)
+
   def self.configuration
-    @configuration ||= Configuration.new
+    if @configuration.nil?
+      raise ConfigurationError,
+            'Loga has not been configured. Configure with Loga.configure(options)'
+    end
+    @configuration
   end
 
-  def self.configure
-    yield configuration
-  end
-
-  def self.initialize!
-    configuration.initialize!
+  def self.configure(options)
+    unless @configuration.nil?
+      raise ConfigurationError, 'Loga has already been configured'
+    end
+    @configuration ||= Configuration.new(options)
   end
 
   def self.logger

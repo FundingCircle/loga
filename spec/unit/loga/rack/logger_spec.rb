@@ -7,9 +7,12 @@ describe Loga::Rack::Logger do
   let(:app)     {  ->(_env) { [response_status, {}, ''] } }
   let(:logger)  { double(:logger) }
 
+  let(:config) { instance_double Loga::Configuration, filter_parameters: [] }
+
   subject { described_class.new(app, logger) }
 
   before do
+    allow(Loga).to receive(:configuration).and_return(config)
     allow(logger).to receive(:info)
     allow(logger).to receive(:error)
   end
