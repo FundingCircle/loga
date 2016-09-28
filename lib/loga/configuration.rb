@@ -51,7 +51,7 @@ module Loga
         device:                    STDOUT,
         enabled:                   true,
         filter_parameters:         [],
-        host:                      gethostname,
+        host:                      hostname,
         level:                     :info,
         service_version:           :git,
         silence_rails_rack_logger: true,
@@ -89,7 +89,7 @@ module Loga
       Logger.const_get(level.to_s.upcase)
     end
 
-    def gethostname
+    def hostname
       Socket.gethostname
     rescue Exception
       'unknown.host'
