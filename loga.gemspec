@@ -29,4 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec',    '~> 3.0.0'
   spec.add_development_dependency 'rubocop',  '~> 0.40.0'
   spec.add_development_dependency 'timecop'
+  spec.add_development_dependency 'guard',         '~> 2.13'
+  spec.add_development_dependency 'guard-rubocop', '~> 1.2'
+  spec.add_development_dependency 'guard-rspec',   '~> 4.7.3'
 end
