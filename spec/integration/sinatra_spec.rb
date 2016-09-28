@@ -4,13 +4,12 @@ describe 'Rack request logger with Sinatra', timecop: true do
   let(:io) { StringIO.new }
   before do
     Loga.reset
-    Loga.configure do |config|
-      config.service_name      = 'hello_world_app'
-      config.service_version   = '1.0'
-      config.filter_parameters = [:password]
-      config.device            = io
-    end
-    Loga.initialize!
+    Loga.configure(
+      device: io,
+      filter_parameters: [:password],
+      service_name: 'hello_world_app',
+      service_version: '1.0',
+    )
   end
   let(:json) do
     io.rewind

@@ -61,11 +61,11 @@ module Rails32
     # parameters by using an attr_accessible or attr_protected declaration.
     # config.active_record.whitelist_attributes = true
     config.log_tags = [ :uuid, 'TEST_TAG' ]
-    config.loga.configure do |loga|
-      loga.service_name = 'hello_world_app'
-      loga.service_version = '1.0'
-      loga.host = 'bird.example.com'
-      loga.device = STREAM
-    end
+    config.loga = {
+      device: STREAM,
+      host: 'bird.example.com',
+      service_name: 'hello_world_app',
+      service_version: '1.0',
+    }
   end
 end

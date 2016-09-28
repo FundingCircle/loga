@@ -5,28 +5,11 @@ RSpec.describe Loga::Railtie do
   let(:middlewares)  { app.middleware.middlewares }
   let(:initializers) { described_class.initializers }
 
-  describe 'loga_initialize_logger' do
-    let(:initializer) { initializers.find { |i| i.name == :loga_initialize_logger } }
+  pending 'loga_initialize_logger' do
+    let(:expected_formatter) { Rails.env.production? ? :gelf : :plain }
 
-    let(:app)    { OpenStruct.new(config: config) }
-    let(:config) { OpenStruct.new(loga: loga, log_level: :info) }
-
-    before { initializer.run(app) }
-
-    context 'when loga is disabled' do
-      let(:loga) { Loga::Configuration.new.tap { |c| c.enabled = false } }
-
-      it 'is not initialized' do
-        expect(config.logger).to be_nil
-      end
-    end
-
-    context 'when loga is enabled' do
-      let(:loga) { Loga::Configuration.new }
-
-      it 'initializes the logger' do
-        expect(config.logger).to be_a(Logger)
-      end
+    it 'configures Loga with the correct formatter' do
+      expect(Loga.configuration.formatter).to eq(expected_formatter)
     end
   end
 
