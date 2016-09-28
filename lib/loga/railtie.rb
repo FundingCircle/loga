@@ -2,41 +2,45 @@ require 'loga'
 
 module Loga
   class Railtie < Rails::Railtie
+    config.loga = {}
+
     class InitializeLogger
       def initialize(app)
         @app = app
       end
 
       def call
-        loga.tap do |config|
-          config.sync  = sync
-          config.level = app.config.log_level
-        end
-        loga.initialize!
-        app.config.logger = loga.logger
+        Loga.configure(user_options, rails_options)
+        app.config.logger = Loga.logger
       end
 
       private
 
       attr_reader :app
 
-      def loga
+      def rails_options
+        {
+          formatter: identify_formatter,
+          sync:      sync,
+          level:     app.config.log_level,
+        }
+      end
+
+      def user_options
         app.config.loga
+      end
+
+      def identify_formatter
+        Rails.env.production? ? :gelf : :plain
       end
 
       def sync
         Rails::VERSION::MAJOR > 3 ? app.config.autoflush_log : true
       end
-
-      def constantized_log_level
-        Logger.const_get(app.config.log_level.to_s.upcase)
-      end
     end
 
-    config.loga = Loga::Configuration.new
-
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
-      InitializeLogger.new(app).call if app.config.loga.enabled
+      InitializeLogger.new(app).call
     end
 
     class InitializeMiddleware
@@ -82,8 +86,6 @@ module Loga
       # Removes start of request log
       # (e.g. Started GET "/users" for 127.0.0.1 at 2015-12-24 23:59:00 +0000)
       def disable_rails_rack_logger
-        return unless app.config.loga.silence_rails_rack_logger
-
         case Rails::VERSION::MAJOR
         when 3 then require 'loga/ext/rails/rack/logger3.rb'
         else
@@ -104,7 +106,7 @@ module Loga
     end
 
     initializer :loga_initialize_middleware do |app|
-      InitializeMiddleware.new(app).call if app.config.loga.enabled
+      InitializeMiddleware.new(app).call
       app.config.colorize_logging = false
     end
 
@@ -146,8 +148,8 @@ module Loga
       end
     end
 
-    config.after_initialize do |app|
-      InitializeInstrumentation.new.call if app.config.loga.enabled
+    config.after_initialize do |_|
+      InitializeInstrumentation.new.call
     end
   end
 end
