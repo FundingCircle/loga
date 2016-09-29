@@ -20,9 +20,9 @@ module Loga
 
       def rails_options
         {
-          formatter: identify_formatter,
-          sync:      sync,
-          level:     app.config.log_level,
+          format: format,
+          sync:   sync,
+          level:  app.config.log_level,
         }
       end
 
@@ -30,7 +30,7 @@ module Loga
         app.config.loga
       end
 
-      def identify_formatter
+      def format
         Rails.env.production? ? :gelf : :plain
       end
 
