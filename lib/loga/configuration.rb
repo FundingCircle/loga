@@ -1,4 +1,5 @@
 require 'active_support/core_ext/object/blank'
+require 'active_support/logger'
 require 'logger'
 require 'socket'
 
@@ -33,15 +34,21 @@ module Loga
       end
 
       raise ServiceNameMissingError if service_name.blank?
+
+      # TODO: @service_version = compute_service_version
+      initialize_logger
     end
 
-    def initialize!
-      @service_version = compute_service_version
-      initialize_logger
+    def format=(name)
+      @format = name.to_s.to_sym
     end
 
     def service_name=(name)
       @service_name = name.to_s.strip
+    end
+
+    def service_version=(name)
+      @service_version = name.to_s.strip
     end
 
     private
@@ -51,9 +58,9 @@ module Loga
         device:                    STDOUT,
         enabled:                   true,
         filter_parameters:         [],
+        format:                    :simple,
         host:                      hostname,
         level:                     :info,
-        service_version:           :git,
         silence_rails_rack_logger: true,
         sync:                      true,
       }
@@ -71,11 +78,7 @@ module Loga
       device.sync = sync
 
       logger           = Logger.new(device)
-      logger.formatter = Formatter.new(
-        service_name:    service_name,
-        service_version: service_version,
-        host:            host,
-      )
+      logger.formatter = assign_formatter
       logger.level     = constantized_log_level
     rescue
       logger           = Logger.new(STDERR)
@@ -93,6 +96,18 @@ module Loga
       Socket.gethostname
     rescue Exception
       'unknown.host'
+    end
+
+    def assign_formatter
+      if format == :gelf
+        Formatter.new(
+          service_name:    service_name,
+          service_version: service_version,
+          host:            host,
+        )
+      else
+        ActiveSupport::Logger::SimpleFormatter.new
+      end
     end
   end
 end

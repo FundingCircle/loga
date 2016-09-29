@@ -15,8 +15,8 @@ describe Loga::Configuration do
       specify { expect(subject.sync).to eq(true) }
       specify { expect(subject.filter_parameters).to eq([]) }
       specify { expect(subject.service_name).to eq('hello_world_app') }
-      specify { expect(subject.service_version).to eq(:git) }
-      specify { expect(subject.format).to eq(nil) }
+      specify { expect(subject.service_version).to eq('') }
+      specify { expect(subject.format).to eq(:simple) }
     end
 
     describe 'hostname' do
@@ -54,7 +54,7 @@ describe Loga::Configuration do
 
       context 'when initialized via ENV' do
         before do
-          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return(:gelf)
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return('gelf')
         end
 
         it 'sets the format' do
@@ -75,7 +75,7 @@ describe Loga::Configuration do
         let(:options) { super().merge(format: :gelf) }
 
         before do
-          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return(:plain)
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return('simple')
         end
 
         it 'prefers user option' do
@@ -88,50 +88,52 @@ describe Loga::Configuration do
         let(:framework_options) { { format: :gelf } }
 
         before do
-          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return(:plain)
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return('simple')
         end
 
         it 'prefers env' do
-          expect(subject.format).to eq(:plain)
+          expect(subject.format).to eq(:simple)
         end
       end
     end
-  end
 
-  describe '#initialize!' do
-    let(:options) do
-      {
-        service_name: ' hello_world_app ',
-        service_version: " 1.0\n",
-      }
-    end
+    describe 'formatter' do
+      context 'when format is :gelf' do
+        let(:options) do
+          super().merge(
+            format: :gelf,
+            service_name: ' hello_world_app ',
+            service_version: " 1.0\n",
+          )
+        end
+        let(:formatter) { subject.logger.formatter }
 
-    it 'initializes the formatter with stripped service name and version' do
-      expect(Loga::Formatter).to receive(:new)
-        .with(service_name: 'hello_world_app',
-              service_version: '1.0',
-              host: hostname_anchor)
-      subject.initialize!
+        it 'uses the GELF formatter' do
+          expect(subject.logger.formatter).to be_a(Loga::Formatter)
+        end
+
+        it 'strips the service name and version' do
+          aggregate_failures do
+            expect(formatter.instance_variable_get(:@service_name))
+              .to eq('hello_world_app')
+
+            expect(formatter.instance_variable_get(:@service_version))
+              .to eq('1.0')
+          end
+        end
+      end
+
+      context 'when format is :simple' do
+        let(:options) { super().merge(format: :simple) }
+
+        it 'uses the SimpleFormatter' do
+          expect(subject.logger.formatter).to be_a(ActiveSupport::Logger::SimpleFormatter)
+        end
+      end
     end
 
     describe 'logger' do
       let(:logdev) { subject.logger.instance_variable_get(:@logdev) }
-
-      context 'when device is nil' do
-        before do
-          subject.device = nil
-          allow(STDERR).to receive(:write)
-        end
-        let(:error_message) { /Loga could not be initialized/ }
-        it 'uses STDERR' do
-          subject.initialize!
-          expect(logdev.dev).to eq(STDERR)
-        end
-        it 'logs an error to STDERR' do
-          expect(STDERR).to receive(:write).with(error_message)
-          subject.initialize!
-        end
-      end
 
       {
         debug:   0,
@@ -142,38 +144,38 @@ describe Loga::Configuration do
         unknown: 5,
       }.each do |sym, level|
         context "when log level is #{sym}" do
-          before { subject.level = sym }
+          let(:options) { super().merge(level: sym) }
+
           it "uses log level #{sym}" do
-            subject.initialize!
             expect(subject.logger.level).to eq(level)
           end
         end
       end
 
       context 'when sync is false' do
-        before { subject.sync = false }
+        let(:options) { super().merge(sync: false) }
+
         it 'uses warn log level' do
-          subject.initialize!
           expect(logdev.dev.sync).to eq(false)
         end
       end
-    end
-  end
 
-  describe '#logger' do
-    context 'when initialized' do
-      before { subject.initialize! }
-      it 'returns a logger' do
-        expect(subject.logger).to be_a(Logger)
+      context 'when device is nil' do
+        let(:options) { super().merge(device: nil) }
+        let(:error_message) { /Loga could not be initialized/ }
+
+        before do
+          allow(STDERR).to receive(:write)
+        end
+
+        it 'uses STDERR' do
+          expect(logdev.dev).to eq(STDERR)
+        end
+        it 'logs an error to STDERR' do
+          expect(STDERR).to receive(:write).with(error_message)
+          subject
+        end
       end
-
-      it 'returns a tagged logger' do
-        expect(subject.logger).to respond_to(:tagged)
-      end
-    end
-
-    context 'when not initialized' do
-      specify { expect(subject.logger).to be_nil }
     end
   end
 end

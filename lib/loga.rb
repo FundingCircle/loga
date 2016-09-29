@@ -26,7 +26,7 @@ module Loga
     unless @configuration.nil?
       raise ConfigurationError, 'Loga has already been configured'
     end
-    @configuration ||= Configuration.new(options, framework_options).tap(&:initialize!)
+    @configuration ||= Configuration.new(options, framework_options)
   end
 
   def self.logger
