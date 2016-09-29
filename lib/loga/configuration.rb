@@ -10,7 +10,7 @@ module Loga
       device
       enabled
       filter_parameters
-      formatter
+      format
       host
       level
       service_name
@@ -60,7 +60,7 @@ module Loga
     end
 
     def environment_options
-      ENV['LOGA_FORMATTER'].blank? ? {} : { formatter: ENV['LOGA_FORMATTER'] }
+      ENV['LOGA_FORMAT'].blank? ? {} : { format: ENV['LOGA_FORMAT'] }
     end
 
     def compute_service_version

@@ -5,11 +5,11 @@ RSpec.describe Loga::Railtie do
   let(:middlewares)  { app.middleware.middlewares }
   let(:initializers) { described_class.initializers }
 
-  pending 'loga_initialize_logger' do
-    let(:expected_formatter) { Rails.env.production? ? :gelf : :plain }
+  describe 'loga_initialize_logger' do
+    let(:expected_format) { Rails.env.production? ? :gelf : :plain }
 
-    it 'configures Loga with the correct formatter' do
-      expect(Loga.configuration.formatter).to eq(expected_formatter)
+    it 'configures Loga with the correct format' do
+      expect(Loga.configuration.format).to eq(expected_format)
     end
   end
 

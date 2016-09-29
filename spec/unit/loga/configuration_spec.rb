@@ -16,7 +16,7 @@ describe Loga::Configuration do
       specify { expect(subject.filter_parameters).to eq([]) }
       specify { expect(subject.service_name).to eq('hello_world_app') }
       specify { expect(subject.service_version).to eq(:git) }
-      specify { expect(subject.formatter).to eq(nil) }
+      specify { expect(subject.format).to eq(nil) }
     end
 
     describe 'hostname' do
@@ -43,56 +43,56 @@ describe Loga::Configuration do
       end
     end
 
-    describe 'formatter' do
-      context 'when initialized with user options' do
-        let(:options) { super().merge(formatter: 'gelf') }
+    describe 'format' do
+      context 'when initialized via user options' do
+        let(:options) { super().merge(format: :gelf) }
 
-        it 'sets the formatter' do
-          expect(subject.formatter).to eq('gelf')
+        it 'sets the format' do
+          expect(subject.format).to eq(:gelf)
         end
       end
 
       context 'when initialized via ENV' do
         before do
-          allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('gelf')
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return(:gelf)
         end
 
-        it 'sets the formatter' do
-          expect(subject.formatter).to eq('gelf')
+        it 'sets the format' do
+          expect(subject.format).to eq(:gelf)
         end
       end
 
       context 'when initialized via framework options' do
         subject { described_class.new(options, framework_options) }
-        let(:framework_options) { { formatter: 'gelf' } }
+        let(:framework_options) { { format: :gelf } }
 
-        it 'sets the formatter' do
-          expect(subject.formatter).to eq('gelf')
+        it 'sets the format' do
+          expect(subject.format).to eq(:gelf)
         end
       end
 
       context 'when initialized with user options and ENV' do
-        let(:options) { super().merge(formatter: 'gelf') }
+        let(:options) { super().merge(format: :gelf) }
 
         before do
-          allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('plain')
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return(:plain)
         end
 
         it 'prefers user option' do
-          expect(subject.formatter).to eq('gelf')
+          expect(subject.format).to eq(:gelf)
         end
       end
 
       context 'when initialized with ENV and framework options' do
         subject { described_class.new(options, framework_options) }
-        let(:framework_options) { { formatter: 'gelf' } }
+        let(:framework_options) { { format: :gelf } }
 
         before do
-          allow(ENV).to receive(:[]).with('LOGA_FORMATTER').and_return('plain')
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return(:plain)
         end
 
         it 'prefers env' do
-          expect(subject.formatter).to eq('plain')
+          expect(subject.format).to eq(:plain)
         end
       end
     end
