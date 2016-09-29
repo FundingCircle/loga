@@ -7,6 +7,7 @@ describe 'Rack request logger with Sinatra', timecop: true do
     Loga.configure(
       device: io,
       filter_parameters: [:password],
+      format: :gelf,
       service_name: 'hello_world_app',
       service_version: '1.0',
     )
