@@ -5,8 +5,6 @@ require 'socket'
 
 module Loga
   class Configuration
-    ServiceNameMissingError = Class.new(StandardError)
-
     DEFAULT_KEYS = %i(
       device
       enabled
@@ -33,7 +31,7 @@ module Loga
         public_send("#{attribute}=", options[attribute])
       end
 
-      raise ServiceNameMissingError if service_name.blank?
+      raise ConfigurationError, 'Service name cannot be blank' if service_name.blank?
       raise ConfigurationError, 'Device cannot be blank' if device.blank?
 
       # TODO: @service_version = compute_service_version
