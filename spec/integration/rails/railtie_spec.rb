@@ -3,13 +3,18 @@ require 'ostruct'
 RSpec.describe Loga::Railtie do
   let(:app)          { Rails.application }
   let(:middlewares)  { app.middleware.middlewares }
-  let(:initializers) { described_class.initializers }
 
   describe 'loga_initialize_logger' do
-    let(:expected_format) { Rails.env.production? ? :gelf : :plain }
+    let(:expected_format) do
+      if Rails.env.production?
+        Loga::Formatter
+      else
+        ActiveSupport::Logger::SimpleFormatter
+      end
+    end
 
     it 'configures Loga with the correct format' do
-      expect(Loga.configuration.format).to eq(expected_format)
+      expect(Loga.configuration.logger.formatter).to be_a(expected_format)
     end
   end
 

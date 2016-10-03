@@ -4,7 +4,13 @@ module Loga
   class Railtie < Rails::Railtie
     config.loga = {}
 
+    # This service class initializes Loga with user options, framework smart
+    # options and update Rails logger with Loga
     class InitializeLogger
+      def self.call(app)
+        new(app).call
+      end
+
       def initialize(app)
         @app = app
       end
@@ -23,7 +29,11 @@ module Loga
           format: format,
           sync:   sync,
           level:  app.config.log_level,
-        }
+        }.merge(device_options)
+      end
+
+      def device_options
+        Rails.env.test? ? { device: File.open('log/test.log', 'a') } : {}
       end
 
       def user_options
@@ -40,7 +50,7 @@ module Loga
     end
 
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
-      InitializeLogger.new(app).call
+      InitializeLogger.call(app)
     end
 
     class InitializeMiddleware
@@ -60,15 +70,19 @@ module Loga
         end
       end
 
+      def self.call(app)
+        new(app).call
+      end
+
       def initialize(app)
         @app = app
       end
 
       def call
         insert_loga_rack_logger
-        disable_rails_rack_logger
+        silence_rails_rack_logger
         insert_exceptions_catcher
-        disable_action_dispatch_debug_exceptions
+        silence_action_dispatch_debug_exceptions_logger
       end
 
       private
@@ -85,15 +99,19 @@ module Loga
 
       # Removes start of request log
       # (e.g. Started GET "/users" for 127.0.0.1 at 2015-12-24 23:59:00 +0000)
-      def disable_rails_rack_logger
+      def silence_rails_rack_logger
         case Rails::VERSION::MAJOR
-        when 3 then require 'loga/ext/rails/rack/logger3.rb'
+        when 3    then require 'loga/ext/rails/rack/logger3.rb'
+        when 4..5 then require 'loga/ext/rails/rack/logger.rb'
         else
-          require 'loga/ext/rails/rack/logger.rb'
+          raise Loga::ConfigurationError,
+                "Rails #{Rails::VERSION::MAJOR} is unsupported"
         end
       end
 
-      def disable_action_dispatch_debug_exceptions
+      # Removes unstructured exception output. Exceptions are logged with
+      # Loga::Rack::Logger instead
+      def silence_action_dispatch_debug_exceptions_logger
         require 'loga/ext/rails/rack/debug_exceptions.rb'
       end
 
@@ -106,22 +124,30 @@ module Loga
     end
 
     initializer :loga_initialize_middleware do |app|
-      InitializeMiddleware.new(app).call
+      InitializeMiddleware.call(app)
       app.config.colorize_logging = false
     end
 
     class InitializeInstrumentation
+      def self.call
+        new.call
+      end
+
       def call
-        remove_existing_log_subscriptions
+        ensure_subscriptions_attached
+        remove_log_subscriptions
       end
 
       private
 
-      # rubocop:disable Metrics/LineLength, Metrics/CyclomaticComplexity
-      def remove_existing_log_subscriptions
+      # Ensure LogSubscribers are attached when available
+      def ensure_subscriptions_attached
         ActionView::Base       if defined?(ActionView::Base)
         ActionController::Base if defined?(ActionController::Base)
+      end
 
+      # rubocop:disable Metrics/LineLength
+      def remove_log_subscriptions
         ActiveSupport::LogSubscriber.log_subscribers.each do |subscriber|
           case subscriber
           when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
@@ -131,7 +157,7 @@ module Loga
           end
         end
       end
-      # rubocop:enable Metrics/LineLength, Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/LineLength
 
       def unsubscribe(component, subscriber)
         events = subscriber
@@ -151,7 +177,7 @@ module Loga
     end
 
     config.after_initialize do |_|
-      InitializeInstrumentation.new.call
+      InitializeInstrumentation.call
     end
   end
 end
