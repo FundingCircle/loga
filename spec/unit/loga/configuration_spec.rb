@@ -19,6 +19,17 @@ describe Loga::Configuration do
       specify { expect(subject.format).to eq(:simple) }
     end
 
+    describe 'device' do
+      context 'when initialized with nil' do
+        let(:options) { super().merge(device: nil) }
+
+        it 'raises an error' do
+          expect { described_class.new(options) }
+            .to raise_error(Loga::ConfigurationError, 'Device cannot be blank')
+        end
+      end
+    end
+
     describe 'hostname' do
       context 'when hostname cannot be resolved' do
         before do
@@ -130,6 +141,14 @@ describe Loga::Configuration do
           expect(subject.logger.formatter).to be_a(ActiveSupport::Logger::SimpleFormatter)
         end
       end
+
+      context 'when the ActiveSupport::VERSION is unsupported' do
+        it 'raises an error' do
+          stub_const('ActiveSupport::VERSION::MAJOR', 1)
+          expect { described_class.new(options) }
+            .to raise_error(Loga::ConfigurationError, 'ActiveSupport 1 is unsupported')
+        end
+      end
     end
 
     describe 'logger' do
@@ -157,23 +176,6 @@ describe Loga::Configuration do
 
         it 'uses warn log level' do
           expect(logdev.dev.sync).to eq(false)
-        end
-      end
-
-      context 'when device is nil' do
-        let(:options) { super().merge(device: nil) }
-        let(:error_message) { /Loga could not be initialized/ }
-
-        before do
-          allow(STDERR).to receive(:write)
-        end
-
-        it 'uses STDERR' do
-          expect(logdev.dev).to eq(STDERR)
-        end
-        it 'logs an error to STDERR' do
-          expect(STDERR).to receive(:write).with(error_message)
-          subject
         end
       end
     end

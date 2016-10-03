@@ -1,5 +1,5 @@
 require 'active_support/core_ext/object/blank'
-require 'active_support/logger'
+require 'active_support/version'
 require 'logger'
 require 'socket'
 
@@ -34,6 +34,7 @@ module Loga
       end
 
       raise ServiceNameMissingError if service_name.blank?
+      raise ConfigurationError, 'Device cannot be blank' if device.blank?
 
       # TODO: @service_version = compute_service_version
       initialize_logger
@@ -80,11 +81,6 @@ module Loga
       logger           = Logger.new(device)
       logger.formatter = assign_formatter
       logger.level     = constantized_log_level
-    rescue
-      logger           = Logger.new(STDERR)
-      logger.level     = Logger::ERROR
-      logger.error 'Loga could not be initialized'
-    ensure
       @logger          = TaggedLogging.new(logger)
     end
 
@@ -106,7 +102,21 @@ module Loga
           host:            host,
         )
       else
+        active_support_simple_formatter
+      end
+    end
+
+    def active_support_simple_formatter
+      case ActiveSupport::VERSION::MAJOR
+      when 3
+        require 'active_support/core_ext/logger'
+        Logger::SimpleFormatter.new
+      when 4..5
+        require 'active_support/logger'
         ActiveSupport::Logger::SimpleFormatter.new
+      else
+        raise Loga::ConfigurationError,
+              "ActiveSupport #{ActiveSupport::VERSION::MAJOR} is unsupported"
       end
     end
   end
