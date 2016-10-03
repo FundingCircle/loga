@@ -1,17 +1,24 @@
-inherit_from: .rubocop_todo.yml
-
 AllCops:
   Exclude:
     - 'spec/fixtures/**/*'
     - '*.gemspec'
 
-Style/TrailingCommaInLiteral:
-  Enabled: true
-  EnforcedStyleForMultiline: comma
+Documentation:
+    Enabled: false
 
-Style/TrailingCommaInArguments:
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/LineLength:
   Enabled: true
-  EnforcedStyleForMultiline: comma
+  Max: 90
+
+Metrics/MethodLength:
+  Enabled: true
+  Max: 15
+
+Style/ExtraSpacing:
+  Enabled: false
 
 Style/BlockDelimiters:
   Enabled: false
@@ -22,8 +29,13 @@ Style/FormatString:
 Style/PerlBackrefs:
   Enabled: false
 
-Style/ExtraSpacing:
-  Enabled: false
-
 Style/SpaceAroundOperators:
   Enabled: false
+
+Style/TrailingCommaInLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInArguments:
+  Enabled: true
+  EnforcedStyleForMultiline: comma

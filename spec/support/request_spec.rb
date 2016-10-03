@@ -58,7 +58,8 @@ RSpec.shared_examples 'request logger' do
 
     it 'preseves request parameters' do
       post '/users?username=yoshi', email: 'hello@world.com'
-      expect(json_response).to include('email' => 'hello@world.com', 'username' => 'yoshi')
+      expect(json_response)
+        .to include('email' => 'hello@world.com', 'username' => 'yoshi')
     end
   end
 

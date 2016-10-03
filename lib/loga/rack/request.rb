@@ -18,9 +18,11 @@ module Loga
 
       alias request_id uuid
 
+      # rubocop:disable Metrics/LineLength
       def action_controller
         "#{action_controller_instance.class.name}##{action_controller_instance.action_name}"
       end
+      # rubocop:enable Metrics/LineLength
 
       def action_controller_instance
         @action_controller_instance ||= env[ACTION_CONTROLLER_INSTANCE]
@@ -30,10 +32,12 @@ module Loga
         env['loga.request.original_path']
       end
 
+      # rubocop:disable Metrics/LineLength
       def filtered_full_path
         @filtered_full_path ||=
           query_string.empty? ? original_path : "#{original_path}?#{filtered_query_string}"
       end
+      # rubocop:enable Metrics/LineLength
 
       def filtered_parameters
         @filtered_parameters ||= filtered_query_hash.merge(filtered_form_hash)
