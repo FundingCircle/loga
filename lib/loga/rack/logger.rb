@@ -37,6 +37,7 @@ module Loga
         send_message
       end
 
+      # rubocop:disable Metrics/LineLength
       def set_data
         data['method']     = request.request_method
         data['path']       = request.original_path
@@ -47,6 +48,7 @@ module Loga
         data['controller'] = request.action_controller if request.action_controller_instance
         data['duration']   = duration_in_ms(started_at, Time.now)
       end
+      # rubocop:enable Metrics/LineLength
 
       def send_message
         event = Loga::Event.new(

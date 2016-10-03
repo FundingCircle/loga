@@ -117,7 +117,7 @@ module Loga
 
       private
 
-      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/LineLength, Metrics/CyclomaticComplexity
       def remove_existing_log_subscriptions
         ActionView::Base       if defined?(ActionView::Base)
         ActionController::Base if defined?(ActionController::Base)
@@ -131,10 +131,12 @@ module Loga
           end
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/LineLength, Metrics/CyclomaticComplexity
 
       def unsubscribe(component, subscriber)
-        events = subscriber.public_methods(false).reject { |method| method.to_s == 'call' }
+        events = subscriber
+                 .public_methods(false)
+                 .reject { |method| method.to_s == 'call' }
         events.each do |event|
           ActiveSupport::Notifications
             .notifier
