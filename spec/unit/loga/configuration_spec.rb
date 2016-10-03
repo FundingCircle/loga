@@ -49,7 +49,8 @@ describe Loga::Configuration do
         end
 
         it 'raises an error' do
-          expect { subject }.to raise_error(described_class::ServiceNameMissingError)
+          expect { subject }.to raise_error(Loga::ConfigurationError,
+                                            'Service name cannot be blank')
         end
       end
     end
