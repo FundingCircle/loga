@@ -17,6 +17,7 @@ module Loga
 
       def call
         Loga.configure(user_options, rails_options)
+        app.config.colorize_logging = false if Loga.configuration.structured?
         app.config.logger = Loga.logger
       end
 
@@ -124,8 +125,7 @@ module Loga
     end
 
     initializer :loga_initialize_middleware do |app|
-      InitializeMiddleware.call(app)
-      app.config.colorize_logging = false
+      InitializeMiddleware.call(app) if Loga.configuration.structured?
     end
 
     class InitializeInstrumentation
@@ -177,7 +177,7 @@ module Loga
     end
 
     config.after_initialize do |_|
-      InitializeInstrumentation.call
+      InitializeInstrumentation.call if Loga.configuration.structured?
     end
   end
 end

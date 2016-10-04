@@ -48,6 +48,10 @@ module Loga
       @service_version = name.to_s.strip
     end
 
+    def structured?
+      format == :gelf
+    end
+
     private
 
     def default_options
