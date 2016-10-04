@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Rack request logger with Sinatra', timecop: true do
+RSpec.describe 'Structured logging with Sinatra', timecop: true do
   let(:io) { StringIO.new }
   before do
     Loga.reset
