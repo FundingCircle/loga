@@ -7,14 +7,12 @@ module Loga
   class Configuration
     DEFAULT_KEYS = %i(
       device
-      enabled
       filter_parameters
       format
       host
       level
       service_name
       service_version
-      silence_rails_rack_logger
       sync
     ).freeze
 
@@ -54,14 +52,12 @@ module Loga
 
     def default_options
       {
-        device:                    STDOUT,
-        enabled:                   true,
-        filter_parameters:         [],
-        format:                    :simple,
-        host:                      hostname,
-        level:                     :info,
-        silence_rails_rack_logger: true,
-        sync:                      true,
+        device:            STDOUT,
+        filter_parameters: [],
+        format:            :simple,
+        host:              hostname,
+        level:             :info,
+        sync:              true,
       }
     end
 
