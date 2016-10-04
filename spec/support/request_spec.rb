@@ -5,7 +5,7 @@ RSpec.shared_examples 'request logger' do
           { username: 'yoshi' },
           'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
-      expect(json).to include(
+      expect(last_log_entry).to include(
         'version'             => '1.1',
         'host'                => 'bird.example.com',
         'short_message'       => 'GET /ok?username=yoshi 200 in 0ms',
@@ -35,7 +35,7 @@ RSpec.shared_examples 'request logger' do
            { email: 'hello@world.com' },
            'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
-      expect(json).to include(
+      expect(last_log_entry).to include(
         'version'             => '1.1',
         'host'                => 'bird.example.com',
         'short_message'       => 'POST /users?username=yoshi 200 in 0ms',
@@ -67,7 +67,7 @@ RSpec.shared_examples 'request logger' do
     it 'specifies the original path' do
       get '/new', {}, 'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
-      expect(json).to include(
+      expect(last_log_entry).to include(
         'version'             => '1.1',
         'host'                => 'bird.example.com',
         'short_message'       => 'GET /new 302 in 0ms',
@@ -95,7 +95,7 @@ RSpec.shared_examples 'request logger' do
           { username: 'yoshi' },
           'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
-      expect(json).to include(
+      expect(last_log_entry).to include(
         'version'              => '1.1',
         'host'                 => 'bird.example.com',
         'short_message'        => 'GET /error?username=yoshi 500 in 0ms',
@@ -124,7 +124,7 @@ RSpec.shared_examples 'request logger' do
     it 'does not log the framework exception' do
       get '/not_found', {}, 'HTTP_X_REQUEST_ID' => '471a34dc'
 
-      expect(json).to include(
+      expect(last_log_entry).to include(
         'version'              => '1.1',
         'host'                 => 'bird.example.com',
         'short_message'        => 'GET /not_found 404 in 0ms',
@@ -153,13 +153,13 @@ RSpec.shared_examples 'request logger' do
       let(:params) { { password: 'password123' } }
 
       it 'filters the parameter from the params hash' do
-        expect(json).to include(
+        expect(last_log_entry).to include(
           '_request.params' => { 'password' => '[FILTERED]' },
         )
       end
 
       it 'filters the parameter from the message' do
-        expect(json).to include(
+        expect(last_log_entry).to include(
           'short_message' => 'GET /ok?password=[FILTERED] 200 in 0ms',
         )
       end
@@ -169,13 +169,13 @@ RSpec.shared_examples 'request logger' do
       let(:params) { { users: [password: 'password123'] } }
 
       it 'filters the parameter from the params hash' do
-        expect(json).to include(
+        expect(last_log_entry).to include(
           '_request.params' => { 'users' => ['password' => '[FILTERED]'] },
         )
       end
 
       it 'filters the parameter from the message' do
-        expect(json).to include(
+        expect(last_log_entry).to include(
           'short_message' => 'GET /ok?users[][password]=[FILTERED] 200 in 0ms',
         )
       end

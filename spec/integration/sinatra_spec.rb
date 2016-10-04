@@ -12,7 +12,7 @@ RSpec.describe 'Structured logging with Sinatra', timecop: true do
       service_version: '1.0',
     )
   end
-  let(:json) do
+  let(:last_log_entry) do
     io.rewind
     JSON.parse(io.read)
   end
@@ -54,6 +54,6 @@ RSpec.describe 'Structured logging with Sinatra', timecop: true do
 
   it 'does not include the controller name and action' do
     get '/ok'
-    expect(json).to_not include('_request.controller')
+    expect(last_log_entry).to_not include('_request.controller')
   end
 end

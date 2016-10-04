@@ -4,7 +4,7 @@ RSpec.describe 'Structured logging with Rails', timecop: true,
                                                 if: Rails.env.production? do
   let(:app) { Rails.application }
 
-  let(:json_entries) do
+  let(:log_entries) do
     entries = []
     STREAM.tap do |s|
       s.rewind
@@ -15,8 +15,8 @@ RSpec.describe 'Structured logging with Rails', timecop: true,
     entries
   end
 
-  let(:json) { json_entries.last }
-  let(:json_response) { JSON.parse(last_response.body) }
+  let(:last_log_entry) { log_entries.last }
+  let(:json_response)  { JSON.parse(last_response.body) }
 
   include_examples 'request logger'
 
@@ -27,13 +27,13 @@ RSpec.describe 'Structured logging with Rails', timecop: true,
 
   it 'includes the controller name and action' do
     get '/ok'
-    expect(json).to include('_request.controller' => 'ApplicationController#ok')
+    expect(last_log_entry).to include('_request.controller' => 'ApplicationController#ok')
   end
 
   describe 'LogSubscriber' do
     context 'ActionController' do
       let(:action_controller_notifications) do
-        json_entries.select { |e| e.to_json =~ /Processing by|Completed/ }
+        log_entries.select { |e| e.to_json =~ /Processing by|Completed/ }
       end
 
       it 'silences ActionController::LogSubscriber' do
@@ -44,7 +44,7 @@ RSpec.describe 'Structured logging with Rails', timecop: true,
 
     context 'ActionView' do
       let(:action_view_notifications) do
-        json_entries.select { |e| e.to_json =~ /Rendered/ }
+        log_entries.select { |e| e.to_json =~ /Rendered/ }
       end
 
       it 'silences ActionView::LogSubscriber' do
@@ -57,8 +57,8 @@ RSpec.describe 'Structured logging with Rails', timecop: true,
   describe 'when request causes ActionDispatch 404' do
     it 'does not log ActionDispatch::DebugExceptions' do
       get '/not_found', {}, 'HTTP_X_REQUEST_ID' => '471a34dc'
-      expect(json_entries.count).to eq(1)
-      expect(json['short_message']).to eq('GET /not_found 404 in 0ms')
+      expect(log_entries.count).to eq(1)
+      expect(last_log_entry['short_message']).to eq('GET /not_found 404 in 0ms')
     end
   end
 end
