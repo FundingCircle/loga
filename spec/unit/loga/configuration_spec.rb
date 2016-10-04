@@ -180,5 +180,19 @@ describe Loga::Configuration do
         end
       end
     end
+
+    describe '#structured?' do
+      context 'when format is :simple' do
+        let(:options) { super().merge(format: :simple) }
+
+        specify { expect(subject.structured?).to eql(false) }
+      end
+
+      context 'when format is :gelf' do
+        let(:options) { super().merge(format: :gelf) }
+
+        specify { expect(subject.structured?).to eql(true) }
+      end
+    end
   end
 end
