@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-describe 'Integration with Rails', timecop: true do
+RSpec.describe 'Structured logging with Rails', timecop: true,
+                                                if: Rails.env.production? do
   let(:app) { Rails.application }
 
   let(:json_entries) do
