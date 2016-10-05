@@ -8,8 +8,16 @@ describe Loga::Configuration do
   subject { described_class.new(options) }
 
   describe 'initialize' do
+    let(:framework_exceptions) do
+      %w(
+        ActionController::RoutingError
+        Sinatra::NotFound
+      )
+    end
+
     context 'defaults' do
       specify { expect(subject.device).to eq(STDOUT) }
+      specify { expect(subject.filter_exceptions).to eq(framework_exceptions) }
       specify { expect(subject.filter_parameters).to eq([]) }
       specify { expect(subject.format).to eq(:simple) }
       specify { expect(subject.host).to eq(hostname_anchor) }

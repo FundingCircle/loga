@@ -50,7 +50,7 @@ module Loga
       def send_message
         event = Loga::Event.new(
           data:       { request: data },
-          exception:  fetch_exception,
+          exception:  compute_exception,
           message:    compute_message,
           timestamp:  started_at,
           type:       'request',
@@ -72,21 +72,19 @@ module Loga
       end
 
       def compute_level
-        fetch_exception ? :error : :info
+        compute_exception ? :error : :info
       end
 
-      def fetch_exception
-        framework_exception.tap do |e|
-          return filtered_exceptions.include?(e.class.to_s) ? nil : e
-        end
+      def compute_exception
+        filter_exceptions.include?(exception.class.to_s) ? nil : exception
       end
 
-      def framework_exception
+      def exception
         env['loga.exception'] || env['action_dispatch.exception'] || env['sinatra.error']
       end
 
-      def filtered_exceptions
-        %w(ActionController::RoutingError Sinatra::NotFound)
+      def filter_exceptions
+        Loga.configuration.filter_exceptions
       end
 
       def compute_tags(request)

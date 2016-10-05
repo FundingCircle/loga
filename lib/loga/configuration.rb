@@ -7,6 +7,7 @@ module Loga
   class Configuration
     DEFAULT_KEYS = %i(
       device
+      filter_exceptions
       filter_parameters
       format
       host
@@ -15,6 +16,11 @@ module Loga
       service_version
       sync
       tags
+    ).freeze
+
+    FRAMEWORK_EXCEPTIONS = %w(
+      ActionController::RoutingError
+      Sinatra::NotFound
     ).freeze
 
     attr_accessor(*DEFAULT_KEYS)
@@ -58,6 +64,7 @@ module Loga
     def default_options
       {
         device:            STDOUT,
+        filter_exceptions: FRAMEWORK_EXCEPTIONS,
         filter_parameters: [],
         format:            :simple,
         host:              hostname,
