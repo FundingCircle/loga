@@ -9,14 +9,15 @@ describe Loga::Configuration do
 
   describe 'initialize' do
     context 'defaults' do
+      specify { expect(subject.device).to eq(STDOUT) }
+      specify { expect(subject.filter_parameters).to eq([]) }
+      specify { expect(subject.format).to eq(:simple) }
       specify { expect(subject.host).to eq(hostname_anchor) }
       specify { expect(subject.level).to eq(:info) }
-      specify { expect(subject.device).to eq(STDOUT) }
-      specify { expect(subject.sync).to eq(true) }
-      specify { expect(subject.filter_parameters).to eq([]) }
       specify { expect(subject.service_name).to eq('hello_world_app') }
       specify { expect(subject.service_version).to eq('') }
-      specify { expect(subject.format).to eq(:simple) }
+      specify { expect(subject.sync).to eq(true) }
+      specify { expect(subject.tags).to eq([]) }
     end
 
     describe 'device' do

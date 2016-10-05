@@ -3,10 +3,8 @@ module Loga
     class Logger
       include Utilities
 
-      attr_reader :taggers
-      def initialize(app, _logger = nil, taggers = nil)
+      def initialize(app, _logger = nil, _taggers = nil)
         @app           = app
-        @taggers       = taggers || []
       end
 
       def call(env)
@@ -92,7 +90,7 @@ module Loga
       end
 
       def compute_tags(request)
-        taggers.collect do |tag|
+        tags.map do |tag|
           case tag
           when Proc
             tag.call(request)
@@ -102,6 +100,10 @@ module Loga
             tag
           end
         end
+      end
+
+      def tags
+        Loga.configuration.tags
       end
     end
   end

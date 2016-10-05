@@ -14,6 +14,7 @@ module Loga
       service_name
       service_version
       sync
+      tags
     ).freeze
 
     attr_accessor(*DEFAULT_KEYS)
@@ -62,6 +63,7 @@ module Loga
         host:              hostname,
         level:             :info,
         sync:              true,
+        tags:              [],
       }
     end
 

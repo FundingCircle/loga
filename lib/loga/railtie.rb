@@ -28,8 +28,9 @@ module Loga
       def rails_options
         {
           format: format,
-          sync:   sync,
           level:  app.config.log_level,
+          sync:   sync,
+          tags:   app.config.log_tags,
         }.merge(device_options)
       end
 
@@ -120,7 +121,7 @@ module Loga
         app.middleware.insert_after Rails::Rack::Logger,
                                     Loga::Rack::Logger,
                                     nil,
-                                    app.config.log_tags
+                                    nil
       end
     end
 
