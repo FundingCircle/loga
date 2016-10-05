@@ -5,17 +5,19 @@ describe Loga::Rack::Logger do
   let(:env)     { Rack::MockRequest.env_for('/about_us?limit=1', options) }
   let(:options) { {} }
   let(:app)     {  ->(_env) { [response_status, {}, ''] } }
-  let(:logger)  { double(:logger) }
+  let(:logger)  { instance_double(Logger, info: nil, error: nil) }
 
-  let(:config) { instance_double Loga::Configuration, filter_parameters: [] }
-
-  subject { described_class.new(app, logger) }
-
-  before do
-    allow(Loga).to receive(:configuration).and_return(config)
-    allow(logger).to receive(:info)
-    allow(logger).to receive(:error)
+  let(:configuration) do
+    instance_double(
+      Loga::Configuration,
+      filter_parameters: [],
+      logger: logger,
+    )
   end
+
+  subject { described_class.new(app) }
+
+  before { Loga.instance_variable_set(:@configuration, configuration) }
 
   shared_examples 'logs the event' do |details|
     let(:level) { details[:level] }
