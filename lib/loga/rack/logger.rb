@@ -3,8 +3,8 @@ module Loga
     class Logger
       include Utilities
 
-      def initialize(app, _logger = nil, _taggers = nil)
-        @app           = app
+      def initialize(app)
+        @app = app
       end
 
       def call(env)

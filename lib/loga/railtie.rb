@@ -118,10 +118,7 @@ module Loga
       end
 
       def insert_loga_rack_logger
-        app.middleware.insert_after Rails::Rack::Logger,
-                                    Loga::Rack::Logger,
-                                    nil,
-                                    nil
+        app.middleware.insert_after Rails::Rack::Logger, Loga::Rack::Logger
       end
     end
 
