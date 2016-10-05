@@ -10,6 +10,7 @@ RSpec.describe 'Structured logging with Sinatra', timecop: true do
       format: :gelf,
       service_name: 'hello_world_app',
       service_version: '1.0',
+      tags: [:uuid, 'TEST_TAG'],
     )
   end
   let(:last_log_entry) do
@@ -24,7 +25,7 @@ RSpec.describe 'Structured logging with Sinatra', timecop: true do
       set :show_exceptions, false
 
       use Loga::Rack::RequestId
-      use Loga::Rack::Logger, nil, [:uuid, 'TEST_TAG']
+      use Loga::Rack::Logger
 
       error do
         status 500
