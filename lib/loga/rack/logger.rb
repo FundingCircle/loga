@@ -3,10 +3,9 @@ module Loga
     class Logger
       include Utilities
 
-      attr_reader :logger, :taggers
-      def initialize(app, logger = nil, taggers = nil)
+      attr_reader :taggers
+      def initialize(app, _logger = nil, taggers = nil)
         @app           = app
-        @logger        = logger
         @taggers       = taggers || []
       end
 
@@ -59,6 +58,10 @@ module Loga
           type:       'request',
         )
         logger.public_send(compute_level, event)
+      end
+
+      def logger
+        Loga.logger
       end
 
       def compute_message
