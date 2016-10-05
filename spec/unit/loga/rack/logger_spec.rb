@@ -10,6 +10,7 @@ describe Loga::Rack::Logger do
   let(:configuration) do
     instance_double(
       Loga::Configuration,
+      filter_exceptions: %w(ActionController::RoutingError),
       filter_parameters: [],
       logger: logger,
     )
