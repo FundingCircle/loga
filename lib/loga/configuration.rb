@@ -4,6 +4,7 @@ require 'logger'
 require 'socket'
 
 module Loga
+  # rubocop:disable Metrics/ClassLength
   class Configuration
     DEFAULT_KEYS = %i(
       device
@@ -20,6 +21,7 @@ module Loga
 
     FRAMEWORK_EXCEPTIONS = %w(
       ActionController::RoutingError
+      ActiveRecord::RecordNotFound
       Sinatra::NotFound
     ).freeze
 
@@ -78,7 +80,8 @@ module Loga
       { format: ENV['LOGA_FORMAT'].presence }.delete_if { |_, v| v.nil? }
     end
 
-    def compute_service_version
+    def compute
+      _service_version
       RevisionStrategy.call(service_version)
     end
 
@@ -129,4 +132,5 @@ module Loga
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

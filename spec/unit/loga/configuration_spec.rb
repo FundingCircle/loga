@@ -11,6 +11,7 @@ describe Loga::Configuration do
     let(:framework_exceptions) do
       %w(
         ActionController::RoutingError
+        ActiveRecord::RecordNotFound
         Sinatra::NotFound
       )
     end
