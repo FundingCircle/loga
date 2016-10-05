@@ -144,4 +144,8 @@ Refer to the [Appraisals](https://github.com/FundingCircle/loga/blob/master/Appr
 - [Rails](https://github.com/rails/rails)
 - [RackLogstasher](https://github.com/alphagov/rack-logstasher)
 
+## License
+
 Copyright (c) 2015 Funding Circle. All rights reserved.
+
+Distributed under the BSD 3-Clause License.
