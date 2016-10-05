@@ -66,7 +66,7 @@ module Loga
     end
 
     def environment_options
-      ENV['LOGA_FORMAT'].blank? ? {} : { format: ENV['LOGA_FORMAT'] }
+      { format: ENV['LOGA_FORMAT'].presence }.delete_if { |_, v| v.nil? }
     end
 
     def compute_service_version
