@@ -16,6 +16,7 @@ module Loga
       end
 
       def call
+        validate_user_options
         Loga.configure(user_options, rails_options)
         app.config.colorize_logging = false if Loga.configuration.structured?
         app.config.logger = Loga.logger
@@ -49,6 +50,18 @@ module Loga
       def sync
         Rails::VERSION::MAJOR > 3 ? app.config.autoflush_log : true
       end
+
+      # rubocop:disable Metrics/LineLength
+      def validate_user_options
+        if user_options[:tags].present?
+          raise Loga::ConfigurationError, 'Configure tags with Rails config.log_tags'
+        elsif user_options[:level].present?
+          raise Loga::ConfigurationError, 'Configure level with Rails config.log_level'
+        elsif user_options[:filter_parameters].present?
+          raise Loga::ConfigurationError, 'Configure filter_parameters with Rails config.filter_parameters'
+        end
+      end
+      # rubocop:enable Metrics/LineLength
     end
 
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
