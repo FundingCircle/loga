@@ -1,10 +1,10 @@
 require 'active_support/core_ext/object/blank'
 require 'active_support/version'
+require 'loga/service_version_strategies'
 require 'logger'
 require 'socket'
 
 module Loga
-  # rubocop:disable Metrics/ClassLength
   class Configuration
     DEFAULT_KEYS = %i(
       device
@@ -26,7 +26,7 @@ module Loga
     ).freeze
 
     attr_accessor(*DEFAULT_KEYS)
-    attr_reader :logger
+    attr_reader :logger, :service_version
     private_constant :DEFAULT_KEYS
 
     def initialize(user_options = {}, framework_options = {})
@@ -41,8 +41,8 @@ module Loga
       raise ConfigurationError, 'Service name cannot be blank' if service_name.blank?
       raise ConfigurationError, 'Device cannot be blank' if device.blank?
 
-      # TODO: @service_version = compute_service_version
-      initialize_logger
+      @service_version = initialize_service_version
+      @logger          = initialize_logger
     end
 
     def format=(name)
@@ -51,10 +51,6 @@ module Loga
 
     def service_name=(name)
       @service_name = name.to_s.strip
-    end
-
-    def service_version=(name)
-      @service_version = name.to_s.strip
     end
 
     def structured?
@@ -80,18 +76,16 @@ module Loga
       { format: ENV['LOGA_FORMAT'].presence }.delete_if { |_, v| v.nil? }
     end
 
-    def compute
-      _service_version
-      RevisionStrategy.call(service_version)
+    def initialize_service_version
+      service_version || ServiceVersionStrategies.call
     end
 
     def initialize_logger
-      device.sync = sync
-
+      device.sync      = sync
       logger           = Logger.new(device)
       logger.formatter = assign_formatter
       logger.level     = constantized_log_level
-      @logger          = TaggedLogging.new(logger)
+      TaggedLogging.new(logger)
     end
 
     def constantized_log_level
@@ -132,5 +126,4 @@ module Loga
       end
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end

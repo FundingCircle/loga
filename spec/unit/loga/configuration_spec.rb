@@ -16,6 +16,10 @@ describe Loga::Configuration do
       )
     end
 
+    before do
+      allow(Loga::ServiceVersionStrategies).to receive(:call).and_return('unknown.sha')
+    end
+
     context 'defaults' do
       specify { expect(subject.device).to eq(STDOUT) }
       specify { expect(subject.filter_exceptions).to eq(framework_exceptions) }
@@ -24,7 +28,7 @@ describe Loga::Configuration do
       specify { expect(subject.host).to eq(hostname_anchor) }
       specify { expect(subject.level).to eq(:info) }
       specify { expect(subject.service_name).to eq('hello_world_app') }
-      specify { expect(subject.service_version).to eq('') }
+      specify { expect(subject.service_version).to eq('unknown.sha') }
       specify { expect(subject.sync).to eq(true) }
       specify { expect(subject.tags).to eq([]) }
     end
@@ -61,6 +65,21 @@ describe Loga::Configuration do
         it 'raises an error' do
           expect { subject }.to raise_error(Loga::ConfigurationError,
                                             'Service name cannot be blank')
+        end
+      end
+    end
+
+    describe 'service_version' do
+      context 'when service version is missing' do
+        it 'uses a service version strategy' do
+          expect(subject.service_version).to eq('unknown.sha')
+        end
+      end
+      context 'when initialized via user options' do
+        let(:options) { super().merge(service_version: 'v3.0.1') }
+
+        it 'sets the service version' do
+          expect(subject.service_version).to eq('v3.0.1')
         end
       end
     end
@@ -125,7 +144,7 @@ describe Loga::Configuration do
           super().merge(
             format: :gelf,
             service_name: ' hello_world_app ',
-            service_version: " 1.0\n",
+            service_version_strategies: ['1.0'],
           )
         end
         let(:formatter) { subject.logger.formatter }
@@ -134,14 +153,8 @@ describe Loga::Configuration do
           expect(subject.logger.formatter).to be_a(Loga::Formatter)
         end
 
-        it 'strips the service name and version' do
-          aggregate_failures do
-            expect(formatter.instance_variable_get(:@service_name))
-              .to eq('hello_world_app')
-
-            expect(formatter.instance_variable_get(:@service_version))
-              .to eq('1.0')
-          end
+        it 'strips the service name' do
+          expect(formatter.instance_variable_get(:@service_name)).to eq('hello_world_app')
         end
       end
 
