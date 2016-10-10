@@ -114,6 +114,20 @@ Middleware augment payload with the `type` key to label events.
 
 Consult the [milestones](https://github.com/FundingCircle/loga/milestones).
 
+
+## Publishing
+
+### Tagged Versions
+
+When a new tag is released, the new version of this gem is published to Gemfury by CircleCI.
+
+### Any other branch
+
+If any branch other than master is pushed to origin, CircleCI will build a pre-release version of the gem.
+
+The name of the pre-release version is outputted during the CircleCI build.
+
+
 ## Contributing
 
 ### Overview
