@@ -44,32 +44,21 @@ describe Loga::Rack::Request do
     end
   end
 
-  describe '#action_controller_instance' do
-    let(:action_controller_instance) { action_controller_class.new }
-
-    context 'when ACTION_CONTROLLER_INSTANCE is present' do
+  describe '#controller_action_name' do
+    context 'when available' do
       let(:options) do
-        { 'action_controller.instance' => action_controller_instance }
+        { 'action_controller.instance' => action_controller_class.new }
       end
-      it 'returns the instance' do
-        expect(subject.action_controller_instance).to eq(action_controller_instance)
+
+      it 'returns the namespaced controller name with the action_name' do
+        expect(subject.controller_action_name).to eq('ApplicationController#index')
       end
     end
 
-    context 'when ACTION_DISPATCH_REQUEST_ID blank' do
+    context 'when missing' do
       it 'returns nil' do
-        expect(subject.action_controller_instance).to be_nil
+        expect(subject.controller_action_name).to be_nil
       end
-    end
-  end
-
-  describe '#action_controller' do
-    let(:options) do
-      { 'action_controller.instance' => action_controller_class.new }
-    end
-
-    it 'returns the controller with the action_name' do
-      expect(subject.action_controller).to eq('ApplicationController#index')
     end
   end
 

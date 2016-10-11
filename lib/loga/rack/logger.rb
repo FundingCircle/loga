@@ -42,7 +42,7 @@ module Loga
         data['request_id'] = request.uuid
         data['request_ip'] = request.ip
         data['user_agent'] = request.user_agent
-        data['controller'] = request.action_controller if request.action_controller_instance
+        data['controller'] = request.controller_action_name if request.controller_action_name
         data['duration']   = duration_in_ms(started_at, Time.now)
       end
       # rubocop:enable Metrics/LineLength

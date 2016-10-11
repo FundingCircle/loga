@@ -18,14 +18,16 @@ module Loga
 
       alias request_id uuid
 
-      # rubocop:disable Metrics/LineLength
-      def action_controller
-        "#{action_controller_instance.class.name}##{action_controller_instance.action_name}"
-      end
-      # rubocop:enable Metrics/LineLength
-
-      def action_controller_instance
-        @action_controller_instance ||= env[ACTION_CONTROLLER_INSTANCE]
+      # Builds a namespaced controller name and action name string.
+      #
+      # class Admin::UsersController
+      #   def show
+      #   end
+      # end
+      #
+      #  => "Admin::UsersController#show"
+      def controller_action_name
+        aci && "#{aci.class.name}##{aci.action_name}"
       end
 
       def original_path
@@ -87,6 +89,12 @@ module Loga
       def action_dispatch_filter_params
         env['action_dispatch.parameter_filter'] || []
       end
+
+      def action_controller_instance
+        @action_controller_instance ||= env[ACTION_CONTROLLER_INSTANCE]
+      end
+
+      alias aci action_controller_instance
     end
   end
 end
