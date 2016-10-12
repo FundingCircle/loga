@@ -7,10 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ## [2.0.0.pre1]
 ### Added
-- Multiple formatter support
-- Human readable `SimpleFormatter`
+- Human readable formatter `SimpleFormatter`
 - `LOGA_FORMAT` environment variable to switch between (gelf|simple) formatters
-- Add `format` and `filter_exceptions` configuration options
+- Added `format` and `filter_exceptions` configuration options
 
 ### Changed
 #### Configuration interface
@@ -19,12 +18,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Rails
 - Use Loga everywhere with environment based configuration
-- Add `ActiveRecord::RecordNotFound` to default `filter_exceptions`
-- Remove `enabled` and `silence_rails_rack_logger` configure options
+- Added `ActiveRecord::RecordNotFound` to default `filter_exceptions`
+- Removed `enabled` and `silence_rails_rack_logger` configure options
 - Enforce Rails configuration options over Loga where possible
 
 #### Sinatra
-- Remove logger and tags parameters in `Loga::Rack::Logger`
+- Removed logger and tags parameters in `Loga::Rack::Logger`
 
 ### Fixed
 - Uninitialized `Loga.logger` in Rails
