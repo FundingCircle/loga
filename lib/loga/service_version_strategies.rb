@@ -13,7 +13,7 @@ module Loga
     end
 
     def call
-      STRATEGIES.map { |strategy| strategy.call.presence }.compact.first.strip
+      STRATEGIES.map(&:call).find(&:presence).strip
     end
   end
 end
