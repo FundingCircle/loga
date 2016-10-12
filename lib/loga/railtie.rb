@@ -44,7 +44,7 @@ module Loga
       end
 
       def format
-        Rails.env.production? ? :gelf : :plain
+        Rails.env.production? ? :gelf : :simple
       end
 
       def sync
