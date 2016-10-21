@@ -6,6 +6,7 @@ describe Loga::Rack::Logger do
   let(:options) { {} }
   let(:app)     {  ->(_env) { [response_status, {}, ''] } }
   let(:logger)  { instance_double(Logger, info: nil, error: nil) }
+  let(:tags)    { [] }
 
   let(:configuration) do
     instance_double(
@@ -13,6 +14,7 @@ describe Loga::Rack::Logger do
       filter_exceptions: %w(ActionController::RoutingError),
       filter_parameters: [],
       logger: logger,
+      tags: tags,
     )
   end
 
@@ -109,11 +111,15 @@ describe Loga::Rack::Logger do
         end
       end
 
-      it 'yields the app with tags' do
-        expect(logger).to receive(:tagged).with(:tag) do |&block|
-          expect(block.call).to eq(:response)
+      context 'when tags are present' do
+        let(:tags) { [:foo] }
+
+        it 'yields the app with tags' do
+          expect(logger).to receive(:tagged).with(:tag) do |&block|
+            expect(block.call).to eq(:response)
+          end
+          subject.call(env)
         end
-        subject.call(env)
       end
     end
   end

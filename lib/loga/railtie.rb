@@ -31,7 +31,7 @@ module Loga
           format: format,
           level:  app.config.log_level,
           sync:   sync,
-          tags:   app.config.log_tags,
+          tags:   app.config.log_tags || [],
         }.merge(device_options)
       end
 
