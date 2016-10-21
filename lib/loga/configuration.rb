@@ -73,7 +73,7 @@ module Loga
     end
 
     def environment_options
-      { format: ENV['LOGA_FORMAT'].presence }.delete_if { |_, v| v.nil? }
+      { format: ENV['LOGA_FORMAT'].presence }.reject { |_, v| v.nil? }
     end
 
     def initialize_service_version
