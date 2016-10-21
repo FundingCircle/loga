@@ -47,7 +47,7 @@ describe Loga::Configuration do
     describe 'hostname' do
       context 'when hostname cannot be resolved' do
         before do
-          allow(Socket).to receive(:gethostname).and_raise(Exception)
+          allow(Socket).to receive(:gethostname).and_raise(SystemCallError, 'Something')
         end
 
         it 'uses a default hostname' do

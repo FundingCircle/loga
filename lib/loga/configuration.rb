@@ -92,13 +92,11 @@ module Loga
       Logger.const_get(level.to_s.upcase)
     end
 
-    # rubocop:disable Lint/RescueException
     def hostname
       Socket.gethostname
-    rescue Exception
+    rescue SystemCallError
       'unknown.host'
     end
-    # rubocop:enable Lint/RescueException
 
     def assign_formatter
       if format == :gelf
