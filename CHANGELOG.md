@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [2.0.0.pre.2]
 ## [2.0.0.pre1]
 ### Added
 - Human readable formatter `SimpleFormatter`
@@ -40,6 +41,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Silence ActionDispatch::DebugExceptions' logger
 
-[2.0.0.pre1]: https://github.com/FundingCircle/loga/compare/v1.4.0...2.0.0.pre1
+[2.0.0.pre.2]: https://github.com/FundingCircle/loga/compare/v2.0.0.pre1...v2.0.0.pre.2
+[2.0.0.pre1]: https://github.com/FundingCircle/loga/compare/v1.4.0...v2.0.0.pre1
 [1.4.0]: https://github.com/FundingCircle/loga/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/FundingCircle/loga/compare/v1.2.1...v1.3.0
