@@ -72,14 +72,15 @@ RSpec.describe 'Structured logging with Sinatra', timecop: true do
     context 'get request' do
       it 'logs the request' do
         get '/ok', username: 'yoshi'
-        expect(last_log_entry).to eq("GET /ok?username=yoshi 200 in 0ms\n")
+        expect(last_log_entry)
+          .to eq("#{time_anchor.iso8601(3)} GET /ok?username=yoshi 200 in 0ms\n")
       end
     end
 
     context 'request with redirect' do
       it 'specifies the original path' do
         get '/new'
-        expect(last_log_entry).to eql("GET /new 302 in 0ms\n")
+        expect(last_log_entry).to eql("#{time_anchor.iso8601(3)} GET /new 302 in 0ms\n")
       end
     end
 

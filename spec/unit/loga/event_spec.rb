@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Loga::Event do
+RSpec.describe Loga::Event, timecop: true do
   describe 'initialize' do
     context 'no message is passed' do
       it 'sets message to an empty string' do
@@ -19,7 +19,7 @@ RSpec.describe Loga::Event do
   end
 
   describe '#to_s' do
-    let(:opts) { { message: 'Hello World' } }
+    let(:opts) { { message: 'Hello World', timestamp: Time.now } }
     subject { described_class.new(opts) }
 
     context 'when exception' do
@@ -28,19 +28,20 @@ RSpec.describe Loga::Event do
       end
       let(:opts) { super().merge(exception: exception) }
       it 'outputs the message with exception' do
-        expect(subject.to_s).to eql("Hello World\nSome Message\nfile")
+        expect(subject.to_s)
+          .to eql("#{time_anchor.iso8601(3)} Hello World\nSome Message\nfile")
       end
     end
 
     context 'when no exception' do
       it 'outputs the message' do
-        expect(subject.to_s).to eql('Hello World')
+        expect(subject.to_s).to eql("#{time_anchor.iso8601(3)} Hello World")
       end
     end
   end
 
   describe '#inspect' do
-    subject { described_class.new message: 'Hey Siri' }
+    subject { described_class.new message: 'Hey Siri', timestamp: Time.now }
 
     it 'aliases to to_s' do
       expect(subject.to_s).to eql(subject.inspect)

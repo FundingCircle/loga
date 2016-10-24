@@ -11,7 +11,7 @@ module Loga
     end
 
     def to_s
-      output = [message]
+      output = ["#{timestamp.iso8601(3)} #{message}"]
       if exception
         output.push exception.to_s
         output.push exception.backtrace.join("\n")
