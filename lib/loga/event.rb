@@ -10,6 +10,17 @@ module Loga
       @type      = opts[:type]
     end
 
+    def to_s
+      output = [message]
+      if exception
+        output.push exception.to_s
+        output.push exception.backtrace.join("\n")
+      end
+      output.join("\n")
+    end
+
+    alias inspect to_s
+
     private
 
     # Guard against Encoding::UndefinedConversionError
