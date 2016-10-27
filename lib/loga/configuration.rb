@@ -1,76 +1,127 @@
+require 'active_support/core_ext/object/blank'
+require 'active_support/version'
+require 'loga/service_version_strategies'
 require 'logger'
 require 'socket'
 
 module Loga
   class Configuration
-    attr_accessor :service_name,
-                  :service_version,
-                  :device,
-                  :sync,
-                  :filter_parameters,
-                  :level,
-                  :host,
-                  :enabled,
-                  :silence_rails_rack_logger
+    DEFAULT_KEYS = %i(
+      device
+      filter_exceptions
+      filter_parameters
+      format
+      host
+      level
+      service_name
+      service_version
+      sync
+      tags
+    ).freeze
 
-    attr_reader :logger
+    FRAMEWORK_EXCEPTIONS = %w(
+      ActionController::RoutingError
+      ActiveRecord::RecordNotFound
+      Sinatra::NotFound
+    ).freeze
 
-    def initialize
-      @host              = gethostname
-      @device            = nil
-      @sync              = true
-      @level             = :info
-      @filter_parameters = []
-      @service_version   = :git
+    attr_accessor(*DEFAULT_KEYS)
+    attr_reader :logger, :service_version
+    private_constant :DEFAULT_KEYS
 
-      # Rails specific configuration
-      @enabled           = true
-      @silence_rails_rack_logger = true
+    def initialize(user_options = {}, framework_options = {})
+      options = default_options.merge(framework_options)
+                               .merge(environment_options)
+                               .merge(user_options)
+
+      DEFAULT_KEYS.each do |attribute|
+        public_send("#{attribute}=", options[attribute])
+      end
+
+      raise ConfigurationError, 'Service name cannot be blank' if service_name.blank?
+      raise ConfigurationError, 'Device cannot be blank' if device.blank?
+
+      @service_version = initialize_service_version
+      @logger          = initialize_logger
     end
 
-    def initialize!
-      @service_name = service_name.to_s.strip
-      @service_version = compute_service_version
-
-      initialize_logger
+    def format=(name)
+      @format = name.to_s.to_sym
     end
 
-    def configure
-      yield self
+    def service_name=(name)
+      @service_name = name.to_s.strip
+    end
+
+    def structured?
+      format == :gelf
     end
 
     private
 
-    def compute_service_version
-      RevisionStrategy.call(service_version)
+    def default_options
+      {
+        device:            STDOUT,
+        filter_exceptions: FRAMEWORK_EXCEPTIONS,
+        filter_parameters: [],
+        format:            :simple,
+        host:              hostname,
+        level:             :info,
+        sync:              true,
+        tags:              [],
+      }
+    end
+
+    def environment_options
+      { format: ENV['LOGA_FORMAT'].presence }.reject { |_, v| v.nil? }
+    end
+
+    def initialize_service_version
+      service_version || ServiceVersionStrategies.call
     end
 
     def initialize_logger
-      device.sync = sync
-
+      device.sync      = sync
       logger           = Logger.new(device)
-      logger.formatter = Formatter.new(
-        service_name:    service_name,
-        service_version: service_version,
-        host:            host,
-      )
+      logger.formatter = assign_formatter
       logger.level     = constantized_log_level
-    rescue
-      logger           = Logger.new(STDERR)
-      logger.level     = Logger::ERROR
-      logger.error 'Loga could not be initialized'
-    ensure
-      @logger          = TaggedLogging.new(logger)
+      TaggedLogging.new(logger)
     end
 
     def constantized_log_level
       Logger.const_get(level.to_s.upcase)
     end
 
-    def gethostname
+    def hostname
       Socket.gethostname
-    rescue Exception
+    rescue SystemCallError
       'unknown.host'
+    end
+
+    def assign_formatter
+      if format == :gelf
+        Formatter.new(
+          service_name:    service_name,
+          service_version: service_version,
+          host:            host,
+        )
+      else
+        active_support_simple_formatter
+      end
+    end
+
+    def active_support_simple_formatter
+      case ActiveSupport::VERSION::MAJOR
+      when 3
+        require 'active_support/core_ext/logger'
+        Logger::SimpleFormatter.new
+      when 4..5
+        require 'active_support/logger'
+        ActiveSupport::Logger::SimpleFormatter.new
+      else
+        raise Loga::ConfigurationError,
+              "ActiveSupport #{ActiveSupport::VERSION::MAJOR} is unsupported"
+      end
     end
   end
 end

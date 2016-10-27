@@ -2,41 +2,70 @@ require 'loga'
 
 module Loga
   class Railtie < Rails::Railtie
+    config.loga = {}
+
+    # This service class initializes Loga with user options, framework smart
+    # options and update Rails logger with Loga
     class InitializeLogger
+      def self.call(app)
+        new(app).call
+      end
+
       def initialize(app)
         @app = app
       end
 
       def call
-        loga.tap do |config|
-          config.sync  = sync
-          config.level = app.config.log_level
-        end
-        loga.initialize!
-        app.config.logger = loga.logger
+        validate_user_options
+        Loga.configure(user_options, rails_options)
+        app.config.colorize_logging = false if Loga.configuration.structured?
+        app.config.logger = Loga.logger
       end
 
       private
 
       attr_reader :app
 
-      def loga
+      def rails_options
+        {
+          format: format,
+          level:  app.config.log_level,
+          sync:   sync,
+          tags:   app.config.log_tags || [],
+        }.merge(device_options)
+      end
+
+      def device_options
+        Rails.env.test? ? { device: File.open('log/test.log', 'a') } : {}
+      end
+
+      def user_options
         app.config.loga
+      end
+
+      def format
+        Rails.env.production? ? :gelf : :simple
       end
 
       def sync
         Rails::VERSION::MAJOR > 3 ? app.config.autoflush_log : true
       end
 
-      def constantized_log_level
-        Logger.const_get(app.config.log_level.to_s.upcase)
+      # rubocop:disable Metrics/LineLength
+      def validate_user_options
+        if user_options[:tags].present?
+          raise Loga::ConfigurationError, 'Configure tags with Rails config.log_tags'
+        elsif user_options[:level].present?
+          raise Loga::ConfigurationError, 'Configure level with Rails config.log_level'
+        elsif user_options[:filter_parameters].present?
+          raise Loga::ConfigurationError, 'Configure filter_parameters with Rails config.filter_parameters'
+        end
       end
+      # rubocop:enable Metrics/LineLength
     end
 
-    config.loga = Loga::Configuration.new
-
     initializer :loga_initialize_logger, before: :initialize_logger do |app|
-      InitializeLogger.new(app).call if app.config.loga.enabled
+      InitializeLogger.call(app)
     end
 
     class InitializeMiddleware
@@ -56,15 +85,19 @@ module Loga
         end
       end
 
+      def self.call(app)
+        new(app).call
+      end
+
       def initialize(app)
         @app = app
       end
 
       def call
         insert_loga_rack_logger
-        disable_rails_rack_logger
+        silence_rails_rack_logger
         insert_exceptions_catcher
-        disable_action_dispatch_debug_exceptions
+        silence_action_dispatch_debug_exceptions_logger
       end
 
       private
@@ -81,45 +114,51 @@ module Loga
 
       # Removes start of request log
       # (e.g. Started GET "/users" for 127.0.0.1 at 2015-12-24 23:59:00 +0000)
-      def disable_rails_rack_logger
-        return unless app.config.loga.silence_rails_rack_logger
-
+      def silence_rails_rack_logger
         case Rails::VERSION::MAJOR
-        when 3 then require 'loga/ext/rails/rack/logger3.rb'
+        when 3    then require 'loga/ext/rails/rack/logger3.rb'
+        when 4..5 then require 'loga/ext/rails/rack/logger.rb'
         else
-          require 'loga/ext/rails/rack/logger.rb'
+          raise Loga::ConfigurationError,
+                "Rails #{Rails::VERSION::MAJOR} is unsupported"
         end
       end
 
-      def disable_action_dispatch_debug_exceptions
+      # Removes unstructured exception output. Exceptions are logged with
+      # Loga::Rack::Logger instead
+      def silence_action_dispatch_debug_exceptions_logger
         require 'loga/ext/rails/rack/debug_exceptions.rb'
       end
 
       def insert_loga_rack_logger
-        app.middleware.insert_after Rails::Rack::Logger,
-                                    Loga::Rack::Logger,
-                                    app.config.logger,
-                                    app.config.log_tags
+        app.middleware.insert_after Rails::Rack::Logger, Loga::Rack::Logger
       end
     end
 
     initializer :loga_initialize_middleware do |app|
-      InitializeMiddleware.new(app).call if app.config.loga.enabled
-      app.config.colorize_logging = false
+      InitializeMiddleware.call(app) if Loga.configuration.structured?
     end
 
     class InitializeInstrumentation
+      def self.call
+        new.call
+      end
+
       def call
-        remove_existing_log_subscriptions
+        ensure_subscriptions_attached
+        remove_log_subscriptions
       end
 
       private
 
-      # rubocop:disable Metrics/CyclomaticComplexity
-      def remove_existing_log_subscriptions
+      # Ensure LogSubscribers are attached when available
+      def ensure_subscriptions_attached
         ActionView::Base       if defined?(ActionView::Base)
         ActionController::Base if defined?(ActionController::Base)
+      end
 
+      # rubocop:disable Metrics/LineLength
+      def remove_log_subscriptions
         ActiveSupport::LogSubscriber.log_subscribers.each do |subscriber|
           case subscriber
           when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
@@ -129,10 +168,12 @@ module Loga
           end
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/LineLength
 
       def unsubscribe(component, subscriber)
-        events = subscriber.public_methods(false).reject { |method| method.to_s == 'call' }
+        events = subscriber
+                 .public_methods(false)
+                 .reject { |method| method.to_s == 'call' }
         events.each do |event|
           ActiveSupport::Notifications
             .notifier
@@ -146,8 +187,8 @@ module Loga
       end
     end
 
-    config.after_initialize do |app|
-      InitializeInstrumentation.new.call if app.config.loga.enabled
+    config.after_initialize do |_|
+      InitializeInstrumentation.call if Loga.configuration.structured?
     end
   end
 end

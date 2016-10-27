@@ -3,11 +3,8 @@ module Loga
     class Logger
       include Utilities
 
-      attr_reader :logger, :taggers
-      def initialize(app, logger = nil, taggers = nil)
-        @app           = app
-        @logger        = logger
-        @taggers       = taggers || []
+      def initialize(app)
+        @app = app
       end
 
       def call(env)
@@ -37,6 +34,7 @@ module Loga
         send_message
       end
 
+      # rubocop:disable Metrics/LineLength
       def set_data
         data['method']     = request.request_method
         data['path']       = request.original_path
@@ -44,19 +42,24 @@ module Loga
         data['request_id'] = request.uuid
         data['request_ip'] = request.ip
         data['user_agent'] = request.user_agent
-        data['controller'] = request.action_controller if request.action_controller_instance
+        data['controller'] = request.controller_action_name if request.controller_action_name
         data['duration']   = duration_in_ms(started_at, Time.now)
       end
+      # rubocop:enable Metrics/LineLength
 
       def send_message
         event = Loga::Event.new(
           data:       { request: data },
-          exception:  fetch_exception,
+          exception:  compute_exception,
           message:    compute_message,
           timestamp:  started_at,
           type:       'request',
         )
         logger.public_send(compute_level, event)
+      end
+
+      def logger
+        Loga.logger
       end
 
       def compute_message
@@ -69,25 +72,23 @@ module Loga
       end
 
       def compute_level
-        fetch_exception ? :error : :info
+        compute_exception ? :error : :info
       end
 
-      def fetch_exception
-        framework_exception.tap do |e|
-          return filtered_exceptions.include?(e.class.to_s) ? nil : e
-        end
+      def compute_exception
+        filter_exceptions.include?(exception.class.to_s) ? nil : exception
       end
 
-      def framework_exception
+      def exception
         env['loga.exception'] || env['action_dispatch.exception'] || env['sinatra.error']
       end
 
-      def filtered_exceptions
-        %w(ActionController::RoutingError Sinatra::NotFound)
+      def filter_exceptions
+        Loga.configuration.filter_exceptions
       end
 
       def compute_tags(request)
-        taggers.collect do |tag|
+        tags.map do |tag|
           case tag
           when Proc
             tag.call(request)
@@ -97,6 +98,10 @@ module Loga
             tag
           end
         end
+      end
+
+      def tags
+        Loga.configuration.tags
       end
     end
   end

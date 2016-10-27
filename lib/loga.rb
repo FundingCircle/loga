@@ -5,23 +5,27 @@ require 'loga/utilities'
 require 'loga/event'
 require 'loga/formatter'
 require 'loga/parameter_filter'
-require 'loga/revision_strategy'
 require 'loga/rack/logger'
 require 'loga/rack/request'
 require 'loga/rack/request_id'
 require 'loga/railtie' if defined?(Rails)
 
 module Loga
+  ConfigurationError = Class.new(StandardError)
+
   def self.configuration
-    @configuration ||= Configuration.new
+    if @configuration.nil?
+      raise ConfigurationError,
+            'Loga has not been configured. Configure with Loga.configure(options)'
+    end
+    @configuration
   end
 
-  def self.configure
-    yield configuration
-  end
-
-  def self.initialize!
-    configuration.initialize!
+  def self.configure(options, framework_options = {})
+    unless @configuration.nil?
+      raise ConfigurationError, 'Loga has already been configured'
+    end
+    @configuration ||= Configuration.new(options, framework_options)
   end
 
   def self.logger

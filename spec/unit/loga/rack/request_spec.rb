@@ -6,11 +6,21 @@ describe Loga::Rack::Request do
   let(:env)       { Rack::MockRequest.env_for(full_path, options) }
 
   let(:action_controller_class) do
-    ApplicationController = Class.new do
+    Class.new do
+      def self.name
+        'ApplicationController'
+      end
+
       def action_name
         'index'
       end
     end
+  end
+
+  let(:config) { instance_double Loga::Configuration, filter_parameters: [:password] }
+
+  before do
+    allow(Loga).to receive(:configuration).and_return(config)
   end
 
   subject { described_class.new(env) }
@@ -34,32 +44,21 @@ describe Loga::Rack::Request do
     end
   end
 
-  describe '#action_controller_instance' do
-    let(:action_controller_instance) { action_controller_class.new }
-
-    context 'when ACTION_CONTROLLER_INSTANCE is present' do
+  describe '#controller_action_name' do
+    context 'when available' do
       let(:options) do
-        { 'action_controller.instance' => action_controller_instance }
+        { 'action_controller.instance' => action_controller_class.new }
       end
-      it 'returns the instance' do
-        expect(subject.action_controller_instance).to eq(action_controller_instance)
+
+      it 'returns the namespaced controller name with the action_name' do
+        expect(subject.controller_action_name).to eq('ApplicationController#index')
       end
     end
 
-    context 'when ACTION_DISPATCH_REQUEST_ID blank' do
+    context 'when missing' do
       it 'returns nil' do
-        expect(subject.action_controller_instance).to be_nil
+        expect(subject.controller_action_name).to be_nil
       end
-    end
-  end
-
-  describe '#action_controller' do
-    let(:options) do
-      { 'action_controller.instance' => action_controller_class.new }
-    end
-
-    it 'returns the controller with the action_name' do
-      expect(subject.action_controller).to eq('ApplicationController#index')
     end
   end
 
@@ -84,18 +83,12 @@ describe Loga::Rack::Request do
   end
 
   describe '#filtered_full_path' do
-    let(:config) { double :config, filter_parameters: [:password] }
-
     let(:path)         { '/hello' }
     let(:query)        { { 'password' => 123, 'color' => 'red' }  }
     let(:query_string) { Rack::Utils.build_query(query) }
     let(:full_path)    { "#{path}?#{query_string}" }
 
     let(:options) { { 'loga.request.original_path' => path } }
-
-    before do
-      allow(Loga).to receive(:configuration).and_return(config)
-    end
 
     context 'request with sensitive parameters' do
       it 'returns the path with sensitive parameters filtered' do

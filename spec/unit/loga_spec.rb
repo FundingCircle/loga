@@ -3,39 +3,76 @@ require 'spec_helper'
 describe Loga do
   before { described_class.reset }
 
-  describe '.configuration' do
-    specify { expect(subject.configuration).to be_instance_of(Loga::Configuration) }
-
-    it 'memoizes the result' do
-      expect(subject.configuration).to equal(subject.configuration)
-    end
+  let(:config_missing_class) { described_class::ConfigurationError }
+  let(:config_missing_msg) do
+    'Loga has not been configured. Configure with Loga.configure(options)'
   end
+  let(:options)           { { service_name: 'hello_world_app' } }
+  let(:framework_options) { { format: 'gelf' } }
 
   describe '.configure' do
     it 'configures Loga' do
-      expect { |b| subject.configure(&b) }.to yield_with_args(subject.configuration)
+      expect(Loga::Configuration).to receive(:new).with(options, {}).and_call_original
+      subject.configure(options)
+    end
+
+    context 'when framework options provided' do
+      it 'configures Loga' do
+        expect(Loga::Configuration)
+          .to receive(:new).with(options, framework_options).and_call_original
+        subject.configure(options, framework_options)
+      end
+    end
+
+    context 'when configure twice' do
+      before { subject.configure(options) }
+
+      it 'raises an error' do
+        expect { subject.configure(options) }
+          .to raise_error(config_missing_class, 'Loga has already been configured')
+      end
     end
   end
 
-  describe '.initialize!' do
-    it 'initializes Loga' do
-      expect { subject.initialize! }.to_not raise_error
+  describe '.configuration' do
+    context 'when Loga is not configured' do
+      it 'raises an error' do
+        expect { subject.configuration }
+          .to raise_error(config_missing_class, config_missing_msg)
+      end
+    end
+
+    context 'when Loga is configured' do
+      before { subject.configure(options) }
+
+      it 'returns the configuration' do
+        expect(subject.configuration.service_name).to eql(options[:service_name])
+      end
     end
   end
 
   describe '.logger' do
-    context 'when Loga is not initialized' do
-      specify { expect(subject.logger).to be_nil }
+    context 'when Loga is not configured' do
+      it 'raises an error' do
+        expect { subject.logger }
+          .to raise_error(config_missing_class, config_missing_msg)
+      end
     end
-    context 'when Loga is initialized' do
-      before { Loga.initialize! }
+
+    context 'when Loga is configured' do
+      before { subject.configure(options) }
       specify { expect(subject.logger).to be_kind_of(Logger) }
     end
   end
 
   describe '.reset' do
+    before { subject.configure(options) }
+
     it 'resets the configuration' do
-      expect { subject.reset }.to change { subject.configuration.object_id }
+      expect do
+        subject.reset
+        subject.configure(options)
+      end.to change { subject.configuration.object_id }
     end
   end
 end

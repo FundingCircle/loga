@@ -1,67 +1,182 @@
 require 'spec_helper'
 
 describe Loga::Configuration do
-  subject do
-    described_class.new.tap { |config| config.device = STDOUT }
+  let(:options) do
+    { service_name: 'hello_world_app' }
   end
+
+  subject { described_class.new(options) }
 
   describe 'initialize' do
-    subject { described_class.new }
+    let(:framework_exceptions) do
+      %w(
+        ActionController::RoutingError
+        ActiveRecord::RecordNotFound
+        Sinatra::NotFound
+      )
+    end
+
+    before do
+      allow(Loga::ServiceVersionStrategies).to receive(:call).and_return('unknown.sha')
+    end
+
     context 'defaults' do
+      specify { expect(subject.device).to eq(STDOUT) }
+      specify { expect(subject.filter_exceptions).to eq(framework_exceptions) }
+      specify { expect(subject.filter_parameters).to eq([]) }
+      specify { expect(subject.format).to eq(:simple) }
       specify { expect(subject.host).to eq(hostname_anchor) }
       specify { expect(subject.level).to eq(:info) }
-      specify { expect(subject.device).to eq(nil) }
+      specify { expect(subject.service_name).to eq('hello_world_app') }
+      specify { expect(subject.service_version).to eq('unknown.sha') }
       specify { expect(subject.sync).to eq(true) }
-      specify { expect(subject.filter_parameters).to eq([]) }
-      specify { expect(subject.service_name).to eq(nil) }
-      specify { expect(subject.service_version).to eq(:git) }
+      specify { expect(subject.tags).to eq([]) }
     end
 
-    context 'when hostname cannot be resolved' do
-      before do
-        allow(Socket).to receive(:gethostname).and_raise(Exception)
-      end
+    describe 'device' do
+      context 'when initialized with nil' do
+        let(:options) { super().merge(device: nil) }
 
-      it 'uses a default hostname' do
-        expect(subject.host).to eq('unknown.host')
-      end
-    end
-  end
-
-  describe '#initialize!' do
-    before do
-      subject.tap do |config|
-        config.service_name    = ' hello_world_app '
-        config.service_version = " 1.0\n"
+        it 'raises an error' do
+          expect { described_class.new(options) }
+            .to raise_error(Loga::ConfigurationError, 'Device cannot be blank')
+        end
       end
     end
 
-    it 'initializes the formatter with stiped service name and version' do
-      expect(Loga::Formatter).to receive(:new)
-        .with(service_name: 'hello_world_app',
-              service_version: '1.0',
-              host: hostname_anchor)
-      subject.initialize!
+    describe 'hostname' do
+      context 'when hostname cannot be resolved' do
+        before do
+          allow(Socket).to receive(:gethostname).and_raise(SystemCallError, 'Something')
+        end
+
+        it 'uses a default hostname' do
+          expect(subject.host).to eq('unknown.host')
+        end
+      end
+    end
+
+    describe 'service_name' do
+      context 'when service name is missing' do
+        let(:options) do
+          { service_: 'hello_world_app' }
+        end
+
+        it 'raises an error' do
+          expect { subject }.to raise_error(Loga::ConfigurationError,
+                                            'Service name cannot be blank')
+        end
+      end
+    end
+
+    describe 'service_version' do
+      context 'when service version is missing' do
+        it 'uses a service version strategy' do
+          expect(subject.service_version).to eq('unknown.sha')
+        end
+      end
+      context 'when initialized via user options' do
+        let(:options) { super().merge(service_version: 'v3.0.1') }
+
+        it 'sets the service version' do
+          expect(subject.service_version).to eq('v3.0.1')
+        end
+      end
+    end
+
+    describe 'format' do
+      context 'when initialized via user options' do
+        let(:options) { super().merge(format: :gelf) }
+
+        it 'sets the format' do
+          expect(subject.format).to eq(:gelf)
+        end
+      end
+
+      context 'when initialized via ENV' do
+        before do
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return('gelf')
+        end
+
+        it 'sets the format' do
+          expect(subject.format).to eq(:gelf)
+        end
+      end
+
+      context 'when initialized via framework options' do
+        subject { described_class.new(options, framework_options) }
+        let(:framework_options) { { format: :gelf } }
+
+        it 'sets the format' do
+          expect(subject.format).to eq(:gelf)
+        end
+      end
+
+      context 'when initialized with user options and ENV' do
+        let(:options) { super().merge(format: :gelf) }
+
+        before do
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return('simple')
+        end
+
+        it 'prefers user option' do
+          expect(subject.format).to eq(:gelf)
+        end
+      end
+
+      context 'when initialized with ENV and framework options' do
+        subject { described_class.new(options, framework_options) }
+        let(:framework_options) { { format: :gelf } }
+
+        before do
+          allow(ENV).to receive(:[]).with('LOGA_FORMAT').and_return('simple')
+        end
+
+        it 'prefers env' do
+          expect(subject.format).to eq(:simple)
+        end
+      end
+    end
+
+    describe 'formatter' do
+      context 'when format is :gelf' do
+        let(:options) do
+          super().merge(
+            format: :gelf,
+            service_name: ' hello_world_app ',
+            service_version_strategies: ['1.0'],
+          )
+        end
+        let(:formatter) { subject.logger.formatter }
+
+        it 'uses the GELF formatter' do
+          expect(subject.logger.formatter).to be_a(Loga::Formatter)
+        end
+
+        it 'strips the service name' do
+          expect(formatter.instance_variable_get(:@service_name)).to eq('hello_world_app')
+        end
+      end
+
+      context 'when format is :simple' do
+        let(:options) { super().merge(format: :simple) }
+
+        it 'uses the SimpleFormatter' do
+          expect(subject.logger.formatter).to be_a(ActiveSupport::Logger::SimpleFormatter)
+        end
+      end
+
+      context 'when the ActiveSupport::VERSION is unsupported' do
+        it 'raises an error' do
+          stub_const('ActiveSupport::VERSION::MAJOR', 1)
+          expect { described_class.new(options) }
+            .to raise_error(Loga::ConfigurationError, 'ActiveSupport 1 is unsupported')
+        end
+      end
     end
 
     describe 'logger' do
       let(:logdev) { subject.logger.instance_variable_get(:@logdev) }
-
-      context 'when device is nil' do
-        before do
-          subject.device = nil
-          allow(STDERR).to receive(:write)
-        end
-        let(:error_message) { /Loga could not be initialized/ }
-        it 'uses STDERR' do
-          subject.initialize!
-          expect(logdev.dev).to eq(STDERR)
-        end
-        it 'logs an error to STDERR' do
-          expect(STDERR).to receive(:write).with(error_message)
-          subject.initialize!
-        end
-      end
 
       {
         debug:   0,
@@ -72,44 +187,35 @@ describe Loga::Configuration do
         unknown: 5,
       }.each do |sym, level|
         context "when log level is #{sym}" do
-          before { subject.level = sym }
+          let(:options) { super().merge(level: sym) }
+
           it "uses log level #{sym}" do
-            subject.initialize!
             expect(subject.logger.level).to eq(level)
           end
         end
       end
 
       context 'when sync is false' do
-        before { subject.sync = false }
+        let(:options) { super().merge(sync: false) }
+
         it 'uses warn log level' do
-          subject.initialize!
           expect(logdev.dev.sync).to eq(false)
         end
       end
     end
-  end
 
-  describe '#logger' do
-    context 'when initialized' do
-      before { subject.initialize! }
-      it 'returns a logger' do
-        expect(subject.logger).to be_a(Logger)
+    describe '#structured?' do
+      context 'when format is :simple' do
+        let(:options) { super().merge(format: :simple) }
+
+        specify { expect(subject.structured?).to eql(false) }
       end
 
-      it 'returns a tagged logger' do
-        expect(subject.logger).to respond_to(:tagged)
+      context 'when format is :gelf' do
+        let(:options) { super().merge(format: :gelf) }
+
+        specify { expect(subject.structured?).to eql(true) }
       end
-    end
-
-    context 'when not initialized' do
-      specify { expect(subject.logger).to be_nil }
-    end
-  end
-
-  describe '#configure' do
-    it 'yields self' do
-      expect { |b| subject.configure(&b) }.to yield_with_args(subject)
     end
   end
 end

@@ -2,144 +2,208 @@
 
 ## Description
 
-Loga defines a single log format, logger and middleware logger
-to faciliate log aggregation.
+Loga provides consistent logging across frameworks and environments.
 
-It provides:
-- Rack logger middleware to log HTTP requests
-- Ruby logger
+Includes:
+- One logger for all environments
+- Human readable logs for development
+- Structured logs for production ([GELF](http://docs.graylog.org/en/2.1/pages/gelf.html))
+- One Rack logger for all Rack based applications
+
+## TOC
+
+- [Installation](#installation)
+  - [Rails](#rails)
+    - [Reduced logs](#reduced-logs)
+    - [Request log tags](#request-log-tags)
+  - [Sinatra](#sinatra)
+- [GELF Output example](#gelf-output-example)
+- [Road map](#road-map)
+- [Contributing](#contributing)
+  - [Running tests](#running-tests)
+- [Credits](#credits)
+- [License](#license)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'loga', git: 'git@github.com:FundingCircle/loga.git'
-
-And then execute:
-
-    $ bundle
-
-## Usage
-
-Loga integrates well with Rails and Sinatra frameworks. It also works in projects
-using plain Ruby.
-
-### Rails applications
-
-In Rails applications initialization and middleware insertion is catered by
-the Railtie.
-
-```ruby
-# config/environments/production.rb
-...
-config.loga.configure do |loga|
-  # See configuration section
-end
-...
+```
+gem 'loga', git: 'git@github.com:FundingCircle/loga.git'
 ```
 
-### Ruby and Sinatra/Rack applications
+### Rails
 
-In Ruby applications Loga must be required and configured.
+Let Loga know what your application name is and Loga will do the rest.
 
 ```ruby
-# .../initializers/loga.rb
+# config/application.rb
+class MyApp::Application < Rails::Application
+  config.loga = { service_name: 'MyApp' }
+end
+```
+
+Loga hooks into the Rails logger initialization process and defines its own logger for all environments.
+
+The logger configuration adjusts based on the environment:
+
+|        | Production | Test         | Development | Others |
+|--------|------------|--------------|-------------|--------|
+| Output | STDOUT     | log/test.log | STDOUT      | STDOUT |
+| Format | gelf       | simple       | simple      | simple |
+
+You can customize the configuration to your liking:
+
+```ruby
+# config/application.rb
+class MyApp::Application < Rails::Application
+  config.loga = {
+    device:       File.open("log/application.log", 'a'),
+    format:       :gelf,
+    service_name: 'MyApp',
+  }
+end
+```
+
+Loga leverages existing Rails configuration options:
+
+- `config.filter_parameters`
+- `config.log_level`
+- `config.log_tags`
+
+Use these options to customize Loga instead of the Loga options hash.
+
+Inside your application use `Rails.logger` instead of `Loga.logger`, even though
+they are equivalent, to prevent lock-in.
+
+#### Reduced logs
+
+When the format set to `gelf` requests logs are reduced to a single log entry, which
+could include an exception.
+
+This is made possible by silencing these loggers:
+
+- `Rack::Request::Logger`
+- `ActionDispatch::DebugExceptions`
+- `ActionController::LogSubscriber`
+- `ActionView::LogSubscriber`
+
+#### Request log tags
+
+To provide consistency between Rails and other Rack frameworks, tags (e.i `config.log_tags`)
+are computed with a [Loga::Rack::Request](lib/loga/rack/request.rb) as
+opposed to a `ActionDispatch::Request`.
+
+### Sinatra
+
+With Sinatra Loga needs to be configured manually:
+
+```ruby
 require 'loga'
 
-Loga.configure do |loga|
-  # See configuration section
-end
-Loga.initialize!
-```
-Log requests in Rack applications with Loga middleware.
+Loga.configure(
+  filter_parameters: [:password],
+  format: :gelf,
+  service_name: 'my_app',
+  tags: [:uuid],
+)
 
-`RequestId` and `Logger` must be inserted early in the middleware chain.
-
-```ruby
-# config.ru
 use Loga::Rack::RequestId
-use Loga::Rack::Logger, Loga.logger
+use Loga::Rack::Logger
 
-user Marketplace
+use MyApp
 run Sinatra::Application
 ```
 
-### Configuration
+You can now use `Loga.logger` or assign it to your existing logger.
+The above configuration also inserts two middleware:
 
-| Option          | Type          | Default | Description                                                                                        |
-|-----------------|---------------|---------|----------------------------------------------------------------------------------------------------|
-| host            | String        | nil     | Service hostname. When nil the hostname is computed with `Socket.gethostname`                      |
-| service_version | String/Symbol | :git    | Service version is embedded in every message. When Symbol the version is computed with a strategy. |
-| service_name    | String        | nil     | Service name is embedded in every message                                                          |
-| device          | IO            | nil     | The device the logger writes to                                                                    |
-| sync            | Boolean       | true    | Sync IO                                                                                            |
-| level           | Symbol        | :info   | The level to logger logs at                                                                        |
-| enabled         | Boolean       | true    | Enable/Disable Loga in Rails                                                                       |
+- `Loga::Rack::RequestId` makes the request id available to the request logger
+- `Loga::Rack::Logger`  logs requests
 
-## Sample output
+## GELF Output Example
 
-```ruby
-# Anywhere in your application
-Loga.logger.info('Hello World')
-```
+Rails request logger: (includes controller/action name):
+
+`GET /ok`
+
 ```json
-//GELF Output
 {
-  "version":           "1.1",
-  "host":              "example.com",
-  "short_message":     "Hello World",
-  "timestamp":         1450150205.123,
-  "level":             6,
-  "_service.name":     "marketplace",
-  "_service.version":  "v1.0.0",
-  "_tags":             ""
+   "_request.status":     200,
+   "_request.method":     "GET",
+   "_request.path":       "/ok",
+   "_request.params":     {},
+   "_request.request_id": "2b99e3d3-3ee2-4781-972b-782682f57648",
+   "_request.request_ip": "127.0.0.1",
+   "_request.user_agent": null,
+   "_request.controller": "ApplicationController#ok",
+   "_request.duration":   0,
+   "_type":               "request",
+   "_service.name":       "my_app",
+   "_service.version":    "1.0",
+   "_tags":               "2b99e3d3-3ee2-4781-972b-782682f57648",
+   "short_message":       "GET /ok 200 in 0ms",
+   "timestamp":           1450150205.123,
+   "host":                "example.com",
+   "level":               6,
+   "version":             "1.1"
 }
 ```
 
-## Event types
+Sinatra request output is identical to Rails but without the `_request.controller` key.
 
-Middleware augment payload with the `type` key to label events.
+Logger output:
 
-| event type        | description                       | middleware              |
-|-------------------|-----------------------------------|-------------------------|
-| request           | HTTP request and response         | Rack                    |
+```ruby
+Rails.logger.info('I love Loga')
+# or
+Loga.logger.info('I love Loga')
+```
 
-## Caveat
+```json
+{
+  "_service.name":     "my_app",
+  "_service.version":  "v1.0.0",
+  "_tags":             "",
+  "host":              "example.com",
+  "level":             6,
+  "short_message":     "I love Loga",
+  "timestamp":         1450150205.123,
+  "version":           "1.1"
+}
+```
 
-- Loga formats timestamps in seconds since UNIX epoch with 3 decimal places
-  for milliseconds. Which is in accordance with GELF 1.1 specification.
-
-
-## Road Map
+## Road map
 
 Consult the [milestones](https://github.com/FundingCircle/loga/milestones).
 
 ## Contributing
 
-### Overview
-
-1. Fork it ( https://github.com/FundingCircle/loga/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+Loga is in active development, feedback and contributions are welcomed.
 
 ### Running tests
 
-This project uses [`appraisal`](https://github.com/thoughtbot/appraisal/tree/v2.0.2) to run tests against different versions of dependencies (e.g. Rails, Sinatra).
+This project uses [`appraisal`](https://github.com/thoughtbot/appraisal/tree/v2.0.2)
+to run tests against different versions of dependencies (e.g. Rails, Sinatra).
 
-Once you have run bundle, you can install the test dependencies with `bundle exec appraisal install`.
+Install Loga dependencies with `bundle install` and then appraisals
+with `bundle exec appraisal install`.
 
 Run all tests with `bundle exec appraisal rspec`.
 
 You can run tests for one appraisal with `bundle exec appraisal appraisal-name rspec`.
+Refer to the [Appraisals](Appraisals) file for a complete lists of appraisals.
 
-With Rack applications prepend RACK\_ENV to switch between environments `RACK_ENV=production bundle exec appraisal rspec`
+Prefix test command with RACK\_ENV to switch between environments for Rack based tests
+`RACK_ENV=production bundle exec appraisal rspec`.
 
-Refer to the [Appraisals](https://github.com/FundingCircle/loga/blob/master/Appraisals) file for a complete lists of appraisals.
+Experiment Guard support introduced to ease running tests locally `bundle exec guard`.
+
+[CI](https://circleci.com/gh/FundingCircle/loga) results are the source of truth.
 
 ## Credits
 
+- [Lograge](https://github.com/roidrage/lograge)
 - [LogStashLogger](https://github.com/dwbutler/logstash-logger)
 - [Rails](https://github.com/rails/rails)
 - [RackLogstasher](https://github.com/alphagov/rack-logstasher)

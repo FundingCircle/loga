@@ -18,22 +18,28 @@ module Loga
 
       alias request_id uuid
 
-      def action_controller
-        "#{action_controller_instance.class}##{action_controller_instance.action_name}"
-      end
-
-      def action_controller_instance
-        @action_controller_instance ||= env[ACTION_CONTROLLER_INSTANCE]
+      # Builds a namespaced controller name and action name string.
+      #
+      # class Admin::UsersController
+      #   def show
+      #   end
+      # end
+      #
+      #  => "Admin::UsersController#show"
+      def controller_action_name
+        aci && "#{aci.class.name}##{aci.action_name}"
       end
 
       def original_path
         env['loga.request.original_path']
       end
 
+      # rubocop:disable Metrics/LineLength
       def filtered_full_path
         @filtered_full_path ||=
           query_string.empty? ? original_path : "#{original_path}?#{filtered_query_string}"
       end
+      # rubocop:enable Metrics/LineLength
 
       def filtered_parameters
         @filtered_parameters ||= filtered_query_hash.merge(filtered_form_hash)
@@ -83,6 +89,12 @@ module Loga
       def action_dispatch_filter_params
         env['action_dispatch.parameter_filter'] || []
       end
+
+      def action_controller_instance
+        @action_controller_instance ||= env[ACTION_CONTROLLER_INSTANCE]
+      end
+
+      alias aci action_controller_instance
     end
   end
 end

@@ -24,11 +24,11 @@ module Rails50
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
     config.log_tags = [ :request_id, 'TEST_TAG' ]
-    config.loga.configure do |loga|
-      loga.service_name = 'hello_world_app'
-      loga.service_version = '1.0'
-      loga.host = 'bird.example.com'
-      loga.device = STREAM
-    end
+    config.loga = {
+      device: STREAM,
+      host: 'bird.example.com',
+      service_name: 'hello_world_app',
+      service_version: '1.0',
+    }
   end
 end

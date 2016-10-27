@@ -5,14 +5,22 @@ describe Loga::Rack::Logger do
   let(:env)     { Rack::MockRequest.env_for('/about_us?limit=1', options) }
   let(:options) { {} }
   let(:app)     {  ->(_env) { [response_status, {}, ''] } }
-  let(:logger)  { double(:logger) }
+  let(:logger)  { instance_double(Logger, info: nil, error: nil) }
+  let(:tags)    { [] }
 
-  subject { described_class.new(app, logger) }
-
-  before do
-    allow(logger).to receive(:info)
-    allow(logger).to receive(:error)
+  let(:configuration) do
+    instance_double(
+      Loga::Configuration,
+      filter_exceptions: %w(ActionController::RoutingError),
+      filter_parameters: [],
+      logger: logger,
+      tags: tags,
+    )
   end
+
+  subject { described_class.new(app) }
+
+  before { Loga.instance_variable_set(:@configuration, configuration) }
 
   shared_examples 'logs the event' do |details|
     let(:level) { details[:level] }
@@ -103,11 +111,15 @@ describe Loga::Rack::Logger do
         end
       end
 
-      it 'yields the app with tags' do
-        expect(logger).to receive(:tagged).with(:tag) do |&block|
-          expect(block.call).to eq(:response)
+      context 'when tags are present' do
+        let(:tags) { [:foo] }
+
+        it 'yields the app with tags' do
+          expect(logger).to receive(:tagged).with(:tag) do |&block|
+            expect(block.call).to eq(:response)
+          end
+          subject.call(env)
         end
-        subject.call(env)
       end
     end
   end
