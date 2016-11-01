@@ -38,6 +38,14 @@ RSpec.describe Loga::Event, timecop: true do
         expect(subject.to_s).to eql("#{time_anchor.iso8601(3)} Hello World")
       end
     end
+
+    context 'when no timestamp' do
+      let(:opts) { { message: 'Hello World' } }
+
+      it 'will render the message without it' do
+        expect(subject.to_s).to eql('Hello World')
+      end
+    end
   end
 
   describe '#inspect' do
