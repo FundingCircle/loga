@@ -6,43 +6,36 @@ require 'socket'
 
 module Loga
   class Configuration
-    DEFAULT_KEYS = %i(
-      device
-      filter_exceptions
-      filter_parameters
-      format
-      host
-      level
-      service_name
-      service_version
-      sync
-      tags
-    ).freeze
-
     FRAMEWORK_EXCEPTIONS = %w(
       ActionController::RoutingError
       ActiveRecord::RecordNotFound
       Sinatra::NotFound
     ).freeze
 
-    attr_accessor(*DEFAULT_KEYS)
-    attr_reader :logger, :service_version
-    private_constant :DEFAULT_KEYS
+    attr_accessor :device, :filter_exceptions, :filter_parameters, :format,
+                  :host, :level, :service_name, :service_version, :sync, :tags
+    attr_reader :logger
 
     def initialize(user_options = {}, framework_options = {})
       options = default_options.merge(framework_options)
                                .merge(environment_options)
                                .merge(user_options)
 
-      DEFAULT_KEYS.each do |attribute|
-        public_send("#{attribute}=", options[attribute])
-      end
+      self.device            = options[:device]
+      self.filter_exceptions = options[:filter_exceptions]
+      self.filter_parameters = options[:filter_parameters]
+      self.format            = options[:format]
+      self.host              = options[:host]
+      self.level             = options[:level]
+      self.service_name      = options[:service_name]
+      self.service_version   = options[:service_version] || ServiceVersionStrategies.call
+      self.sync              = options[:sync]
+      self.tags              = options[:tags]
 
       raise ConfigurationError, 'Service name cannot be blank' if service_name.blank?
       raise ConfigurationError, 'Device cannot be blank' if device.blank?
 
-      @service_version = initialize_service_version
-      @logger          = initialize_logger
+      @logger = initialize_logger
     end
 
     def format=(name)
@@ -74,10 +67,6 @@ module Loga
 
     def environment_options
       { format: ENV['LOGA_FORMAT'].presence }.reject { |_, v| v.nil? }
-    end
-
-    def initialize_service_version
-      service_version || ServiceVersionStrategies.call
     end
 
     def initialize_logger
