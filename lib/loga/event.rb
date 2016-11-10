@@ -19,8 +19,6 @@ module Loga
       output.join("\n")
     end
 
-    alias inspect to_s
-
     private
 
     # Guard against Encoding::UndefinedConversionError
