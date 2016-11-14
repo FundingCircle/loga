@@ -1,5 +1,6 @@
 require 'active_support/core_ext/object/blank'
 require 'active_support/version'
+require 'loga/formatters/gelf_formatter'
 require 'loga/service_version_strategies'
 require 'logger'
 require 'socket'
@@ -93,7 +94,7 @@ module Loga
 
     def assign_formatter
       if format == :gelf
-        Formatter.new(
+        Formatters::GELFFormatter.new(
           service_name:    service_name,
           service_version: service_version,
           host:            host,

@@ -150,7 +150,7 @@ describe Loga::Configuration do
         let(:formatter) { subject.logger.formatter }
 
         it 'uses the GELF formatter' do
-          expect(subject.logger.formatter).to be_a(Loga::Formatter)
+          expect(subject.logger.formatter).to be_a(Loga::Formatters::GELFFormatter)
         end
 
         it 'strips the service name' do
