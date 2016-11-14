@@ -32,8 +32,7 @@ module Loga
       self.sync              = options[:sync]
       self.tags              = options[:tags]
 
-      raise ConfigurationError, 'Service name cannot be blank' if service_name.blank?
-      raise ConfigurationError, 'Device cannot be blank' if device.blank?
+      validate
 
       @logger = initialize_logger
     end
@@ -51,6 +50,11 @@ module Loga
     end
 
     private
+
+    def validate
+      raise ConfigurationError, 'Service name cannot be blank' if service_name.blank?
+      raise ConfigurationError, 'Device cannot be blank' if device.blank?
+    end
 
     def default_options
       {
