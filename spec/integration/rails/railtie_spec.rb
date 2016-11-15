@@ -6,13 +6,7 @@ RSpec.describe Loga::Railtie do
 
   context 'development', if: Rails.env.development? do
     describe 'loga_initialize_logger' do
-      let(:formatter) do
-        if ActiveSupport::VERSION::MAJOR == 3
-          Logger::SimpleFormatter
-        else
-          ActiveSupport::Logger::SimpleFormatter
-        end
-      end
+      let(:formatter) { Loga::Formatters::SimpleFormatter }
 
       it 'assign Loga logger to Rails logger' do
         expect(Loga.logger).to equal(Rails.logger)
