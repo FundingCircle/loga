@@ -62,37 +62,68 @@ RSpec.describe 'Structured logging with Sinatra', timecop: true do
     end
   end
 
-  context 'when RACK_ENV is production', if: ENV['RACK_ENV'].eql?('development') do
+  # rubocop:disable Metrics/LineLength
+  context 'when RACK_ENV is development', if: ENV['RACK_ENV'].eql?('development') do
     let(:format) { :simple }
     let(:last_log_entry) do
       io.rewind
       io.read
     end
+    let(:data) do
+      {
+        'status' => 200,
+        'method' => 'GET',
+        'path'   => '/ok',
+        'params' => { 'username'=>'yoshi' },
+        'request_id' => '700a6a01',
+        'request_ip' => '127.0.0.1',
+        'user_agent' => nil,
+        'duration'   => 0,
+      }
+    end
+    let(:data_as_text)  { "data=#{{ request: data }.inspect}" }
+    let(:time_pid_tags) { '[2015-12-15T09:30:05.123000+06:00 #999][700a6a01 TEST_TAG]' }
+
+    before do
+      allow(Process).to receive(:pid).and_return(999)
+    end
 
     context 'get request' do
       it 'logs the request' do
-        get '/ok', username: 'yoshi'
-        expect(last_log_entry)
-          .to eq("#{time_anchor.iso8601(3)} GET /ok?username=yoshi 200 in 0ms\n")
+        get '/ok', { username: 'yoshi' }, 'HTTP_X_REQUEST_ID' => '700a6a01'
+
+        expect(last_log_entry).to eq("I, #{time_pid_tags} GET /ok?username=yoshi 200 in 0ms type=request #{data_as_text}\n")
       end
     end
 
     context 'request with redirect' do
+      let(:data) do
+        super().merge(
+          'status' => 302,
+          'path'   => '/new',
+          'params' => {},
+        )
+      end
       it 'specifies the original path' do
-        get '/new'
-        expect(last_log_entry).to eql("#{time_anchor.iso8601(3)} GET /new 302 in 0ms\n")
+        get '/new', {}, 'HTTP_X_REQUEST_ID' => '700a6a01'
+        expect(last_log_entry).to eql("I, #{time_pid_tags} GET /new 302 in 0ms type=request #{data_as_text}\n")
       end
     end
 
     context 'when the request raises an exception' do
-      let(:log_entry_match) do
-        %r{GET /error 500 in 0ms.undefined method `name' for nil:NilClass..+sinatra_spec}m
+      let(:data) do
+        super().merge(
+          'status' => 500,
+          'path'   => '/error',
+          'params' => {},
+        )
       end
 
       it 'logs the request with the exception' do
-        get '/error'
-        expect(last_log_entry).to match(log_entry_match)
+        get '/error', {}, 'HTTP_X_REQUEST_ID' => '700a6a01'
+        expect(last_log_entry).to eql("E, #{time_pid_tags} GET /error 500 in 0ms type=request #{data_as_text} exception=undefined method `name' for nil:NilClass\n")
       end
     end
   end
+  # rubocop:enable Metrics/LineLength
 end

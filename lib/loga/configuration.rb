@@ -1,5 +1,7 @@
 require 'active_support/core_ext/object/blank'
 require 'active_support/version'
+require 'loga/formatters/gelf_formatter'
+require 'loga/formatters/simple_formatter'
 require 'loga/service_version_strategies'
 require 'logger'
 require 'socket'
@@ -93,27 +95,13 @@ module Loga
 
     def assign_formatter
       if format == :gelf
-        Formatter.new(
+        Formatters::GELFFormatter.new(
           service_name:    service_name,
           service_version: service_version,
           host:            host,
         )
       else
-        active_support_simple_formatter
-      end
-    end
-
-    def active_support_simple_formatter
-      case ActiveSupport::VERSION::MAJOR
-      when 3
-        require 'active_support/core_ext/logger'
-        Logger::SimpleFormatter.new
-      when 4..5
-        require 'active_support/logger'
-        ActiveSupport::Logger::SimpleFormatter.new
-      else
-        raise Loga::ConfigurationError,
-              "ActiveSupport #{ActiveSupport::VERSION::MAJOR} is unsupported"
+        Formatters::SimpleFormatter.new
       end
     end
   end

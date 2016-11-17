@@ -150,7 +150,7 @@ describe Loga::Configuration do
         let(:formatter) { subject.logger.formatter }
 
         it 'uses the GELF formatter' do
-          expect(subject.logger.formatter).to be_a(Loga::Formatter)
+          expect(subject.logger.formatter).to be_a(Loga::Formatters::GELFFormatter)
         end
 
         it 'strips the service name' do
@@ -162,15 +162,7 @@ describe Loga::Configuration do
         let(:options) { super().merge(format: :simple) }
 
         it 'uses the SimpleFormatter' do
-          expect(subject.logger.formatter).to be_a(ActiveSupport::Logger::SimpleFormatter)
-        end
-      end
-
-      context 'when the ActiveSupport::VERSION is unsupported' do
-        it 'raises an error' do
-          stub_const('ActiveSupport::VERSION::MAJOR', 1)
-          expect { described_class.new(options) }
-            .to raise_error(Loga::ConfigurationError, 'ActiveSupport 1 is unsupported')
+          expect(subject.logger.formatter).to be_a(Loga::Formatters::SimpleFormatter)
         end
       end
     end

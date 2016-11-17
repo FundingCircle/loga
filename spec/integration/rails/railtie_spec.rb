@@ -6,13 +6,7 @@ RSpec.describe Loga::Railtie do
 
   context 'development', if: Rails.env.development? do
     describe 'loga_initialize_logger' do
-      let(:formatter) do
-        if ActiveSupport::VERSION::MAJOR == 3
-          Logger::SimpleFormatter
-        else
-          ActiveSupport::Logger::SimpleFormatter
-        end
-      end
+      let(:formatter) { Loga::Formatters::SimpleFormatter }
 
       it 'assign Loga logger to Rails logger' do
         expect(Loga.logger).to equal(Rails.logger)
@@ -31,7 +25,8 @@ RSpec.describe Loga::Railtie do
       end
 
       it 'configures Loga with a structured formatter' do
-        expect(Loga.configuration.logger.formatter).to be_a(Loga::Formatter)
+        expect(Loga.configuration.logger.formatter)
+          .to be_a(Loga::Formatters::GELFFormatter)
       end
 
       it 'disables colorized logging' do

@@ -17,7 +17,9 @@ Includes:
     - [Reduced logs](#reduced-logs)
     - [Request log tags](#request-log-tags)
   - [Sinatra](#sinatra)
-- [GELF Output example](#gelf-output-example)
+- [Output example](#output-example)
+   - [GELF Format](#gelf-format)
+   - [Simple Format](#simple-format)
 - [Road map](#road-map)
 - [Contributing](#contributing)
   - [Running tests](#running-tests)
@@ -45,7 +47,7 @@ end
 
 Loga hooks into the Rails logger initialization process and defines its own logger for all environments.
 
-The logger configuration adjusts based on the environment:
+The logger configuration is adjusted based on the environment:
 
 |        | Production | Test         | Development | Others |
 |--------|------------|--------------|-------------|--------|
@@ -119,13 +121,23 @@ You can now use `Loga.logger` or assign it to your existing logger.
 The above configuration also inserts two middleware:
 
 - `Loga::Rack::RequestId` makes the request id available to the request logger
-- `Loga::Rack::Logger`  logs requests
+- `Loga::Rack::Logger` logs requests
 
-## GELF Output Example
+You can easily switch between formats by using the `LOGA_FORMAT`
+environment variable. The `format` key in the options takes precedence over the
+environment variable therefore it must be removed.
+
+```
+LOGA_FORMAT=simple rackup
+```
+
+## Output Example
+
+### GELF Format
 
 Rails request logger: (includes controller/action name):
 
-`GET /ok`
+`curl localhost:3000/ok -X GET -H "X-Request-Id: 12345"`
 
 ```json
 {
@@ -133,7 +145,7 @@ Rails request logger: (includes controller/action name):
    "_request.method":     "GET",
    "_request.path":       "/ok",
    "_request.params":     {},
-   "_request.request_id": "2b99e3d3-3ee2-4781-972b-782682f57648",
+   "_request.request_id": "12345",
    "_request.request_ip": "127.0.0.1",
    "_request.user_agent": null,
    "_request.controller": "ApplicationController#ok",
@@ -141,7 +153,7 @@ Rails request logger: (includes controller/action name):
    "_type":               "request",
    "_service.name":       "my_app",
    "_service.version":    "1.0",
-   "_tags":               "2b99e3d3-3ee2-4781-972b-782682f57648",
+   "_tags":               "12345",
    "short_message":       "GET /ok 200 in 0ms",
    "timestamp":           1450150205.123,
    "host":                "example.com",
@@ -164,13 +176,45 @@ Loga.logger.info('I love Loga')
 {
   "_service.name":     "my_app",
   "_service.version":  "v1.0.0",
-  "_tags":             "",
+  "_tags":             "12345",
   "host":              "example.com",
   "level":             6,
   "short_message":     "I love Loga",
   "timestamp":         1450150205.123,
   "version":           "1.1"
 }
+```
+
+### Simple Format
+
+Request logger:
+
+`curl localhost:3000/ok -X GET -H "X-Request-Id: 12345"`
+
+Rails
+
+```
+I, [2016-11-15T16:05:03.614081+00:00 #1][12345] Started GET "/ok" for ::1 at 2016-11-15 16:05:03 +0000
+I, [2016-11-15T16:05:03.620176+00:00 #1][12345] Processing by ApplicationController#ok as HTML
+I, [2016-11-15T16:05:03.624807+00:00 #1][12345]   Rendering text template
+I, [2016-11-15T16:05:03.624952+00:00 #1][12345]   Rendered text template (0.0ms)
+I, [2016-11-15T16:05:03.625137+00:00 #1][12345] Completed 200 OK in 5ms (Views: 4.7ms)
+```
+
+Sinatra
+
+```
+I, [2016-11-15T16:10:08.645521+00:00 #1][12345] GET /ok 200 in 0ms type=request data={:request=>{"status"=>200, "method"=>"GET", "path"=>"/ok", "params"=>{}, "request_id"=>"12345", "request_ip"=>"127.0.0.1", "user_agent"=>nil, "duration"=>0}}
+```
+
+Logger output:
+
+```ruby
+Loga.logger.info('I love Loga')
+```
+
+```
+I, [2015-12-15T09:30:05.123000+06:00 #999] I love Loga
 ```
 
 ## Road map
