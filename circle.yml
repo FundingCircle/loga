@@ -1,4 +1,6 @@
 dependencies:
+  post:
+    - "gem install gem-versioner -v 1.1.0"
   override:
     - rvm-exec 2.2.5 bundle install -j 4
     - rvm-exec 2.2.5 bundle exec appraisal install -j 4
@@ -17,4 +19,9 @@ deployment:
     tag: /.*/
     commands:
       - "gem build loga.gemspec"
+      - "curl -F package=@$(ls -t1 loga-*.gem | head -1) ${GEMFURY_PUSH_URI}"
+  dev:
+    branch: /^(?!master$).*/
+    commands:
+      - "PRE_RELEASE=$CIRCLE_BRANCH gem build loga.gemspec"
       - "curl -F package=@$(ls -t1 loga-*.gem | head -1) ${GEMFURY_PUSH_URI}"

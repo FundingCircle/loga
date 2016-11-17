@@ -221,6 +221,20 @@ I, [2015-12-15T09:30:05.123000+06:00 #999] I love Loga
 
 Consult the [milestones](https://github.com/FundingCircle/loga/milestones).
 
+
+## Publishing
+
+### Tagged Versions
+
+When a new tag is released, the new version of this gem is published to Gemfury by CircleCI.
+
+### Any other branch
+
+If any branch other than master is pushed to origin, CircleCI will build a pre-release version of the gem.
+
+The name of the pre-release version is outputted during the CircleCI build.
+
+
 ## Contributing
 
 Loga is in active development, feedback and contributions are welcomed.
