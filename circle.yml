@@ -14,7 +14,10 @@ test:
     - rvm-exec 2.3.1 bundle exec codeclimate-test-reporter
 deployment:
   gemfury:
-    tag: /.*/
+    tag: /^v\d.+/
+    owner: FundingCircle
     commands:
-      - "gem build loga.gemspec"
-      - "curl -F package=@$(ls -t1 loga-*.gem | head -1) ${GEMFURY_PUSH_URI}"
+      - "gem build $CIRCLE_PROJECT_REPONAME.gemspec"
+      - 'echo :rubygems_api_key: ${RUBYGEMS_API_KEY} >  ~/.gem/credentials'
+      - "chmod 0600 ~/.gem/credentials"
+      - "gem push $CIRCLE_PROJECT_REPONAME-$(echo $CIRCLE_TAG | sed -e 's/v//').gem"
