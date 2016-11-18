@@ -1,4 +1,8 @@
-# Loga [![Build Status](https://circleci.com/gh/FundingCircle/loga/tree/master.svg?style=shield&circle-token=9b81c3cf8468a8c3dc760f4c0398cf8914cb27d4)](https://circleci.com/gh/FundingCircle/loga/tree/master) [![Code Quality](https://codeclimate.com/repos/5563694f6956805723005d2f/badges/8eecb9144730614fb39e/gpa.svg)](https://codeclimate.com/repos/5563694f6956805723005d2f/feed) [![Test Coverage](https://codeclimate.com/repos/5563694f6956805723005d2f/badges/8eecb9144730614fb39e/coverage.svg)](https://codeclimate.com/repos/5563694f6956805723005d2f/coverage)
+# Loga
+
+[![Build Status](https://circleci.com/gh/FundingCircle/loga/tree/master.svg?style=shield&circle-token=9b81c3cf8468a8c3dc760f4c0398cf8914cb27d4)](https://circleci.com/gh/FundingCircle/loga/tree/master)
+[![Code Quality](https://codeclimate.com/repos/5563694f6956805723005d2f/badges/8eecb9144730614fb39e/gpa.svg)](https://codeclimate.com/repos/5563694f6956805723005d2f/feed)
+[![Test Coverage](https://codeclimate.com/repos/5563694f6956805723005d2f/badges/8eecb9144730614fb39e/coverage.svg)](https://codeclimate.com/repos/5563694f6956805723005d2f/coverage)
 
 ## Description
 
