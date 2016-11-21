@@ -11,7 +11,7 @@
 Loga provides consistent logging across frameworks and environments.
 
 Includes:
-- One logger for all environments
+- One tagged logger for all environments
 - Human readable logs for development
 - Structured logs for production ([GELF](http://docs.graylog.org/en/2.1/pages/gelf.html))
 - One Rack logger for all Rack based applications
@@ -37,7 +37,7 @@ Includes:
 Add this line to your application's Gemfile:
 
 ```
-gem 'loga', git: 'git@github.com:FundingCircle/loga.git'
+gem 'loga'
 ```
 
 ### Rails
@@ -47,7 +47,7 @@ Let Loga know what your application name is and Loga will do the rest.
 ```ruby
 # config/application.rb
 class MyApp::Application < Rails::Application
-  config.loga = { service_name: 'MyApp' }
+  config.loga = { service_name: 'my_app' }
 end
 ```
 
@@ -68,7 +68,7 @@ class MyApp::Application < Rails::Application
   config.loga = {
     device:       File.open("log/application.log", 'a'),
     format:       :gelf,
-    service_name: 'MyApp',
+    service_name: 'my_app',
   }
 end
 ```
@@ -173,21 +173,41 @@ Sinatra request output is identical to Rails but without the `_request.controlle
 Logger output:
 
 ```ruby
-Rails.logger.info('I love Loga')
+# Rails.logger
 # or
+# Loga.logger
+
+Loga.configure(service_name: 'my_app', format: :gelf)
+
 Loga.logger.info('I love Loga')
+Loga.logger.tagged(%w(USER_123 CRM)) do
+  Loga.logger.info('I love Loga with tags')
+end
 ```
 
 ```json
 {
-  "_service.name":     "my_app",
-  "_service.version":  "v1.0.0",
-  "_tags":             "12345",
+  "_service.name":    "my_app",
+  "_service.version": "v1.0.0",
+  "_tags":            "",
   "host":              "example.com",
-  "level":             6,
-  "short_message":     "I love Loga",
-  "timestamp":         1450150205.123,
-  "version":           "1.1"
+  "level":            6,
+  "short_message":    "I love Loga",
+  "timestamp":        1479402679.663,
+  "version":          "1.1"
+}
+```
+
+```json
+{
+  "_service.name":    "my_app",
+  "_service.version": "v1.0.0",
+  "_tags":            "USER_123 CRM",
+  "host":              "example.com",
+  "level":            6,
+  "short_message":    "I love Loga",
+  "timestamp":        1479402706.102,
+  "version":          "1.1"
 }
 ```
 
@@ -216,11 +236,17 @@ I, [2016-11-15T16:10:08.645521+00:00 #1][12345] GET /ok 200 in 0ms type=request 
 Logger output:
 
 ```ruby
+Loga.configure(service_name: 'my_app', format: :simple)
+
 Loga.logger.info('I love Loga')
+Loga.logger.tagged(%w(USER_123 CRM)) do
+  Loga.logger.info('I love Loga with tags')
+end
 ```
 
 ```
-I, [2015-12-15T09:30:05.123000+06:00 #999] I love Loga
+I, [2016-11-17T17:07:46.714215+00:00 #595] I love Loga
+I, [2016-11-17T17:07:46.725624+00:00 #595][USER_123 CRM] I love Loga with tags
 ```
 
 ## Road map
