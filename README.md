@@ -37,7 +37,7 @@ Includes:
 Add this line to your application's Gemfile:
 
 ```
-gem 'loga', git: 'git@github.com:FundingCircle/loga.git'
+gem 'loga'
 ```
 
 ### Rails
