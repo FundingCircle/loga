@@ -181,4 +181,25 @@ RSpec.shared_examples 'request logger' do
       end
     end
   end
+
+  describe 'when the request uploads a file' do
+    it 'works' do
+      post '/users?username=yoshi',
+           { bob_file: Rack::Test::UploadedFile.new('README.md', 'text/markdown') },
+           'HTTP_X_REQUEST_ID' => '471a34dc'
+
+      expect(last_log_entry).to include(
+        'short_message'       => 'POST /users?username=yoshi 200 in 0ms',
+        'level'               => 6,
+        '_request.params'     => {
+          'username' => 'yoshi',
+          'bob_file' => include(
+            'filename' => 'README.md',
+            'name' => 'bob_file',
+            'type' => 'text/markdown',
+          ),
+        },
+      )
+    end
+  end
 end
