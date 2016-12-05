@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.1] - 2016-12-02
+### Fixed
+- Encoding error when converting uploaded file to JSON
+[rails/rails#25250](https://github.com/rails/rails/issues/25250)
+
 ## [2.1.0] - 2016-11-17
 ## [2.1.0.pre.1]
 ### Changed
@@ -48,6 +53,7 @@ when using simple format. The formatter adds level, timestamp, pid and tags prep
 ### Changed
 - Silence ActionDispatch::DebugExceptions' logger
 
+[2.1.1]: https://github.com/FundingCircle/loga/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/FundingCircle/loga/compare/v2.0.0...v2.1.0
 [2.1.0.pre.1]: https://github.com/FundingCircle/loga/compare/v2.0.0...v2.1.0.pre.1
 [2.0.0]: https://github.com/FundingCircle/loga/compare/v1.4.0...v2.0.0

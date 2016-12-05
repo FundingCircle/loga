@@ -181,4 +181,23 @@ RSpec.shared_examples 'request logger' do
       end
     end
   end
+
+  describe 'when the request uploads a binary file', focus: true do
+    it 'logs the request' do
+      post '/users?username=yoshi',
+           bob_file: Rack::Test::UploadedFile.new('spec/fixtures/random_bin')
+
+      expect(last_log_entry).to include(
+        'short_message'       => 'POST /users?username=yoshi 200 in 0ms',
+        'level'               => 6,
+        '_request.params'     => {
+          'username' => 'yoshi',
+          'bob_file' => include(
+            'filename' => 'random_bin',
+            'name' => 'bob_file',
+          ),
+        },
+      )
+    end
+  end
 end

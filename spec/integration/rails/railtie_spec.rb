@@ -4,6 +4,13 @@ RSpec.describe Loga::Railtie do
   let(:app)          { Rails.application }
   let(:middlewares)  { app.middleware.middlewares }
 
+  describe 'Tempfile' do
+    let(:tempfile) { Tempfile.new('README.md') }
+    it 'monkey patches #as_json' do
+      expect(tempfile.as_json).to eql(tempfile.to_s)
+    end
+  end
+
   context 'development', if: Rails.env.development? do
     describe 'loga_initialize_logger' do
       let(:formatter) { Loga::Formatters::SimpleFormatter }
