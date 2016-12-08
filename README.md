@@ -107,6 +107,8 @@ opposed to a `ActionDispatch::Request`.
 With Sinatra Loga needs to be configured manually:
 
 ```ruby
+# config.ru
+require 'sinatra/base'
 require 'loga'
 
 Loga.configure(
@@ -116,11 +118,19 @@ Loga.configure(
   tags: [:uuid],
 )
 
+class MyApp < Sinatra::Base
+  set :logging, false # suppress Sinatra request logger
+
+  get '/' do
+    Loga.logger.info('Everything is Awesome!')
+    'Hello World!'
+  end
+end
+
 use Loga::Rack::RequestId
 use Loga::Rack::Logger
 
-use MyApp
-run Sinatra::Application
+run MyApp
 ```
 
 You can now use `Loga.logger` or assign it to your existing logger.

@@ -96,6 +96,15 @@ describe Loga::Rack::Logger do
       include_examples 'logs the event', level: :info
     end
 
+    context 'when the exception is on rack.exception', focus: true do
+      let(:response_status)  { 500 }
+      let(:exception)        { StandardError }
+      let(:logged_exception) { exception }
+      let(:options)          { { 'rack.exception' => exception } }
+
+      include_examples 'logs the event', level: :error
+    end
+
     context 'when no exception is raised' do
       include_examples 'logs the event', level: :info
     end

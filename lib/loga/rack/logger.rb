@@ -80,7 +80,8 @@ module Loga
       end
 
       def exception
-        env['loga.exception'] || env['action_dispatch.exception'] || env['sinatra.error']
+        env['loga.exception'] || env['action_dispatch.exception'] ||
+          env['sinatra.error'] || env['rack.exception']
       end
 
       def filter_exceptions

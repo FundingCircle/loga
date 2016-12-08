@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.2] - 2016-12-08
+### Fixed
+- `Loga::Rack::Logger` looks into `env['rack.exception']` for exceptions
+
 ## [2.1.1] - 2016-12-02
 ### Fixed
 - Encoding error when converting uploaded file to JSON
@@ -53,6 +57,7 @@ when using simple format. The formatter adds level, timestamp, pid and tags prep
 ### Changed
 - Silence ActionDispatch::DebugExceptions' logger
 
+[2.1.2]: https://github.com/FundingCircle/loga/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/FundingCircle/loga/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/FundingCircle/loga/compare/v2.0.0...v2.1.0
 [2.1.0.pre.1]: https://github.com/FundingCircle/loga/compare/v2.0.0...v2.1.0.pre.1
