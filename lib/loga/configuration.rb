@@ -77,14 +77,14 @@ module Loga
 
     def initialize_logger
       device.sync      = sync
-      logger           = Logger.new(device)
+      logger           = ContextLogger.new(device)
       logger.formatter = assign_formatter
       logger.level     = constantized_log_level
       TaggedLogging.new(logger)
     end
 
     def constantized_log_level
-      Logger.const_get(level.to_s.upcase)
+      ContextLogger.const_get(level.to_s.upcase)
     end
 
     def hostname
