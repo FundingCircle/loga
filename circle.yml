@@ -13,7 +13,7 @@ test:
     - rvm-exec 2.3.1 bundle exec rubocop
     - rvm-exec 2.3.1 bundle exec codeclimate-test-reporter
 deployment:
-  gemfury:
+  rubygems:
     tag: /^v\d.+/
     owner: FundingCircle
     commands:
