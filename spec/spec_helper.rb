@@ -1,12 +1,12 @@
+require 'simplecov'
+SimpleCov.start
+
 require 'pry'
 require 'support/gethostname_shared'
 require 'support/helpers'
 require 'support/request_spec'
 require 'support/timecop_shared'
 require 'rack/test'
-require 'simplecov'
-
-SimpleCov.start
 
 case ENV['BUNDLE_GEMFILE']
 when /rails/
