@@ -9,8 +9,4 @@ module Helpers
   def time_anchor_unix
     BigDecimal.new('1450150205.123')
   end
-
-  def hostname_anchor
-    'bird.example.com'
-  end
 end

@@ -1,17 +1,12 @@
 require 'pry'
+require 'support/gethostname_shared'
 require 'support/helpers'
-require 'support/timecop_shared'
 require 'support/request_spec'
+require 'support/timecop_shared'
 require 'rack/test'
 require 'simplecov'
 
 SimpleCov.start
-
-class Socket
-  def self.gethostname
-    'bird.example.com'
-  end
-end
 
 case ENV['BUNDLE_GEMFILE']
 when /rails/

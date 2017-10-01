@@ -21,7 +21,7 @@ class MySinatraApp < Sinatra::Base
   end
 end
 
-RSpec.describe 'Structured logging with Sinatra', timecop: true do
+RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
   let(:io) { StringIO.new }
   let(:format) {}
   before do
