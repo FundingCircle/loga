@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rack-test'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec',    '~> 3.6.0'
-  spec.add_development_dependency 'rubocop',  '~> 0.40.0'
+  spec.add_development_dependency 'rubocop',  '~> 0.50.0'
   spec.add_development_dependency 'timecop'
   spec.add_development_dependency 'guard',         '~> 2.13'
   spec.add_development_dependency 'guard-rubocop', '~> 1.2'

@@ -4,7 +4,7 @@ guard :rubocop do
 end
 
 group :sinatra do
-  %w(production development).each do |env|
+  %w[production development].each do |env|
     guard :rspec,
           all_on_start: true,
           cmd: "RACK_ENV=#{env} bundle exec appraisal sinatra14 rspec" do
@@ -14,8 +14,8 @@ group :sinatra do
 end
 
 group :rails do
-  %w(production development).each do |env|
-    %w(rails32 rails40 rails50).each do |appraisal|
+  %w[production development].each do |env|
+    %w[rails32 rails40 rails50].each do |appraisal|
       guard :rspec,
             all_on_start: true,
             cmd: "RACK_ENV=#{env} bundle exec appraisal #{appraisal} rspec" do

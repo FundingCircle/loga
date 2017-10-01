@@ -72,7 +72,7 @@ describe Loga do
       expect do
         subject.reset
         subject.configure(options)
-      end.to change { subject.configuration.object_id }
+      end.to(change { subject.configuration.object_id })
     end
   end
 end

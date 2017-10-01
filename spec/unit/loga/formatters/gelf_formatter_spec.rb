@@ -109,7 +109,7 @@ describe Loga::Formatters::GELFFormatter do
       end
 
       context 'when the Event has an exception' do
-        let(:backtrace) { %w(a b) }
+        let(:backtrace) { %w[a b] }
         let(:exception) do
           StandardError.new('Foo Error').tap { |e| e.set_backtrace backtrace }
         end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class MySinatraApp < Sinatra::Base
-  set :logging, :false
+  set :logging, false
 
   get '/ok' do
     'Hello Sinatra'
