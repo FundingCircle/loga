@@ -20,12 +20,12 @@ describe Loga::Configuration do
       allow(Loga::ServiceVersionStrategies).to receive(:call).and_return('unknown.sha')
     end
 
-    context 'defaults' do
+    context 'defaults', with_hostname: true do
       specify { expect(subject.device).to eq(STDOUT) }
       specify { expect(subject.filter_exceptions).to eq(framework_exceptions) }
       specify { expect(subject.filter_parameters).to eq([]) }
       specify { expect(subject.format).to eq(:simple) }
-      specify { expect(subject.host).to eq(hostname_anchor) }
+      specify { expect(subject.host).to eq(hostname) }
       specify { expect(subject.level).to eq(:info) }
       specify { expect(subject.service_name).to eq('hello_world_app') }
       specify { expect(subject.service_version).to eq('unknown.sha') }
