@@ -8,15 +8,15 @@ require 'socket'
 
 module Loga
   class Configuration
-    FRAMEWORK_EXCEPTIONS = %w(
+    FRAMEWORK_EXCEPTIONS = %w[
       ActionController::RoutingError
       ActiveRecord::RecordNotFound
       Sinatra::NotFound
-    ).freeze
+    ].freeze
 
-    attr_accessor :device, :filter_exceptions, :filter_parameters, :format,
-                  :host, :level, :service_name, :service_version, :sync, :tags
-    attr_reader :logger
+    attr_accessor :device, :filter_exceptions, :filter_parameters,
+                  :host, :level, :service_version, :sync, :tags
+    attr_reader :logger, :format, :service_name
 
     def initialize(user_options = {}, framework_options = {})
       options = default_options.merge(framework_options)

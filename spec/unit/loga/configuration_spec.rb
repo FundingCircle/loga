@@ -9,11 +9,11 @@ describe Loga::Configuration do
 
   describe 'initialize' do
     let(:framework_exceptions) do
-      %w(
+      %w[
         ActionController::RoutingError
         ActiveRecord::RecordNotFound
         Sinatra::NotFound
-      )
+      ]
     end
 
     before do

@@ -29,7 +29,7 @@ module Loga
       def compute_event_message(event)
         components = [event.message]
 
-        %i(type data exception).each do |attr|
+        %i[type data exception].each do |attr|
           if event.public_send(attr)
             components.push "#{attr}=#{event.public_send(attr)}"
           end

@@ -7,11 +7,11 @@ appraise 'rails40' do
 end
 
 appraise 'sinatra14' do
- gem 'sinatra',  '~> 1.4.0'
+  gem 'sinatra',  '~> 1.4.0'
 end
 
 appraise 'rails50' do
- gem 'rails',  '~> 5.0.0'
+  gem 'rails',  '~> 5.0.0'
 end
 
 appraise 'unit' do
