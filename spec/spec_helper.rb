@@ -13,7 +13,7 @@ when /rails/
   rspec_pattern = 'integration/rails/**/*_spec.rb'
   /(?<appraisal>rails\d{2})\.gemfile/ =~ ENV['BUNDLE_GEMFILE']
   require 'rails'
-  require File.expand_path("../fixtures/#{appraisal}/config/environment.rb",  __FILE__)
+  require File.expand_path("../fixtures/#{appraisal}.rb",  __FILE__)
 when /sinatra/
   rspec_pattern = 'integration/sinatra_spec.rb'
   require 'json'
