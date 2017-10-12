@@ -1,19 +1,23 @@
 dependencies:
   override:
-    - rvm-exec 2.2.5 bundle install -j 4
-    - rvm-exec 2.2.5 bundle exec appraisal install -j 4
-    - rvm-exec 2.3.1 bundle install -j 4
-    - rvm-exec 2.3.1 bundle exec appraisal install -j 4
+    - rvm-exec 2.2.5 bundle install --jobs 4
+    - rvm-exec 2.2.5 bundle exec appraisal install --jobs 4
+    - rvm-exec 2.3.1 bundle install --jobs 4
+    - rvm-exec 2.3.1 bundle exec appraisal install --jobs 4
+    - rvm-exec 2.4.1 bundle install --jobs 4
+    - rvm-exec 2.4.1 bundle exec appraisal install --jobs 4
 test:
   override:
     - RACK_ENV=development rvm-exec 2.2.5 bundle exec appraisal rspec
     - RACK_ENV=production  rvm-exec 2.2.5 bundle exec appraisal rspec
     - RACK_ENV=development rvm-exec 2.3.1 bundle exec appraisal rspec
     - RACK_ENV=production  rvm-exec 2.3.1 bundle exec appraisal rspec
-    - rvm-exec 2.3.1 bundle exec rubocop
-    - rvm-exec 2.3.1 bundle exec codeclimate-test-reporter
+    - RACK_ENV=development rvm-exec 2.4.1 bundle exec appraisal rspec
+    - RACK_ENV=production  rvm-exec 2.4.1 bundle exec appraisal rspec
+    - rvm-exec 2.4.1 bundle exec rubocop
+    - rvm-exec 2.4.1 bundle exec codeclimate-test-reporter
 deployment:
-  gemfury:
+  rubygems:
     tag: /^v\d.+/
     owner: FundingCircle
     commands:
