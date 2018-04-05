@@ -1,0 +1,64 @@
+defaults: &defaults
+  working_directory: ~/loga
+  steps:
+    - checkout
+    - run: bundle install -j 4
+    - run: bundle exec appraisal install -j 4
+    - run: RACK_ENV=development bundle exec appraisal rspec
+    - run: RACK_ENV=production bundle exec appraisal rspec
+
+version: 2
+jobs:
+  ruby-2.2:
+    docker:
+      - image: circleci/ruby:2.2.10
+    <<: *defaults
+  ruby-2.3:
+    docker:
+      - image: circleci/ruby:2.3.7
+    <<: *defaults
+  ruby-2.4:
+    docker:
+      - image: circleci/ruby:2.4.4
+    <<: *defaults
+  ruby-2.5:
+    docker:
+      - image: circleci/ruby:2.5.1
+    <<: *defaults
+  rubocop:
+    docker:
+      - image: circleci/ruby:2.5.1
+    steps:
+      - checkout
+      - run: bundle install -j 4
+      - run: bundle exec appraisal install -j 4
+      - run: bundle exec rubocop
+  push-to-rubygems:
+    docker:
+      - image: circleci/ruby:2.5.1
+    steps:
+      - run: "gem build $CIRCLE_PROJECT_REPONAME.gemspec"
+      - run: 'echo :rubygems_api_key: ${RUBYGEMS_API_KEY} >  ~/.gem/credentials'
+      - run: "chmod 0600 ~/.gem/credentials"
+      - run: "gem push $CIRCLE_PROJECT_REPONAME-$(echo $CIRCLE_TAG | sed -e 's/v//').gem"
+workflows:
+  version: 2
+  test-then-push-gem:
+    jobs:
+      - rubocop
+      - ruby-2.2
+      - ruby-2.3
+      - ruby-2.4
+      - ruby-2.5
+      - push-to-rubygems:
+          filters:
+            tags:
+              only: /^v\d.+/
+            branches:
+              ignore: /.*/
+          requires:
+            - rubocop
+            - ruby-2.2
+            - ruby-2.3
+            - ruby-2.4
+            - ruby-2.5
