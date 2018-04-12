@@ -1,7 +1,8 @@
 AllCops:
   Exclude:
-    - 'spec/fixtures/**/*'
     - '*.gemspec'
+    - 'spec/fixtures/**/*'
+    - 'vendor/bundle/**/*'
 
 Documentation:
   Enabled: false
