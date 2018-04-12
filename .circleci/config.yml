@@ -38,6 +38,7 @@ jobs:
       - image: circleci/ruby:2.5.1
     <<: *defaults
   rubocop:
+    working_directory: ~/loga
     docker:
       - image: circleci/ruby:2.5.1
     steps:
