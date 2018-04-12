@@ -16,8 +16,8 @@ defaults: &defaults
   steps:
     - checkout
     - *restore_gems
-    - run: bundle install -j 4
-    - run: bundle exec appraisal install -j 4
+    - run: bundle install --jobs 4 --path=vendor/bundle --retry 3
+    - run: bundle exec appraisal install
     - *cache_gems
     - run: RACK_ENV=development bundle exec appraisal rspec
     - run: RACK_ENV=production bundle exec appraisal rspec
