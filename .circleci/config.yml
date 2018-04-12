@@ -7,15 +7,17 @@ defaults: &defaults
     - &restore_gems
       restore_cache:
         keys:
-          - gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
+          - v2-gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
+          - v2-gems-{{ checksum "Gemfile" }}
     - &bundle_install
       run: bundle install --jobs 4 --path=vendor/bundle --retry 3
     - run: bundle exec appraisal install
     - &cache_gems
       save_cache:
-        key: gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
+        key: v2-gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
         paths:
-          - vendor/bundle
+          - ~/loga/gemfiles/vendor/bundle
+          - ~/loga/vendor/bundle
     - run: RACK_ENV=development bundle exec appraisal rspec
     - run: RACK_ENV=production bundle exec appraisal rspec
 
