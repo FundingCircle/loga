@@ -1,9 +1,24 @@
+restore_gems: &restore_gems
+
+restore_gems: &restore_gems
+  restore_cache:
+    keys:
+      - gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
+
+cache_gems: &cache_gems
+  save_cache:
+    key: gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
+    paths:
+      - vendor/bundle
+
 defaults: &defaults
   working_directory: ~/loga
   steps:
     - checkout
+    - *restore_gems
     - run: bundle install -j 4
     - run: bundle exec appraisal install -j 4
+    - *cache_gems
     - run: RACK_ENV=development bundle exec appraisal rspec
     - run: RACK_ENV=production bundle exec appraisal rspec
 
@@ -30,8 +45,9 @@ jobs:
       - image: circleci/ruby:2.5.1
     steps:
       - checkout
+      - *restore_gems
       - run: bundle install -j 4
-      - run: bundle exec appraisal install -j 4
+      - *cache_gems
       - run: bundle exec rubocop
   push-to-rubygems:
     docker:
