@@ -23,3 +23,4 @@ tmp
 mkmf.log
 spec/fixtures/**/*.log
 gemfiles/*.lock
+vendor/bundle
