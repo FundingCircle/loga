@@ -16,11 +16,45 @@ defaults: &defaults
         paths:
           - ~/loga/gemfiles/vendor/bundle
           - ~/loga/vendor/bundle
+    - attach_workspace:
+        at: ./tmp
     - run: RACK_ENV=development bundle exec appraisal rspec
     - run: RACK_ENV=production bundle exec appraisal rspec
+    - run: ./tmp/cc-test-reporter format-coverage -t simplecov -o $(ruby -e 'puts "tmp/codeclimate.#{RUBY_VERSION}.json"') coverage/.resultset.json
+    - persist_to_workspace:
+        root: tmp
+        paths:
+          - codeclimate.*.json
 
 version: 2
 jobs:
+  build:
+    working_directory: ~/loga
+    docker:
+      - image: circleci/ruby:2.5.1
+    steps:
+      - run:
+          name: Download cc-test-reporter
+          command: |
+            mkdir -p tmp/
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+            chmod +x ./tmp/cc-test-reporter
+      - persist_to_workspace:
+          root: ./tmp
+          paths:
+            - cc-test-reporter
+  upload-coverage:
+    working_directory: ~/loga
+    docker:
+      - image: circleci/ruby:2.5.1
+    steps:
+      - attach_workspace:
+          at: ./tmp
+      - run:
+          name: Upload coverage results to Code Climate
+          command: |
+            ./tmp/cc-test-reporter sum-coverage tmp/codeclimate.*.json -o tmp/codeclimate.total.json
+            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.total.json -r $CODECLIMATE_REPO_TOKEN
   ruby-2.2:
     docker:
       - image: circleci/ruby:2.2.10
@@ -59,11 +93,26 @@ workflows:
   version: 2
   test-then-push-gem:
     jobs:
+      - build
       - rubocop
-      - ruby-2.2
-      - ruby-2.3
-      - ruby-2.4
-      - ruby-2.5
+      - ruby-2.2:
+          requires:
+            - build
+      - ruby-2.3:
+          requires:
+            - build
+      - ruby-2.4:
+          requires:
+            - build
+      - ruby-2.5:
+          requires:
+            - build
+      - upload-coverage:
+          requires:
+            - ruby-2.2
+            - ruby-2.3
+            - ruby-2.4
+            - ruby-2.5
       - push-to-rubygems:
           filters:
             tags:
