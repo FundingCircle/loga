@@ -84,13 +84,23 @@ jobs:
       - *cache_gems
       - run: bundle exec rubocop
   push-to-rubygems:
+    working_directory: ~/loga
     docker:
       - image: circleci/ruby:2.5.1
     steps:
-      - run: "gem build $CIRCLE_PROJECT_REPONAME.gemspec"
-      - run: 'echo :rubygems_api_key: ${RUBYGEMS_API_KEY} >  ~/.gem/credentials'
-      - run: "chmod 0600 ~/.gem/credentials"
-      - run: "gem push $CIRCLE_PROJECT_REPONAME-$(echo $CIRCLE_TAG | sed -e 's/v//').gem"
+      - checkout
+      - *restore_gems
+      - *bundle_install
+      - *cache_gems
+      - run:
+          name: Build gem
+          command: gem build $CIRCLE_PROJECT_REPONAME.gemspec
+      - run:
+          name: Publish to rubygems
+          command: |
+            echo ":rubygems_api_key: $RUBYGEMS_API_KEY" >  ~/.gem/credentials
+            chmod 0600 ~/.gem/credentials
+            gem push $CIRCLE_PROJECT_REPONAME-$(echo $CIRCLE_TAG | sed -e 's/v//').gem
 workflows:
   version: 2
   test-then-push-gem:
