@@ -25,6 +25,8 @@ defaults: &defaults
         root: tmp
         paths:
           - codeclimate.*.json
+    - store_artifacts:
+        path: coverage
 
 version: 2
 jobs:
