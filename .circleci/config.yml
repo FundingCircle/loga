@@ -90,9 +90,9 @@ jobs:
       - *bundle_install
       - *cache_gems
       - run:
-          name: Build gem
+          name: Build the gem
           command: gem build $CIRCLE_PROJECT_REPONAME.gemspec
-      - run:
+      - deploy:
           name: Publish to rubygems
           command: |
             echo ":rubygems_api_key: $RUBYGEMS_API_KEY" >  ~/.gem/credentials
