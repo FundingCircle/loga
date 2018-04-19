@@ -1,3 +1,4 @@
+require 'byebug'
 require 'pry'
 require 'support/gethostname_shared'
 require 'support/helpers'
@@ -15,6 +16,7 @@ when /rails/
   rspec_pattern = 'integration/rails/**/*_spec.rb'
   /(?<appraisal>rails\d{2})\.gemfile/ =~ ENV['BUNDLE_GEMFILE']
   require 'rails'
+  require 'action_mailer'
   require File.expand_path("../fixtures/#{appraisal}.rb",  __FILE__)
 when /sinatra/
   rspec_pattern = 'integration/sinatra_spec.rb'

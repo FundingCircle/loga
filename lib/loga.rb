@@ -13,17 +13,19 @@ module Loga
   ConfigurationError = Class.new(StandardError)
 
   def self.configuration
-    if @configuration.nil?
+    unless @configuration
       raise ConfigurationError,
             'Loga has not been configured. Configure with Loga.configure(options)'
     end
+
     @configuration
   end
 
   def self.configure(options, framework_options = {})
-    unless @configuration.nil?
+    if @configuration
       raise ConfigurationError, 'Loga has already been configured'
     end
+
     @configuration ||= Configuration.new(options, framework_options)
   end
 

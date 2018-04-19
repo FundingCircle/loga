@@ -52,6 +52,7 @@ RSpec.describe Loga::Railtie do
       let(:listeners)   do
         ActiveSupport::Notifications.notifier.listeners_for(notification)
       end
+
       let(:subscribers) do
         listeners.map { |l| l.instance_variable_get(:@delegate).class }
       end
@@ -91,6 +92,20 @@ RSpec.describe Loga::Railtie do
 
           it 'removes ActionController::LogSubscriber' do
             expect(subscribers).to_not include(ActionController::LogSubscriber)
+          end
+        end
+      end
+
+      context 'ActionMailer' do
+        [
+          'receive.action_mailer',
+          'deliver.action_mailer',
+          'process.action_mailer',
+        ].each do |notification|
+          let(:notification) { notification }
+
+          it 'removes ActionMailer::LogSubscriber' do
+            expect(subscribers).to_not include(ActionMailer::LogSubscriber)
           end
         end
       end
