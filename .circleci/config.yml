@@ -1,4 +1,9 @@
-defaults: &defaults
+basic_build: &basic_build
+  working_directory: ~/loga
+  docker:
+    - image: circleci/ruby:2.5.1
+
+test_build: &test_build
   working_directory: ~/loga
   steps:
     - checkout
@@ -31,9 +36,7 @@ defaults: &defaults
 version: 2
 jobs:
   build:
-    working_directory: ~/loga
-    docker:
-      - image: circleci/ruby:2.5.1
+    <<: *basic_build
     steps:
       - run:
           name: Download cc-test-reporter
@@ -46,9 +49,7 @@ jobs:
           paths:
             - cc-test-reporter
   upload-coverage:
-    working_directory: ~/loga
-    docker:
-      - image: circleci/ruby:2.5.1
+    <<: *basic_build
     steps:
       - attach_workspace:
           at: ./tmp
@@ -60,23 +61,21 @@ jobs:
   ruby-2.2:
     docker:
       - image: circleci/ruby:2.2.10
-    <<: *defaults
+    <<: *test_build
   ruby-2.3:
     docker:
       - image: circleci/ruby:2.3.7
-    <<: *defaults
+    <<: *test_build
   ruby-2.4:
     docker:
       - image: circleci/ruby:2.4.4
-    <<: *defaults
+    <<: *test_build
   ruby-2.5:
     docker:
       - image: circleci/ruby:2.5.1
-    <<: *defaults
+    <<: *test_build
   rubocop:
-    working_directory: ~/loga
-    docker:
-      - image: circleci/ruby:2.5.1
+    <<: *basic_build
     steps:
       - checkout
       - *restore_gems
@@ -84,9 +83,7 @@ jobs:
       - *cache_gems
       - run: bundle exec rubocop
   push-to-rubygems:
-    working_directory: ~/loga
-    docker:
-      - image: circleci/ruby:2.5.1
+    <<: *basic_build
     steps:
       - checkout
       - *restore_gems
