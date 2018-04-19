@@ -14,8 +14,8 @@ defaults: &defaults
       save_cache:
         key: v2-gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
         paths:
-          - ~/loga/gemfiles/vendor/bundle
-          - ~/loga/vendor/bundle
+          - gemfiles/vendor/bundle
+          - vendor/bundle
     - attach_workspace:
         at: ./tmp
     - run: RACK_ENV=development bundle exec appraisal rspec
