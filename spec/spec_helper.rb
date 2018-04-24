@@ -6,7 +6,9 @@ require 'support/timecop_shared'
 require 'rack/test'
 require 'simplecov'
 
-SimpleCov.start
+SimpleCov.start do
+  command_name "ruby-#{RUBY_VERSION}-#{File.basename(ENV['BUNDLE_GEMFILE'], '.gemfile')}"
+end
 
 case ENV['BUNDLE_GEMFILE']
 when /rails/

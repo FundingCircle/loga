@@ -8,7 +8,7 @@ class Dummy < Rails::Application
   config.eager_load = true
   config.filter_parameters += [:password]
   config.secret_key_base = '2624599ca9ab3cf3823626240138a128118a87683bf03ab8f155844c33b3cd8cbbfa3ef5e29db6f5bd182f8bd4776209d9577cfb46ac51bfd232b00ab0136b24'
-  config.session_store :cookie_store, key: '_rails40_session'
+  config.session_store :cookie_store, key: '_rails52_session'
 
   config.log_tags = [ :uuid, 'TEST_TAG' ]
   config.loga = {
@@ -21,10 +21,10 @@ end
 
 class ApplicationController < ActionController::Base
   include Rails.application.routes.url_helpers
-  protect_from_forgery
+  protect_from_forgery with: :null_session
 
   def ok
-    render text: 'Hello Rails'
+    render plain: 'Hello Rails'
   end
 
   def error

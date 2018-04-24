@@ -1,0 +1,157 @@
+basic_build: &basic_build
+  working_directory: ~/loga
+  docker:
+    - image: circleci/ruby:2.5.1
+
+test_build: &test_build
+  working_directory: ~/loga
+  steps:
+    - checkout
+    - &restore_gems
+      restore_cache:
+        keys:
+          - v2-gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
+          - v2-gems-{{ checksum "Gemfile" }}
+    - &bundle_install
+      run: bundle install --jobs 4 --path=vendor/bundle --retry 3
+    - run: bundle exec appraisal install
+    - &cache_gems
+      save_cache:
+        key: v2-gems-{{ checksum "Gemfile" }}-{{ checksum "Appraisals"}}-{{ .Environment.CIRCLE_JOB }}
+        paths:
+          - gemfiles/vendor/bundle
+          - vendor/bundle
+    - attach_workspace:
+        at: ./tmp
+    - run: RACK_ENV=development bundle exec appraisal rspec
+    - run: RACK_ENV=production bundle exec appraisal rspec
+    - run: ./tmp/cc-test-reporter format-coverage -t simplecov -o $(ruby -e 'puts "tmp/codeclimate.#{RUBY_VERSION}.json"') coverage/.resultset.json
+    - persist_to_workspace:
+        root: tmp
+        paths:
+          - codeclimate.*.json
+    - store_artifacts:
+        path: coverage
+
+version: 2
+jobs:
+  build:
+    <<: *basic_build
+    steps:
+      - run:
+          name: Download cc-test-reporter
+          command: |
+            mkdir -p tmp/
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+            chmod +x ./tmp/cc-test-reporter
+      - persist_to_workspace:
+          root: ./tmp
+          paths:
+            - cc-test-reporter
+  upload-coverage:
+    <<: *basic_build
+    steps:
+      - attach_workspace:
+          at: ./tmp
+      - run:
+          name: Upload coverage results to Code Climate
+          command: |
+            ./tmp/cc-test-reporter sum-coverage tmp/codeclimate.*.json -o tmp/codeclimate.total.json
+            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.total.json -r $CODECLIMATE_REPO_TOKEN
+  ruby-2.2:
+    docker:
+      - image: circleci/ruby:2.2.10
+    <<: *test_build
+  ruby-2.3:
+    docker:
+      - image: circleci/ruby:2.3.7
+    <<: *test_build
+  ruby-2.4:
+    docker:
+      - image: circleci/ruby:2.4.4
+    <<: *test_build
+  ruby-2.5:
+    docker:
+      - image: circleci/ruby:2.5.1
+    <<: *test_build
+  rubocop:
+    <<: *basic_build
+    steps:
+      - checkout
+      - *restore_gems
+      - *bundle_install
+      - *cache_gems
+      - run: bundle exec rubocop
+  push-to-rubygems:
+    <<: *basic_build
+    steps:
+      - checkout
+      - *restore_gems
+      - *bundle_install
+      - *cache_gems
+      - run:
+          name: Build the gem
+          command: gem build $CIRCLE_PROJECT_REPONAME.gemspec
+      - deploy:
+          name: Publish to rubygems
+          command: |
+            echo ":rubygems_api_key: $RUBYGEMS_API_KEY" >  ~/.gem/credentials
+            chmod 0600 ~/.gem/credentials
+            gem push $CIRCLE_PROJECT_REPONAME-$(echo $CIRCLE_TAG | sed -e 's/v//').gem
+workflows:
+  version: 2
+  test-then-push-gem:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - rubocop:
+          filters:
+            tags:
+              only: /.*/
+      - ruby-2.2:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
+      - ruby-2.3:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
+      - ruby-2.4:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
+      - ruby-2.5:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
+      - upload-coverage:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - ruby-2.2
+            - ruby-2.3
+            - ruby-2.4
+            - ruby-2.5
+      - push-to-rubygems:
+          filters:
+            tags:
+              only: /^v\d.+/
+            branches:
+              ignore: /.*/
+          requires:
+            - rubocop
+            - ruby-2.2
+            - ruby-2.3
+            - ruby-2.4
+            - ruby-2.5

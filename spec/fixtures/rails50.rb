@@ -8,7 +8,7 @@ class Dummy < Rails::Application
   config.eager_load = true
   config.filter_parameters += [:password]
   config.secret_key_base = '2624599ca9ab3cf3823626240138a128118a87683bf03ab8f155844c33b3cd8cbbfa3ef5e29db6f5bd182f8bd4776209d9577cfb46ac51bfd232b00ab0136b24'
-  config.session_store :cookie_store, key: '_rails32_session'
+  config.session_store :cookie_store, key: '_rails50_session'
 
   config.log_tags = [ :uuid, 'TEST_TAG' ]
   config.loga = {
