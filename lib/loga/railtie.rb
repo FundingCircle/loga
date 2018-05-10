@@ -1,4 +1,5 @@
 require 'loga'
+require 'loga/log_subscribers/action_mailer'
 
 module Loga
   class Railtie < Rails::Railtie
@@ -153,29 +154,41 @@ module Loga
 
       def call
         ensure_subscriptions_attached
+        subscribe_to_action_mailer
         remove_log_subscriptions
       end
 
       private
 
+      def subscribe_to_action_mailer
+        LogSubscribers::ActionMailer.attach_to(:action_mailer)
+      end
+
       # Ensure LogSubscribers are attached when available
       def ensure_subscriptions_attached
         ActionView::Base       if defined?(ActionView::Base)
         ActionController::Base if defined?(ActionController::Base)
+        ActionMailer::Base     if defined?(ActionMailer::Base)
       end
 
-      # rubocop:disable Metrics/LineLength
       def remove_log_subscriptions
         ActiveSupport::LogSubscriber.log_subscribers.each do |subscriber|
-          case subscriber
-          when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
-            unsubscribe(:action_view, subscriber)
-          when defined?(ActionController::LogSubscriber) && ActionController::LogSubscriber
-            unsubscribe(:action_controller, subscriber)
-          end
+          component = log_subscription_component(subscriber)
+
+          unsubscribe(component, subscriber)
         end
       end
-      # rubocop:enable Metrics/LineLength
+
+      def log_subscription_component(subscriber) # rubocop:disable CyclomaticComplexity
+        case subscriber
+        when defined?(ActionView::LogSubscriber) && ActionView::LogSubscriber
+          :action_view
+        when defined?(ActionController::LogSubscriber) && ActionController::LogSubscriber
+          :action_controller
+        when defined?(ActionMailer::LogSubscriber) && ActionMailer::LogSubscriber
+          :action_mailer
+        end
+      end
 
       def unsubscribe(component, subscriber)
         events = subscriber
@@ -187,7 +200,7 @@ module Loga
             .listeners_for("#{event}.#{component}")
             .each do |listener|
             if listener.instance_variable_get('@delegate') == subscriber
-              ActiveSupport::Notifications.unsubscribe listener
+              ActiveSupport::Notifications.unsubscribe(listener)
             end
           end
         end
