@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.0] - 2018-05-10
+### Added
+Subscribe to `ActionMailer` events
+  - deliver
+  - process
+  - receive
+
 ## [2.1.2] - 2016-12-08
 ### Fixed
 - `Loga::Rack::Logger` looks into `env['rack.exception']` for exceptions

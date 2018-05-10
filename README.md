@@ -95,6 +95,7 @@ This is made possible by silencing these loggers:
 - `ActionDispatch::DebugExceptions`
 - `ActionController::LogSubscriber`
 - `ActionView::LogSubscriber`
+- `ActionMailer::LogSubscriber`
 
 #### Request log tags
 
