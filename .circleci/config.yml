@@ -95,6 +95,7 @@ jobs:
       - deploy:
           name: Publish to rubygems
           command: |
+            mkdir ~/.gem
             echo ":rubygems_api_key: $RUBYGEMS_API_KEY" >  ~/.gem/credentials
             chmod 0600 ~/.gem/credentials
             gem push $CIRCLE_PROJECT_REPONAME-$(echo $CIRCLE_TAG | sed -e 's/v//').gem
