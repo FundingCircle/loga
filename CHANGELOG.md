@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.0] - 2018-06-29
+### Added
+Support for Sidekiq `~> 5.0`.
+
 ## [2.2.0] - 2018-05-10
 ### Added
 Subscribe to `ActionMailer` events

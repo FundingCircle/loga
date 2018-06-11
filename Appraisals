@@ -24,5 +24,9 @@ appraise 'rails52' do
   gem 'rails', '~> 5.2.0'
 end
 
+appraise 'sidekiq51' do
+  gem 'sidekiq', '~> 5.1.0'
+end
+
 appraise 'unit' do
 end

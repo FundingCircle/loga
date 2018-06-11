@@ -25,3 +25,5 @@ spec/fixtures/**/*.log
 gemfiles/*.lock
 vendor/bundle
 .byebug_history
+.DS_Store
+

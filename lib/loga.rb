@@ -8,8 +8,8 @@ require 'loga/rack/logger'
 require 'loga/rack/request'
 require 'loga/rack/request_id'
 require 'loga/railtie' if defined?(Rails)
+require 'loga/sidekiq'
 
-# rubocop:disable Naming/MemoizedInstanceVariableName
 module Loga
   ConfigurationError = Class.new(StandardError)
 
@@ -26,6 +26,8 @@ module Loga
     raise ConfigurationError, 'Loga has already been configured' if @configuration
 
     @configuration ||= Configuration.new(options, framework_options)
+
+    Loga::Sidekiq.configure_logging
   end
 
   def self.logger
@@ -36,4 +38,3 @@ module Loga
     @configuration = nil
   end
 end
-# rubocop:enable Naming/MemoizedInstanceVariableName
