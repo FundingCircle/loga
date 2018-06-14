@@ -11,8 +11,8 @@ RSpec.describe Loga::ParameterFilter do
     end
 
     it 'compiles filters only once' do
-      expect(compiled_filters).to receive(:compile).once
       2.times { subject.filter(params) }
+      expect(compiled_filters).to have_received(:compile).once
     end
   end
 

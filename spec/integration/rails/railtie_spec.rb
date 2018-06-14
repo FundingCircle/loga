@@ -6,12 +6,13 @@ RSpec.describe Loga::Railtie do
 
   describe 'Tempfile' do
     let(:tempfile) { Tempfile.new('README.md') }
+
     it 'monkey patches #as_json' do
       expect(tempfile.as_json).to eql(tempfile.to_s)
     end
   end
 
-  context 'development', if: Rails.env.development? do
+  context 'when development', if: Rails.env.development? do
     describe 'loga_initialize_logger' do
       let(:formatter) { Loga::Formatters::SimpleFormatter }
 
@@ -25,7 +26,7 @@ RSpec.describe Loga::Railtie do
     end
   end
 
-  context 'production', if: Rails.env.production? do
+  context 'when production', if: Rails.env.production? do
     describe 'loga_initialize_logger' do
       it 'assign Loga logger to Rails logger' do
         expect(Loga.logger).to equal(Rails.logger)
@@ -57,7 +58,7 @@ RSpec.describe Loga::Railtie do
         listeners.map { |l| l.instance_variable_get(:@delegate).class }
       end
 
-      context 'ActionView' do
+      describe 'ActionView' do
         [
           'render_collection.action_view',
           'render_partial.action_view',
@@ -66,12 +67,12 @@ RSpec.describe Loga::Railtie do
           let(:notification) { notification }
 
           it 'removes ActionView::LogSubscriber' do
-            expect(subscribers).to_not include(ActionView::LogSubscriber)
+            expect(subscribers).not_to include(ActionView::LogSubscriber)
           end
         end
       end
 
-      context 'ActionController' do
+      describe 'ActionController' do
         [
           'exist_fragment?.action_controller',
           'expire_fragment.action_controller',
@@ -91,12 +92,12 @@ RSpec.describe Loga::Railtie do
           let(:notification) { notification }
 
           it 'removes ActionController::LogSubscriber' do
-            expect(subscribers).to_not include(ActionController::LogSubscriber)
+            expect(subscribers).not_to include(ActionController::LogSubscriber)
           end
         end
       end
 
-      context 'ActionMailer' do
+      describe 'ActionMailer' do
         [
           'receive.action_mailer',
           'deliver.action_mailer',
@@ -105,7 +106,7 @@ RSpec.describe Loga::Railtie do
           let(:notification) { notification }
 
           it 'removes ActionMailer::LogSubscriber' do
-            expect(subscribers).to_not include(ActionMailer::LogSubscriber)
+            expect(subscribers).not_to include(ActionMailer::LogSubscriber)
           end
         end
       end

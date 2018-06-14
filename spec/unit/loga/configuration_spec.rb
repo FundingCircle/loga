@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Loga::Configuration do
+  subject { described_class.new(options) }
+
   let(:options) do
     { service_name: 'hello_world_app' }
   end
-
-  subject { described_class.new(options) }
 
   describe 'initialize' do
     let(:framework_exceptions) do
@@ -75,6 +75,7 @@ describe Loga::Configuration do
           expect(subject.service_version).to eq('unknown.sha')
         end
       end
+
       context 'when initialized via user options' do
         let(:options) { super().merge(service_version: 'v3.0.1') }
 
@@ -105,6 +106,7 @@ describe Loga::Configuration do
 
       context 'when initialized via framework options' do
         subject { described_class.new(options, framework_options) }
+
         let(:framework_options) { { format: :gelf } }
 
         it 'sets the format' do
@@ -126,6 +128,7 @@ describe Loga::Configuration do
 
       context 'when initialized with ENV and framework options' do
         subject { described_class.new(options, framework_options) }
+
         let(:framework_options) { { format: :gelf } }
 
         before do
@@ -200,13 +203,13 @@ describe Loga::Configuration do
       context 'when format is :simple' do
         let(:options) { super().merge(format: :simple) }
 
-        specify { expect(subject.structured?).to eql(false) }
+        specify { expect(subject.structured?).to be(false) }
       end
 
       context 'when format is :gelf' do
         let(:options) { super().merge(format: :gelf) }
 
-        specify { expect(subject.structured?).to eql(true) }
+        specify { expect(subject.structured?).to be(true) }
       end
     end
   end

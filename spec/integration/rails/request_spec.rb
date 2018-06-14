@@ -31,7 +31,7 @@ RSpec.describe 'Structured logging with Rails', timecop: true,
   end
 
   describe 'LogSubscriber' do
-    context 'ActionController' do
+    describe 'ActionController' do
       let(:action_controller_notifications) do
         log_entries.select { |e| e.to_json =~ /Processing by|Completed/ }
       end
@@ -42,7 +42,7 @@ RSpec.describe 'Structured logging with Rails', timecop: true,
       end
     end
 
-    context 'ActionView' do
+    describe 'ActionView' do
       let(:action_view_notifications) do
         log_entries.select { |e| e.to_json =~ /Rendered/ }
       end

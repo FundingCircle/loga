@@ -1,5 +1,5 @@
 RSpec.shared_examples 'request logger' do
-  context 'get request' do
+  describe 'get request' do
     it 'logs the request' do
       get '/ok',
           { username: 'yoshi' },
@@ -27,7 +27,7 @@ RSpec.shared_examples 'request logger' do
     end
   end
 
-  context 'post request' do
+  describe 'post request' do
     let(:json_response) { JSON.parse(last_response.body) }
 
     it 'logs the request' do
@@ -63,7 +63,7 @@ RSpec.shared_examples 'request logger' do
     end
   end
 
-  context 'request with redirect' do
+  describe 'request with redirect' do
     it 'specifies the original path' do
       get '/new', {}, 'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
@@ -182,7 +182,7 @@ RSpec.shared_examples 'request logger' do
     end
   end
 
-  describe 'when the request uploads a binary file', focus: true do
+  describe 'when the request uploads a binary file' do
     it 'logs the request' do
       post '/users?username=yoshi',
            bob_file: Rack::Test::UploadedFile.new('spec/fixtures/random_bin')

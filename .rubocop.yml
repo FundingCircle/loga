@@ -5,6 +5,8 @@ AllCops:
     - 'spec/fixtures/**/*'
     - 'vendor/bundle/**/*'
 
+require: rubocop-rspec
+
 Documentation:
   Enabled: false
 
@@ -29,6 +31,25 @@ Metrics/MethodLength:
   Enabled: true
   Max: 15
 
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/FilePath:
+  Exclude:
+    - spec/integration/rails/action_mailer_spec.rb
+    - spec/integration/rails/railtie_spec.rb
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
 Style/BlockDelimiters:
   Enabled: false
 
