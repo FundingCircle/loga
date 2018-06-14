@@ -90,7 +90,7 @@ describe Loga::Formatters::GELFFormatter do
 
       context 'when the Event has a timestamp' do
         let(:time)         { Time.new(2010, 12, 15, 9, 30, 5.323, '+02:00') }
-        let(:time_in_unix) { BigDecimal.new('1292398205.323') }
+        let(:time_in_unix) { BigDecimal('1292398205.323') }
         let(:options)      { { timestamp: time } }
 
         it 'uses the Event timestamp' do

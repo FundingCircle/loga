@@ -7,6 +7,6 @@ module Helpers
   end
 
   def time_anchor_unix
-    BigDecimal.new('1450150205.123')
+    BigDecimal('1450150205.123')
   end
 end

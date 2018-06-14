@@ -30,9 +30,7 @@ module Loga
         components = [event.message]
 
         %i[type data exception].each do |attr|
-          if event.public_send(attr)
-            components.push "#{attr}=#{event.public_send(attr)}"
-          end
+          components.push "#{attr}=#{event.public_send(attr)}" if event.public_send(attr)
         end
 
         components.join(' ')

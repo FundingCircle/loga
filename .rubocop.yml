@@ -1,6 +1,7 @@
 AllCops:
   Exclude:
     - '*.gemspec'
+    - 'gemfiles/*'
     - 'spec/fixtures/**/*'
     - 'vendor/bundle/**/*'
 
@@ -37,10 +38,14 @@ Style/FormatString:
 Style/PerlBackrefs:
   Enabled: false
 
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArguments:
   Enabled: true
   EnforcedStyleForMultiline: comma
 
-Style/TrailingCommaInArguments:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
   Enabled: true
   EnforcedStyleForMultiline: comma

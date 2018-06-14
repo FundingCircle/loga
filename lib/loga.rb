@@ -9,6 +9,7 @@ require 'loga/rack/request'
 require 'loga/rack/request_id'
 require 'loga/railtie' if defined?(Rails)
 
+# rubocop:disable Naming/MemoizedInstanceVariableName
 module Loga
   ConfigurationError = Class.new(StandardError)
 
@@ -22,9 +23,7 @@ module Loga
   end
 
   def self.configure(options, framework_options = {})
-    if @configuration
-      raise ConfigurationError, 'Loga has already been configured'
-    end
+    raise ConfigurationError, 'Loga has already been configured' if @configuration
 
     @configuration ||= Configuration.new(options, framework_options)
   end
@@ -37,3 +36,4 @@ module Loga
     @configuration = nil
   end
 end
+# rubocop:enable Naming/MemoizedInstanceVariableName
