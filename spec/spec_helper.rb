@@ -35,4 +35,10 @@ RSpec.configure do |config|
   config.include Rack::Test::Methods
 
   config.pattern = rspec_pattern
+
+  config.mock_with :rspec do |mocks|
+    mocks.allow_message_expectations_on_nil = false
+    mocks.transfer_nested_constants = true
+    mocks.verify_doubled_constant_names = true
+  end
 end

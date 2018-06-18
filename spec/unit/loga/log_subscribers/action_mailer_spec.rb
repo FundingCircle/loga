@@ -6,13 +6,12 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
   subject(:mailer) { described_class.new }
 
   let(:event) do
-    instance_double('event', payload: payload, duration: 0.0001, time: Time.now)
-  end
-
-  before do
-    Loga.reset
-
-    Loga.configure(service_name: 'hello_world_app')
+    instance_double(
+      'ActiveSupport::Notifications::Event',
+      payload: payload,
+      duration: 0.0001,
+      time: Time.now,
+    )
   end
 
   describe '#deliver' do
@@ -25,9 +24,11 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       end
 
       it 'logs an info message' do
-        allow(Loga.logger).to receive(:info)
+        logger, _loga = loga_mock
+
+        allow(logger).to receive(:info)
         mailer.deliver(event)
-        expect(Loga.logger).to have_received(:info).with(kind_of(Loga::Event))
+        expect(logger).to have_received(:info).with(kind_of(Loga::Event))
       end
     end
   end
@@ -42,9 +43,10 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       end
 
       it 'logs an info message' do
-        allow(Loga.logger).to receive(:debug)
+        logger, _loga = loga_mock
+        allow(logger).to receive(:debug)
         mailer.process(event)
-        expect(Loga.logger).to have_received(:debug).with(kind_of(Loga::Event))
+        expect(logger).to have_received(:debug).with(kind_of(Loga::Event))
       end
     end
   end
@@ -60,9 +62,10 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       end
 
       it 'logs an info message' do
-        allow(Loga.logger).to receive(:info)
+        logger, _loga = loga_mock
+        allow(logger).to receive(:info)
         mailer.receive(event)
-        expect(Loga.logger).to have_received(:info).with(kind_of(Loga::Event))
+        expect(logger).to have_received(:info).with(kind_of(Loga::Event))
       end
     end
   end
