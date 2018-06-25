@@ -5,6 +5,8 @@ require 'loga/log_subscribers/action_mailer'
 RSpec.describe Loga::LogSubscribers::ActionMailer do
   subject(:mailer) { described_class.new }
 
+  before { stub_loga }
+
   let(:event) do
     instance_double(
       'ActiveSupport::Notifications::Event',
@@ -24,11 +26,9 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       end
 
       it 'logs an info message' do
-        logger, _loga = loga_mock
-
-        allow(logger).to receive(:info)
+        allow(Loga.logger).to receive(:info)
         mailer.deliver(event)
-        expect(logger).to have_received(:info).with(kind_of(Loga::Event))
+        expect(Loga.logger).to have_received(:info).with(kind_of(Loga::Event))
       end
     end
   end
@@ -43,10 +43,9 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       end
 
       it 'logs an info message' do
-        logger, _loga = loga_mock
-        allow(logger).to receive(:debug)
+        allow(Loga.logger).to receive(:debug)
         mailer.process(event)
-        expect(logger).to have_received(:debug).with(kind_of(Loga::Event))
+        expect(Loga.logger).to have_received(:debug).with(kind_of(Loga::Event))
       end
     end
   end
@@ -62,10 +61,9 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       end
 
       it 'logs an info message' do
-        logger, _loga = loga_mock
-        allow(logger).to receive(:info)
+        allow(Loga.logger).to receive(:info)
         mailer.receive(event)
-        expect(logger).to have_received(:info).with(kind_of(Loga::Event))
+        expect(Loga.logger).to have_received(:info).with(kind_of(Loga::Event))
       end
     end
   end
