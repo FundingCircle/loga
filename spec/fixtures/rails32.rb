@@ -18,6 +18,7 @@ class Dummy < Rails::Application
     service_version: '1.0',
   }
   config.action_mailer.delivery_method = :test
+  config.active_support.deprecation = :notify
 end
 
 class ApplicationController < ActionController::Base

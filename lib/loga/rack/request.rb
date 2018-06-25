@@ -50,7 +50,7 @@ module Loga
       end
 
       def filtered_form_hash
-        @filter_form_hash ||= filter_hash(form_hash)
+        @filtered_form_hash ||= filter_hash(form_hash)
       end
 
       private
@@ -78,7 +78,7 @@ module Loga
       end
 
       def parameter_filter
-        @filter_parameters ||=
+        @parameter_filter ||=
           ParameterFilter.new(loga_filter_parameters | action_dispatch_filter_params)
       end
 

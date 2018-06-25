@@ -2,13 +2,13 @@ require 'spec_helper'
 
 RSpec.describe Loga::Event, timecop: true do
   describe 'initialize' do
-    context 'no message is passed' do
+    context 'when no message is passed' do
       it 'sets message to an empty string' do
         expect(subject.message).to eq ''
       end
     end
 
-    context 'message is passed' do
+    context 'when message is passed' do
       let(:message) { "stuff \xC2".force_encoding 'ASCII-8BIT' }
       let(:subject) { described_class.new message: message }
 

@@ -20,6 +20,7 @@ describe Loga::Formatters::SimpleFormatter do
 
     context 'when the message parameter is a nil' do
       let(:message) { nil }
+
       specify do
         expect(subject).to eq("I, #{time_pid} nil\n")
       end
@@ -100,7 +101,9 @@ describe Loga::Formatters::SimpleFormatter do
       let(:tags) { %w[USER_54321 EmailWorker] }
 
       before do
+        # rubocop:disable RSpec/AnyInstance
         allow_any_instance_of(described_class).to receive(:current_tags).and_return(tags)
+        # rubocop:enable RSpec/AnyInstance
       end
 
       specify do

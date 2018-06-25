@@ -12,15 +12,17 @@ describe Loga do
 
   describe '.configure' do
     it 'configures Loga' do
-      expect(Loga::Configuration).to receive(:new).with(options, {}).and_call_original
+      allow(Loga::Configuration).to receive(:new).and_call_original
       subject.configure(options)
+      expect(Loga::Configuration).to have_received(:new).with(options, {})
     end
 
     context 'when framework options provided' do
       it 'configures Loga' do
-        expect(Loga::Configuration)
-          .to receive(:new).with(options, framework_options).and_call_original
+        allow(Loga::Configuration).to receive(:new).and_call_original
         subject.configure(options, framework_options)
+        expect(Loga::Configuration).to have_received(:new)
+          .with(options, framework_options)
       end
     end
 
@@ -61,6 +63,7 @@ describe Loga do
 
     context 'when Loga is configured' do
       before { subject.configure(options) }
+
       specify { expect(subject.logger).to be_kind_of(Logger) }
     end
   end

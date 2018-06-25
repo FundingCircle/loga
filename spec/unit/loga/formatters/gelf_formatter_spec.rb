@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Loga::Formatters::GELFFormatter do
+  subject { described_class.new(params) }
+
   let(:service_name)    { 'loga' }
   let(:service_version) { '725e032a' }
   let(:host)            { 'www.example.com' }
@@ -11,8 +13,6 @@ describe Loga::Formatters::GELFFormatter do
       host:            host,
     }
   end
-
-  subject { described_class.new(params) }
 
   shared_examples 'valid GELF message' do
     it 'includes the required fields' do
@@ -51,6 +51,7 @@ describe Loga::Formatters::GELFFormatter do
 
     context 'when the message parameter is a nil' do
       let(:message) { nil }
+
       it 'the short_message is empty' do
         expect(json['short_message']).to eq('')
       end
@@ -90,7 +91,7 @@ describe Loga::Formatters::GELFFormatter do
 
       context 'when the Event has a timestamp' do
         let(:time)         { Time.new(2010, 12, 15, 9, 30, 5.323, '+02:00') }
-        let(:time_in_unix) { BigDecimal.new('1292398205.323') }
+        let(:time_in_unix) { BigDecimal('1292398205.323') }
         let(:options)      { { timestamp: time } }
 
         it 'uses the Event timestamp' do
@@ -105,7 +106,7 @@ describe Loga::Formatters::GELFFormatter do
       end
 
       context 'when the Event no type' do
-        specify { expect(json).to_not include('_type') }
+        specify { expect(json).not_to include('_type') }
       end
 
       context 'when the Event has an exception' do
@@ -121,6 +122,7 @@ describe Loga::Formatters::GELFFormatter do
 
         context 'when the backtrace is larger than 10 lines' do
           let(:backtrace) { ('a'..'z').to_a }
+
           it 'truncates the backtrace' do
             expect(json['_exception.backtrace']).to eq("a\nb\nc\nd\ne\nf\ng\nh\ni\nj")
           end
@@ -128,7 +130,7 @@ describe Loga::Formatters::GELFFormatter do
       end
 
       context 'when the Event has no exception' do
-        specify { expect(json).to_not include(/_exception.+/) }
+        specify { expect(json).not_to include(/_exception.+/) }
       end
 
       context 'when the Event has data' do

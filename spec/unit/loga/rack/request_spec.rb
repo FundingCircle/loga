@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Loga::Rack::Request do
+  subject { described_class.new(env) }
+
   let(:options)   { {} }
   let(:full_path) { '/' }
   let(:env)       { Rack::MockRequest.env_for(full_path, options) }
@@ -23,8 +25,6 @@ describe Loga::Rack::Request do
     allow(Loga).to receive(:configuration).and_return(config)
   end
 
-  subject { described_class.new(env) }
-
   describe '#uuid' do
     let(:action_dispatch_request_id) { 'ABCD' }
 
@@ -32,6 +32,7 @@ describe Loga::Rack::Request do
       let(:options) do
         { 'action_dispatch.request_id' => action_dispatch_request_id }
       end
+
       it 'returns the middleware value' do
         expect(subject.uuid).to eq(action_dispatch_request_id)
       end
@@ -90,7 +91,7 @@ describe Loga::Rack::Request do
 
     let(:options) { { 'loga.request.original_path' => path } }
 
-    context 'request with sensitive parameters' do
+    describe 'request with sensitive parameters' do
       it 'returns the path with sensitive parameters filtered' do
         expect(subject.filtered_full_path).to eq('/hello?password=[FILTERED]&color=red')
       end

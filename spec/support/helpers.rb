@@ -7,6 +7,13 @@ module Helpers
   end
 
   def time_anchor_unix
-    BigDecimal.new('1450150205.123')
+    BigDecimal('1450150205.123')
+  end
+
+  def stub_loga
+    loga = class_double(Loga).as_stubbed_const
+    logger = instance_double(Logger)
+    allow(loga).to receive(:logger).and_return(logger)
+    loga
   end
 end

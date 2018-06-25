@@ -1,7 +1,10 @@
 require 'spec_helper'
 require 'rack/test'
 
+# rubocop:disable RSpec/SubjectStub, RSpec/MessageSpies, RSpec/VerifiedDoubles
 describe Loga::Rack::Logger do
+  subject { described_class.new(app) }
+
   let(:env)     { Rack::MockRequest.env_for('/about_us?limit=1', options) }
   let(:options) { {} }
   let(:app)     {  ->(_env) { [response_status, {}, ''] } }
@@ -17,8 +20,6 @@ describe Loga::Rack::Logger do
       tags: tags,
     )
   end
-
-  subject { described_class.new(app) }
 
   before { Loga.instance_variable_set(:@configuration, configuration) }
 
@@ -54,8 +55,9 @@ describe Loga::Rack::Logger do
     end
 
     it "logs the Loga::Event with severity #{details[:level]}" do
-      expect(logger).to receive(level).with(an_instance_of(Loga::Event))
+      allow(logger).to receive(level)
       subject.call(env)
+      expect(logger).to have_received(level).with(an_instance_of(Loga::Event))
     end
   end
 
@@ -96,7 +98,7 @@ describe Loga::Rack::Logger do
       include_examples 'logs the event', level: :info
     end
 
-    context 'when the exception is on rack.exception', focus: true do
+    context 'when the exception is on rack.exception' do
       let(:response_status)  { 500 }
       let(:exception)        { StandardError }
       let(:logged_exception) { exception }
@@ -124,12 +126,14 @@ describe Loga::Rack::Logger do
         let(:tags) { [:foo] }
 
         it 'yields the app with tags' do
-          expect(logger).to receive(:tagged).with(:tag) do |&block|
+          allow(logger).to receive(:tagged)
+          subject.call(env)
+          expect(logger).to have_received(:tagged).with(:tag) do |&block|
             expect(block.call).to eq(:response)
           end
-          subject.call(env)
         end
       end
     end
   end
 end
+# rubocop:enable RSpec/SubjectStub, RSpec/MessageSpies, RSpec/VerifiedDoubles

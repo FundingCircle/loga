@@ -24,6 +24,18 @@ end
 RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
   let(:io) { StringIO.new }
   let(:format) {}
+  let(:last_log_entry) do
+    io.rewind
+    JSON.parse(io.read)
+  end
+  let(:app) do
+    Rack::Builder.new do
+      use Loga::Rack::RequestId
+      use Loga::Rack::Logger
+      run MySinatraApp
+    end
+  end
+
   before do
     Loga.reset
     Loga.configure(
@@ -36,26 +48,14 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
     )
   end
 
-  let(:last_log_entry) do
-    io.rewind
-    JSON.parse(io.read)
-  end
-
-  let(:app) do
-    Rack::Builder.new do
-      use Loga::Rack::RequestId
-      use Loga::Rack::Logger
-      run MySinatraApp
-    end
-  end
-
   context 'when RACK_ENV is production', if: ENV['RACK_ENV'].eql?('production') do
     let(:format) { :gelf }
+
     include_examples 'request logger'
 
     it 'does not include the controller name and action' do
       get '/ok'
-      expect(last_log_entry).to_not include('_request.controller')
+      expect(last_log_entry).not_to include('_request.controller')
     end
   end
 
@@ -85,7 +85,7 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
       allow(Process).to receive(:pid).and_return(999)
     end
 
-    context 'get request' do
+    describe 'get request' do
       it 'logs the request' do
         get '/ok', { username: 'yoshi' }, 'HTTP_X_REQUEST_ID' => '700a6a01'
 
@@ -93,7 +93,7 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
       end
     end
 
-    context 'request with redirect' do
+    describe 'request with redirect' do
       let(:data) do
         super().merge(
           'status' => 302,
@@ -101,6 +101,7 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
           'params' => {},
         )
       end
+
       it 'specifies the original path' do
         get '/new', {}, 'HTTP_X_REQUEST_ID' => '700a6a01'
         expect(last_log_entry).to eql("I, #{time_pid_tags} GET /new 302 in 0ms type=request #{data_as_text}\n")
