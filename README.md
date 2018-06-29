@@ -150,7 +150,7 @@ LOGA_FORMAT=simple rackup
 
 ### Sidekiq
 
-Loga `2.3` provides an out-of-the support for `Sidekiq ~> 5.0`.
+Loga `2.3` provides an out-of-the-box support for `Sidekiq ~> 5.0`.
 
 ## Output Example
 
