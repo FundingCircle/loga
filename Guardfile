@@ -39,6 +39,20 @@ group :rails do
   end
 end
 
+group :sidekiq do
+  cmd = 'bundle exec appraisal sidekiq51 rspec'
+
+  guard :rspec, all_on_start: true, cmd: cmd do
+    watch('lib/loga/sidekiq/job_logger.rb') do
+      [
+        'spec/integration/sidekiq_spec.rb',
+        'spec/loga/sidekiq/job_logger_spec.rb',
+        'spec/loga/sidekiq_spec.rb',
+      ]
+    end
+  end
+end
+
 group :unit do
   guard :rspec, cmd: 'bundle exec appraisal unit rspec' do
     watch(%r{^spec/unit/.+_spec\.rb$})

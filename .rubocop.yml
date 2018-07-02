@@ -4,6 +4,7 @@ AllCops:
     - 'gemfiles/*'
     - 'spec/fixtures/**/*'
     - 'vendor/bundle/**/*'
+    - 'gemfiles/vendor/bundle/**/*'
 
 require: rubocop-rspec
 
