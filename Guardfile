@@ -57,5 +57,6 @@ group :unit do
   guard :rspec, cmd: 'bundle exec appraisal unit rspec' do
     watch(%r{^spec/unit/.+_spec\.rb$})
     watch(%r{^lib/(.+)\.rb$}) { |m| "spec/unit/#{m[1]}_spec.rb" }
+    watch('spec/loga/context_manager_spec.rb')
   end
 end
