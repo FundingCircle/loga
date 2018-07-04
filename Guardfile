@@ -9,6 +9,8 @@ group :sinatra do
           all_on_start: true,
           cmd: "RACK_ENV=#{env} bundle exec appraisal sinatra14 rspec" do
       watch(%r{^spec/integration/sinatra_spec.rb$})
+      watch('lib/loga/context_manager.rb')
+      watch('spec/loga/context_manager_spec.rb')
     end
   end
 end
@@ -34,6 +36,8 @@ group :rails do
         end
 
         watch(%r{^spec/integration/rails/.+_spec\.rb$})
+        watch('lib/loga/context_manager.rb')
+        watch('spec/loga/context_manager_spec.rb')
       end
     end
   end
@@ -50,6 +54,8 @@ group :sidekiq do
         'spec/loga/sidekiq_spec.rb',
       ]
     end
+    watch('lib/loga/context_manager.rb')
+    watch('spec/loga/context_manager_spec.rb')
   end
 end
 
@@ -57,6 +63,7 @@ group :unit do
   guard :rspec, cmd: 'bundle exec appraisal unit rspec' do
     watch(%r{^spec/unit/.+_spec\.rb$})
     watch(%r{^lib/(.+)\.rb$}) { |m| "spec/unit/#{m[1]}_spec.rb" }
+    watch('lib/loga/context_manager.rb')
     watch('spec/loga/context_manager_spec.rb')
   end
 end
