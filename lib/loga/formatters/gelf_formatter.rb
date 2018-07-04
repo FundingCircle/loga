@@ -48,12 +48,15 @@ module Loga
 
         event.timestamp ||= time
         event.data ||= {}
-        event.data.tap do |hash|
-          hash.merge! compute_exception(event.exception)
-          hash.merge! compute_type(event.type)
+
+        event.data.tap do |data_hash|
+          data_hash.merge!(compute_exception(event.exception))
+          data_hash.merge!(compute_type(event.type))
           # Overwrite hash with Loga's additional fields
-          hash.merge! loga_additional_fields
+          data_hash.merge!(loga_additional_fields)
+          data_hash.merge!(Loga.retrieve_context)
         end
+
         event
       end
 

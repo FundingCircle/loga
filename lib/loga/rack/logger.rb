@@ -43,7 +43,7 @@ module Loga
         data['request_ip'] = request.ip
         data['user_agent'] = request.user_agent
         data['controller'] = request.controller_action_name if request.controller_action_name
-        data['duration']   = duration_in_ms(started_at, Time.now)
+        data['duration']   = duration_in_ms(started_at)
       end
       # rubocop:enable Metrics/LineLength
 
@@ -55,6 +55,7 @@ module Loga
           timestamp:  started_at,
           type:       'request',
         )
+
         logger.public_send(compute_level, event)
       end
 

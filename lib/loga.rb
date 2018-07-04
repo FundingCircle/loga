@@ -48,6 +48,10 @@ module Loga
       current_context.clear
     end
 
+    def retrieve_context
+      current_context.retrieve_context
+    end
+
     private
 
     def current_context
