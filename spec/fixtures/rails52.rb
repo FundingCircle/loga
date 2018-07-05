@@ -49,12 +49,39 @@ class ApplicationController < ActionController::Base
     @id = params[:id]
     render '/user'
   end
+
+  def attach_context
+    Loga.attach_context(animal: 'monkey')
+
+    render json: { hello: :world }
+  end
 end
 
 class FakeMailer < ActionMailer::Base
   default from: 'notifications@example.com'
 
   def self.send_email
+    basic_mail.deliver_now
+  end
+
+  def basic_mail
+    mail(
+      to: 'user@example.com',
+      subject: 'Welcome to My Awesome Site',
+      body: 'Banana muffin',
+      content_type: 'text/html',
+    )
+  end
+end
+
+class FakeMailerWithContext < ActionMailer::Base
+  default from: 'notifications@example.com'
+
+  def self.send_email
+    Loga.attach_context(tshirt_size: 'XL')
+    Loga.attach_context(height: 155)
+    Loga.attach_context(weight: 122)
+
     basic_mail.deliver_now
   end
 
@@ -75,6 +102,8 @@ Dummy.routes.append do
   post 'users'    => 'application#create'
   get 'new'       => 'application#new'
   put 'users/:id' => 'application#update'
+
+  get 'attach_context' => 'application#attach_context'
 end
 
 Dummy.initialize!

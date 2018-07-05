@@ -12,10 +12,20 @@ Sidekiq.configure_server do |config|
   config.redis = dummy_redis_config
 end
 
-class MySidekiqWorker
-  include Sidekiq::Worker
+module Loga
+  class MySidekiqWorker
+    include ::Sidekiq::Worker
 
-  def perform(_name); end
+    def perform(_name); end
+  end
+
+  class DummyWorkerWithContext
+    include ::Sidekiq::Worker
+
+    def perform(name)
+      Loga.attach_context(name_upcased: name.upcase)
+    end
+  end
 end
 
 describe 'Sidekiq client logger' do
@@ -54,12 +64,12 @@ describe 'Sidekiq client logger' do
   end
 
   it 'pushes a new element in the default queue' do
-    MySidekiqWorker.perform_async('Bob')
+    Loga::MySidekiqWorker.perform_async('Bob')
 
     last_element = JSON.parse(Redis.current.lpop('queue:default'))
 
     aggregate_failures do
-      expect(last_element['class']).to eq 'MySidekiqWorker'
+      expect(last_element['class']).to eq 'Loga::MySidekiqWorker'
       expect(last_element['args']).to eq ['Bob']
       expect(last_element['retry']).to eq true
       expect(last_element['queue']).to eq 'default'
@@ -98,7 +108,7 @@ describe 'Sidekiq client logger' do
     end
 
     it 'logs the job processing event' do
-      MySidekiqWorker.perform_async('Bob')
+      Loga::MySidekiqWorker.perform_async('Bob')
 
       require 'sidekiq/processor'
       Sidekiq::Processor.new(mgr.new).start
@@ -108,7 +118,7 @@ describe 'Sidekiq client logger' do
         '_queue'=> 'default',
         '_retry'=> true,
         '_params'=> ['Bob'],
-        '_class'=> 'MySidekiqWorker',
+        '_class'=> 'Loga::MySidekiqWorker',
         '_type'=> 'sidekiq',
         '_service.name'=> 'hello_world_app',
         '_service.version'=> '1.0',
@@ -124,8 +134,18 @@ describe 'Sidekiq client logger' do
           expect(json_line).to have_key(key)
         end
 
-        expect(json_line['short_message']).to match(/MySidekiqWorker with jid:*/)
+        expect(json_line['short_message']).to match(/Loga::MySidekiqWorker with jid:*/)
       end
+    end
+
+    it 'attaches a custom context' do
+      Loga::DummyWorkerWithContext.perform_async('John Doe')
+
+      require 'sidekiq/processor'
+      Sidekiq::Processor.new(mgr.new).start
+      sleep 0.5
+
+      expect(json_line['_name_upcased']).to eq 'JOHN DOE'
     end
   end
 end

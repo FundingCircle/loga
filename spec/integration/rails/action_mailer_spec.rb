@@ -59,5 +59,17 @@ RSpec.describe Loga::LogSubscribers::ActionMailer, if: Rails.env.production? do
 
       expect(last_log_entry).to have_key('_unique_id')
     end
+
+    it 'attaches custom context' do
+      FakeMailerWithContext.send_email
+
+      expected_context = {
+        '_tshirt_size' => 'XL',
+        '_height' => 155,
+        '_weight' => 122,
+      }
+
+      expect(last_log_entry).to include(expected_context)
+    end
   end
 end
