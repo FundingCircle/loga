@@ -3,4 +3,4 @@ engines:
     enabled: true
     channel: rubocop-0-57
     config:
-      file: rubocop.yml
+      file: .rubocop.yml
