@@ -304,3 +304,5 @@ Experiment Guard support introduced to ease running tests locally `bundle exec g
 Copyright (c) 2015 Funding Circle. All rights reserved.
 
 Distributed under the BSD 3-Clause License.
+
+-ST
