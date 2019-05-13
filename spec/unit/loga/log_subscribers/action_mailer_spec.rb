@@ -24,11 +24,34 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
           to:     ['user@example.com'],
         }
       end
+      let(:config) { instance_double Loga::Configuration, hide_pii: hide_pii }
 
-      it 'logs an info message' do
+      before do
         allow(Loga.logger).to receive(:info)
-        mailer.deliver(event)
-        expect(Loga.logger).to have_received(:info).with(kind_of(Loga::Event))
+        allow(Loga).to receive(:configuration).and_return(config)
+      end
+
+      context 'when configuration hide_pii is true' do
+        let(:hide_pii) { true }
+
+        it 'logs an info message' do
+          mailer.deliver(event)
+          expect(Loga.logger).to have_received(:info).with(Loga::Event) do |event|
+            expect(event.message).to include('FakeMailer: Sent mail')
+            expect(event.message).not_to include('user@example.com')
+          end
+        end
+      end
+
+      context 'when configuration option hide_pii is false' do
+        let(:hide_pii) { false }
+
+        it 'logs an info message' do
+          mailer.deliver(event)
+          expect(Loga.logger).to have_received(:info).with(Loga::Event) do |event|
+            expect(event.message).to include('FakeMailer: Sent mail to user@example.com')
+          end
+        end
       end
     end
   end
@@ -45,7 +68,12 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       it 'logs an info message' do
         allow(Loga.logger).to receive(:debug)
         mailer.process(event)
-        expect(Loga.logger).to have_received(:debug).with(kind_of(Loga::Event))
+        expect(Loga.logger).to have_received(:debug)
+          .with(kind_of(Loga::Event)) do |event|
+            expect(event.message).to include(
+              'FakeMailer#hello_world: Processed outbound mail',
+            )
+          end
       end
     end
   end
@@ -59,11 +87,38 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
           subject: 'Lorem ipsum',
         }
       end
+      let(:config) { instance_double Loga::Configuration, hide_pii: hide_pii }
 
-      it 'logs an info message' do
+      before do
         allow(Loga.logger).to receive(:info)
-        mailer.receive(event)
-        expect(Loga.logger).to have_received(:info).with(kind_of(Loga::Event))
+        allow(Loga).to receive(:configuration).and_return(config)
+      end
+
+      context 'when configuration hide_pii is true' do
+        let(:hide_pii) { true }
+
+        it 'logs an info message without email' do
+          mailer.receive(event)
+          expect(Loga.logger).to have_received(:info)
+            .with(kind_of(Loga::Event)) do |event|
+              expect(event.message).to include('Received mail')
+              expect(event.message).not_to include('loremipsum@example.com')
+            end
+        end
+      end
+
+      context 'when configuration option hide_pii is false' do
+        let(:hide_pii) { false }
+
+        it 'logs an info message with email' do
+          mailer.receive(event)
+          expect(Loga.logger).to have_received(:info)
+            .with(kind_of(Loga::Event)) do |event|
+              expect(event.message).to include(
+                'Received mail from loremipsum@example.com',
+              )
+            end
+        end
       end
     end
   end
