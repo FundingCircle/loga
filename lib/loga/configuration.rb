@@ -15,9 +15,10 @@ module Loga
     ].freeze
 
     attr_accessor :device, :filter_exceptions, :filter_parameters,
-                  :host, :level, :service_version, :sync, :tags
+                  :host, :level, :service_version, :sync, :tags, :hide_pii
     attr_reader :logger, :format, :service_name
 
+    # rubocop:disable Metrics/MethodLength
     def initialize(user_options = {}, framework_options = {})
       options = default_options.merge(framework_options)
                                .merge(environment_options)
@@ -33,11 +34,13 @@ module Loga
       self.service_version   = options[:service_version] || ServiceVersionStrategies.call
       self.sync              = options[:sync]
       self.tags              = options[:tags]
+      self.hide_pii          = options[:hide_pii]
 
       validate
 
       @logger = initialize_logger
     end
+    # rubocop:enable Metrics/MethodLength
 
     def format=(name)
       @format = name.to_s.to_sym
@@ -68,6 +71,7 @@ module Loga
         level:             :info,
         sync:              true,
         tags:              [],
+        hide_pii:          true,
       }
     end
 

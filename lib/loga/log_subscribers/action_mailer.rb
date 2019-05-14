@@ -9,7 +9,11 @@ module Loga
         recipients = event.payload[:to].join(',')
         unique_id  = event.payload[:unique_id]
         duration   = event.duration.round(1)
-        message = "#{mailer}: Sent mail to #{recipients} in (#{duration}ms)"
+        message    = ''.tap do |string|
+          string << "#{mailer}: Sent mail"
+          string << " to #{recipients}" unless hide_pii?
+          string << " in (#{duration}ms)"
+        end
 
         loga_event = Event.new(
           data: { mailer: mailer, unique_id: unique_id },
@@ -41,10 +45,15 @@ module Loga
         from      = event.payload[:from]
         mailer    = event.payload[:mailer]
         unique_id = event.payload[:unique_id]
+        message   = ''.tap do |string|
+          string << 'Received mail'
+          string << " from #{from}" unless hide_pii?
+          string << " in (#{event.duration.round(1)}ms)"
+        end
 
         loga_event = Event.new(
           data: { mailer: mailer, unique_id: unique_id },
-          message: "Received mail #{from} in (#{event.duration.round(1)}ms)",
+          message: message,
           type: 'action_mailer',
         )
 
@@ -53,6 +62,10 @@ module Loga
 
       def logger
         Loga.logger
+      end
+
+      def hide_pii?
+        Loga.configuration.hide_pii
       end
     end
   end

@@ -44,7 +44,7 @@ RSpec.describe Loga::LogSubscribers::ActionMailer, if: Rails.env.production? do
     it 'has the proper payload for message delivery' do
       FakeMailer.send_email
 
-      message_pattern = /^FakeMailer: Sent mail to user@example.com in \(*/
+      message_pattern = /^FakeMailer: Sent mail \(*/
       expect(last_log_entry['short_message']).to match(message_pattern)
     end
 
