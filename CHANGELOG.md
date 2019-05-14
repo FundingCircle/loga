@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.1] - 2019-05-14
+### Added
+New configuration option `hide_pii` which defaults to `true` to hide email addresses in logs that get generate when an email is sent through action_mailer
+
 ## [2.3.0] - 2018-06-29
 ### Added
 Support for Sidekiq `~> 5.0`.
