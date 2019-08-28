@@ -21,9 +21,9 @@ end
 describe 'Sidekiq client logger' do
   let(:target) { StringIO.new }
 
-  let(:json_line) do
+  def read_json_log(line:)
     target.rewind
-    JSON.parse(target.read)
+    JSON.parse(target.each_line.drop(line - 1).first)
   end
 
   before do
@@ -117,6 +117,8 @@ describe 'Sidekiq client logger' do
         'version'=> '1.1',
       }
 
+      json_line = read_json_log(line: 1)
+
       aggregate_failures do
         expect(json_line).to include(expected_attributes)
 
@@ -126,6 +128,20 @@ describe 'Sidekiq client logger' do
 
         expect(json_line['short_message']).to match(/MySidekiqWorker with jid:*/)
       end
+
+      # This was a bug - the duration was constantly incresing based on when
+      # the logger was created. https://github.com/FundingCircle/loga/pull/117
+      #
+      # Test that after sleeping for few seconds the duration is still under 500ms
+      sleep 1
+
+      MySidekiqWorker.perform_async('Bob')
+
+      sleep 1
+
+      json_line = read_json_log(line: 2)
+
+      expect(json_line['_duration']).to be < 500
     end
   end
 end
