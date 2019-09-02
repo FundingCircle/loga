@@ -58,21 +58,21 @@ jobs:
           command: |
             ./tmp/cc-test-reporter sum-coverage tmp/codeclimate.*.json -o tmp/codeclimate.total.json
             ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.total.json -r $CODECLIMATE_REPO_TOKEN
-  ruby-2.2:
-    docker:
-      - image: circleci/ruby:2.2.10
-    <<: *test_build
   ruby-2.3:
     docker:
-      - image: circleci/ruby:2.3.7
+      - image: circleci/ruby:2.3
     <<: *test_build
   ruby-2.4:
     docker:
-      - image: circleci/ruby:2.4.4
+      - image: circleci/ruby:2.4
     <<: *test_build
   ruby-2.5:
     docker:
-      - image: circleci/ruby:2.5.1
+      - image: circleci/ruby:2.5
+    <<: *test_build
+  ruby-2.6:
+    docker:
+      - image: circleci/ruby:2.6
     <<: *test_build
   rubocop:
     <<: *basic_build
@@ -111,12 +111,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - ruby-2.2:
-          filters:
-            tags:
-              only: /.*/
-          requires:
-            - build
       - ruby-2.3:
           filters:
             tags:
@@ -135,15 +129,21 @@ workflows:
               only: /.*/
           requires:
             - build
+      - ruby-2.6:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
       - upload-coverage:
           filters:
             tags:
               only: /.*/
           requires:
-            - ruby-2.2
             - ruby-2.3
             - ruby-2.4
             - ruby-2.5
+            - ruby-2.6
       - push-to-rubygems:
           filters:
             tags:
@@ -152,7 +152,7 @@ workflows:
               ignore: /.*/
           requires:
             - rubocop
-            - ruby-2.2
             - ruby-2.3
             - ruby-2.4
             - ruby-2.5
+            - ruby-2.6
