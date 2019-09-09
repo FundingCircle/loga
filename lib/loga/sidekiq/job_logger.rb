@@ -9,14 +9,16 @@ module Loga
 
       EVENT_TYPE = 'sidekiq'.freeze
 
-      attr_reader :started_at, :data
+      def started_at
+        @started_at ||= Time.now
+      end
 
-      def initialize
-        @started_at = Time.now
-        @data = {}
+      def data
+        @data ||= {}
       end
 
       def call(item, _queue)
+        reset_data
         yield
       rescue Exception => ex # rubocop:disable Lint/RescueException
         data['exception'] = ex
@@ -28,6 +30,11 @@ module Loga
       end
 
       private
+
+      def reset_data
+        @data = {}
+        @started_at = Time.now
+      end
 
       def assign_data(item)
         data['created_at']  = item['created_at']
