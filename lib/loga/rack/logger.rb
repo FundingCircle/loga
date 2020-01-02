@@ -44,6 +44,9 @@ module Loga
         data['user_agent'] = request.user_agent
         data['controller'] = request.controller_action_name if request.controller_action_name
         data['duration']   = duration_in_ms(started_at, Time.now)
+
+        # If data['status'] is nil we assume an exception was raised when calling the application
+        data['status']     ||= 500
       end
       # rubocop:enable Metrics/LineLength
 

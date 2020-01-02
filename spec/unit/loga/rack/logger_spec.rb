@@ -65,12 +65,13 @@ describe Loga::Rack::Logger do
     let(:exception)        { StandardError.new }
     let(:logged_exception) { nil }
     let(:response_status)  { 200 }
+    let(:exception_class)  { Class.new(StandardError) }
 
     context 'when an exception is raised' do
-      let(:app) {  ->(_env) { raise exception } }
+      let(:app) {  ->(_env) { raise exception_class } }
 
       it 'does not rescue the exception' do
-        expect { subject.call(env) }.to raise_error(StandardError)
+        expect { subject.call(env) }.to raise_error(exception_class)
       end
     end
 
