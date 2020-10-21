@@ -10,7 +10,7 @@ module Loga
         config.options[:job_logger] = Loga::Sidekiq::JobLogger
       end
 
-      ::Sidekiq::Logging.logger = Loga.configuration.logger
+      ::Sidekiq.logger = Loga.configuration.logger
     end
   end
 end
