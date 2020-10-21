@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.2] - 2020-10-21
+### Fixed
+- Support for sidekiq 6
+
 ## [2.5.1] - 2020-01-02
 ### Fixed
 - Fixed a long standing bug that would mask exceptions raised by the host application when serving requests. The original exception would be replaced with a `TypeError` one due to a HTTP status code not being available within `Loga::Rack::Logger`.

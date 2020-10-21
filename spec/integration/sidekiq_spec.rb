@@ -45,10 +45,6 @@ describe 'Sidekiq client logger' do
     expect(Sidekiq.options[:job_logger]).to eq job_logger
   end
 
-  it 'has the proper logger Sidekiq::Logging.logger' do
-    expect(Sidekiq::Logging.logger).to eq Loga.logger
-  end
-
   it 'has the proper logger for Sidekiq.logger' do
     expect(Sidekiq.logger).to eq Loga.logger
   end
@@ -67,6 +63,10 @@ describe 'Sidekiq client logger' do
   end
 
   if ENV['BUNDLE_GEMFILE'] =~ /sidekiq51/
+    it 'has the proper logger Sidekiq::Logging.logger' do
+      expect(Sidekiq::Logging.logger).to eq Loga.logger
+    end
+
     # https://github.com/mperham/sidekiq/blob/97363210b47a4f8a1d8c1233aaa059d6643f5040/test/test_actors.rb#L57-L79
     let(:mgr) do
       Class.new do
