@@ -47,7 +47,8 @@ module Loga
                 end
 
         event.timestamp ||= time
-        event.data ||= {}
+        # Overwrite sidekiq_context data anything manually specified
+        event.data = sidekiq_context.merge!(event.data || {})
         event.data.tap do |hash|
           hash.merge! compute_exception(event.exception)
           hash.merge! compute_type(event.type)
@@ -100,6 +101,20 @@ module Loga
           },
           tags: current_tags.join(' '),
         }
+      end
+
+      def sidekiq_context
+        return {} unless defined?(::Sidekiq::Context)
+
+        c = ::Sidekiq::Context.current
+
+        # The context usually holds :class and :jid. :elapsed is added when the job ends
+        data = c.dup
+        if data.key?(:elapsed)
+          data[:duration] = data[:elapsed].to_f
+          data.delete(:elapsed)
+        end
+        data
       end
     end
   end

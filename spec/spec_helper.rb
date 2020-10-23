@@ -29,12 +29,16 @@ when /sinatra/
 when /unit/
   rspec_pattern = 'unit/**/*_spec.rb'
   require 'loga'
-when /sidekiq/
+when /sidekiq(?<version>\d+)/
   sidekiq_specs = [
-    'integration/sidekiq_spec.rb',
     'spec/loga/sidekiq/**/*_spec.rb',
     'spec/loga/sidekiq_spec.rb',
   ]
+
+  version = $LAST_MATCH_INFO['version']
+
+  sidekiq_specs << 'spec/integration/sidekiq5_spec.rb' if version == '51'
+  sidekiq_specs << 'spec/integration/sidekiq6_spec.rb' if version == '6'
 
   rspec_pattern = sidekiq_specs.join(',')
 

@@ -19,56 +19,6 @@ class MySidekiqWorker
 end
 
 describe 'Sidekiq client logger' do
-  let(:target) { StringIO.new }
-
-  def read_json_log(line:)
-    target.rewind
-    JSON.parse(target.each_line.drop(line - 1).first)
-  end
-
-  before do
-    Redis.current.flushall
-
-    Loga.reset
-
-    Loga.configure(
-      service_name: 'hello_world_app',
-      service_version: '1.0',
-      device: target,
-      format: :gelf,
-    )
-  end
-
-  it 'has the proper job logger' do
-    job_logger = Loga::Sidekiq::JobLogger
-
-    expect(Sidekiq.options[:job_logger]).to eq job_logger
-  end
-
-  it 'has the proper logger for Sidekiq.logger' do
-    expect(Sidekiq.logger).to eq Loga.logger
-  end
-
-  it 'pushes a new element in the default queue' do
-    MySidekiqWorker.perform_async('Bob')
-
-    last_element = JSON.parse(Redis.current.lpop('queue:default'))
-
-    aggregate_failures do
-      expect(last_element['class']).to eq 'MySidekiqWorker'
-      expect(last_element['args']).to eq ['Bob']
-      expect(last_element['retry']).to eq true
-      expect(last_element['queue']).to eq 'default'
-    end
-  end
-
-  if ENV['BUNDLE_GEMFILE'] =~ /sidekiq51/
-    it 'has the proper logger Sidekiq::Logging.logger' do
-      expect(Sidekiq::Logging.logger).to eq Loga.logger
-    end
-  end
-
-  # https://github.com/mperham/sidekiq/blob/97363210b47a4f8a1d8c1233aaa059d6643f5040/test/test_actors.rb#L57-L79
   let(:mgr) do
     Class.new do
       attr_reader :latest_error, :mutex, :cond
@@ -92,34 +42,71 @@ describe 'Sidekiq client logger' do
         {
           concurrency: 3,
           queues: ['default'],
-          job_logger: Loga::Sidekiq::JobLogger,
+          job_logger: Loga::Sidekiq5::JobLogger,
         }
       end
     end
   end
+
+  let(:target) { StringIO.new }
+
+  def read_json_log(line:)
+    target.rewind
+    JSON.parse(target.each_line.drop(line - 1).first)
+  end
+
+  before do
+    Redis.current.flushall
+
+    Loga.reset
+
+    Loga.configure(
+      service_name: 'hello_world_app',
+      service_version: '1.0',
+      device: target,
+      format: :gelf,
+    )
+  end
+
+  it 'has the proper job logger' do
+    expect(Sidekiq.options[:job_logger]).to eq Loga::Sidekiq5::JobLogger
+  end
+
+  it 'has the proper logger for Sidekiq.logger' do
+    expect(Sidekiq.logger).to eq Loga.logger
+  end
+
+  it 'pushes a new element in the default queue' do
+    MySidekiqWorker.perform_async('Bob')
+
+    last_element = JSON.parse(Redis.current.lpop('queue:default'))
+
+    aggregate_failures do
+      expect(last_element['class']).to eq 'MySidekiqWorker'
+      expect(last_element['args']).to eq ['Bob']
+      expect(last_element['retry']).to eq true
+      expect(last_element['queue']).to eq 'default'
+    end
+  end
+
+  it 'has the proper logger Sidekiq::Logging.logger' do
+    expect(Sidekiq::Logging.logger).to eq Loga.logger
+  end
+
+  # https://github.com/mperham/sidekiq/blob/97363210b47a4f8a1d8c1233aaa059d6643f5040/test/test_actors.rb#L57-L79
 
   it 'logs the job processing event' do
     MySidekiqWorker.perform_async('Bob')
 
     require 'sidekiq/processor'
 
-    if ENV['BUNDLE_GEMFILE'] =~ /sidekiq51/
-      Sidekiq::Processor.new(mgr.new).start
-    else
-      Sidekiq::Processor.new(
-        mgr.new,
-        {
-          fetch: Sidekiq::BasicFetch.new({:queues => ['default']}),
-          job_logger: Loga::Sidekiq::JobLogger,
-        }
-      ).start
-    end
+    Sidekiq::Processor.new(mgr.new).start
     sleep 0.5
 
     json_line = read_json_log(line: 1)
 
     aggregate_failures do
-      expect(json_line).to include({
+      expect(json_line).to include(
         '_queue'=> 'default',
         '_retry'=> true,
         '_params'=> ['Bob'],
@@ -130,7 +117,7 @@ describe 'Sidekiq client logger' do
         '_tags'=> '',
         'level'=> 6,
         'version'=> '1.1',
-      })
+      )
 
       %w[_created_at _enqueued_at _jid _duration timestamp host].each do |key|
         expect(json_line).to have_key(key)
