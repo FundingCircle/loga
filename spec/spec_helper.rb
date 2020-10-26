@@ -30,17 +30,22 @@ when /unit/
   rspec_pattern = 'unit/**/*_spec.rb'
   require 'loga'
 when /sidekiq(?<version>\d+)/
-  sidekiq_specs = [
-    'spec/loga/sidekiq/**/*_spec.rb',
-    'spec/loga/sidekiq_spec.rb',
-  ]
-
-  version = $LAST_MATCH_INFO['version']
-
-  sidekiq_specs << 'spec/integration/sidekiq5_spec.rb' if version == '51'
-  sidekiq_specs << 'spec/integration/sidekiq6_spec.rb' if version == '6'
-
-  rspec_pattern = sidekiq_specs.join(',')
+  case $LAST_MATCH_INFO['version']
+  when '51'
+    rspec_pattern = [
+      'spec/integration/sidekiq5_spec.rb',
+      'spec/loga/sidekiq5/**/*_spec.rb',
+      'spec/loga/sidekiq_spec.rb',
+    ].join(',')
+  when '6'
+    rspec_pattern = [
+      'spec/integration/sidekiq6_spec.rb',
+      'spec/loga/sidekiq6/**/*_spec.rb',
+      'spec/loga/sidekiq_spec.rb',
+    ].join(',')
+  else
+    raise 'FIXME: Unknown sidekiq - update this file.'
+  end
 
   require 'sidekiq'
   require 'sidekiq/cli'

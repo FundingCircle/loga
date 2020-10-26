@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'loga/sidekiq5/job_logger'
+require 'loga/sidekiq6/job_logger'
 
-RSpec.describe Loga::Sidekiq5::JobLogger do
+RSpec.describe Loga::Sidekiq6::JobLogger do
   subject(:job_logger) { described_class.new }
 
   let(:target) { StringIO.new }
@@ -20,6 +20,11 @@ RSpec.describe Loga::Sidekiq5::JobLogger do
       device: target,
       format: :gelf,
     )
+  end
+
+  # https://github.com/mperham/sidekiq/blob/v6.1.2/lib/sidekiq/job_logger.rb
+  it 'inherits from ::Sidekiq::JobLogger' do
+    expect(subject).to be_a(::Sidekiq::JobLogger)
   end
 
   describe '#call' do
