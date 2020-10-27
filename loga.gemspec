@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rack'
 
   spec.add_development_dependency 'appraisal', '~> 2.2.0'
-  spec.add_development_dependency 'bundler',   '~> 1.6'
+  spec.add_development_dependency 'bundler',   '>= 1.6'
   spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'guard',         '~> 2.13'
   spec.add_development_dependency 'guard-rspec',   '~> 4.7.3'

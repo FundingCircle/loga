@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.3] - 2020-10-27
+### Fixed
+- Support for sidekiq 6 - previous versions were causing sidekiq to crash with `Internal exception!`
+
 ## [2.5.2] - 2020-10-21
 ### Fixed
 - Support for sidekiq 6

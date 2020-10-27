@@ -79,6 +79,7 @@ module Loga
       { format: ENV['LOGA_FORMAT'].presence }.reject { |_, v| v.nil? }
     end
 
+    # Note: sidekiq 6 will extend the logger -> https://github.com/mperham/sidekiq/blob/v6.1.2/lib/sidekiq.rb#L210
     def initialize_logger
       device.sync      = sync
       logger           = Logger.new(device)

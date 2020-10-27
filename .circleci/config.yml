@@ -74,6 +74,10 @@ jobs:
     docker:
       - image: circleci/ruby:2.6
     <<: *test_build
+  ruby-2.7:
+    docker:
+      - image: circleci/ruby:2.7
+    <<: *test_build
   rubocop:
     <<: *basic_build
     steps:
@@ -135,6 +139,12 @@ workflows:
               only: /.*/
           requires:
             - build
+      - ruby-2.7:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
       - upload-coverage:
           filters:
             tags:
@@ -144,6 +154,7 @@ workflows:
             - ruby-2.4
             - ruby-2.5
             - ruby-2.6
+            - ruby-2.7
       - push-to-rubygems:
           filters:
             tags:
@@ -156,3 +167,4 @@ workflows:
             - ruby-2.4
             - ruby-2.5
             - ruby-2.6
+            - ruby-2.7

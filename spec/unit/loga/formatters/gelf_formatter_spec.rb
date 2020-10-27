@@ -166,6 +166,49 @@ describe Loga::Formatters::GELFFormatter do
       end
     end
 
+    context 'when working with sidekiq context' do
+      let(:options) { { message: 'Wooden house' } }
+      let(:message) { Loga::Event.new(options) }
+      let(:sidekiq_context) { { class: 'MyWorker', jid: '123' } }
+
+      before do
+        klass = Class.new do
+          class << self
+            attr_accessor :current
+          end
+        end
+        klass.current = sidekiq_context
+        stub_const('::Sidekiq::Context', klass)
+      end
+
+      it 'includes the ::Sidekiq::Context.current data' do
+        expect(json['_class']).to eq('MyWorker')
+        expect(json['_jid']).to eq('123')
+      end
+
+      include_examples 'valid GELF message'
+
+      describe 'overwriting sidekiq context data with manual one' do
+        let(:options) { { message: 'Test', data: { class: 'CoolTest' } } }
+
+        it 'uses the manual data instead of the sidekiq context' do
+          expect(json['_class']).to eq('CoolTest')
+        end
+
+        include_examples 'valid GELF message'
+      end
+
+      describe ':elapsed in the sidekiq context' do
+        let(:sidekiq_context) { { class: 'MyWorker', jid: '123', elapsed: '22.2' } }
+
+        it 'transforms it to _duration' do
+          expect(json['_duration']).to eq(22.2)
+        end
+
+        include_examples 'valid GELF message'
+      end
+    end
+
     {
       'DEBUG'   => 7,
       'INFO'    => 6,

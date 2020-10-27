@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Loga::Sidekiq do
   describe '.configure_logging' do
-    context 'when sidekiq version is 5.1' do
+    context 'when sidekiq is defined' do
       it 'gets invoked on Loga.configure' do
         allow(described_class).to receive(:configure_logging)
 
@@ -18,7 +18,7 @@ RSpec.describe Loga::Sidekiq do
         expect(described_class).to have_received(:configure_logging)
       end
 
-      it 'assigns our custom sidekiq job logger' do
+      it 'assigns our custom sidekiq job logger depending on the sidekiq version' do
         Loga.reset
 
         Loga.configure(
@@ -28,7 +28,14 @@ RSpec.describe Loga::Sidekiq do
           format: :gelf,
         )
 
-        expect(::Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq::JobLogger)
+        m = ENV['BUNDLE_GEMFILE'].match(/sidekiq(?<version>\d+)/)
+
+        case m['version']
+        when '51'
+          expect(::Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq5::JobLogger)
+        when '6'
+          expect(::Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq6::JobLogger)
+        end
       end
     end
 

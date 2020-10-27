@@ -1,6 +1,7 @@
 require 'spec_helper'
+require 'loga/sidekiq5/job_logger'
 
-RSpec.describe Loga::Sidekiq::JobLogger do
+RSpec.describe Loga::Sidekiq5::JobLogger do
   subject(:job_logger) { described_class.new }
 
   let(:target) { StringIO.new }

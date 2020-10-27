@@ -1,9 +1,7 @@
 module Loga
-  module Sidekiq
+  module Sidekiq5
     # The approach of using a custom job logger in sidekiq was introduced
     # in v5.0: https://github.com/mperham/sidekiq/pull/3235
-    # This job logger does not support logging for Sidekiq versions
-    # that are before 5.0
     class JobLogger
       include Loga::Utilities
 
