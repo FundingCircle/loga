@@ -39,6 +39,7 @@ module Loga
       end
 
       def generate_data(request, status, started_at)
+        controller = request.controller_action_name
         {
           'method' => request.request_method,
           'path' => request.original_path,
@@ -48,7 +49,7 @@ module Loga
           'user_agent' => request.user_agent,
           'duration' => duration_in_ms(started_at, Time.now),
           'status' => status.to_i,
-        }.tap { |d| d['controller'] = request.controller_action_name if request.controller_action_name }
+        }.tap { |d| d['controller'] = controller if controller }
       end
 
       def logger

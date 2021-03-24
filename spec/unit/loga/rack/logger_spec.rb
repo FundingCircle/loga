@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'rack/test'
 
+# rubocop:disable RSpec/VerifiedDoubles RSpec/MessageSpies
 describe Loga::Rack::Logger do
   subject(:middleware) { described_class.new(app) }
 
@@ -34,7 +35,11 @@ describe Loga::Rack::Logger do
     let(:level) { details[:level] }
 
     it 'instantiates a Loga::Event' do
-      expect(Loga::Event).to receive(:new).with(
+      allow(Loga::Event).to receive(:new).and_call_original
+
+      middleware.call(env, started_at)
+
+      expect(Loga::Event).to have_received(:new).with(
         data:      {
           request: {
             'status'     => response_status,
@@ -52,8 +57,6 @@ describe Loga::Rack::Logger do
         timestamp: started_at,
         type:      'request',
       )
-
-      middleware.call(env, started_at)
     end
 
     it "logs the Loga::Event with severity #{details[:level]}" do
@@ -125,8 +128,11 @@ describe Loga::Rack::Logger do
       it 'calls the tags and computes them' do
         middleware.call(env)
 
-        expect(fake_tag_proc).to have_received(:call).with(instance_of(Loga::Rack::Request))
+        expect(fake_tag_proc)
+          .to have_received(:call)
+          .with(instance_of(Loga::Rack::Request))
       end
     end
   end
 end
+# rubocop:enable RSpec/VerifiedDoubles RSpec/MessageSpies
