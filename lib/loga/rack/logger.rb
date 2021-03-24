@@ -40,6 +40,7 @@ module Loga
 
       def generate_data(request, status, started_at)
         controller = request.controller_action_name
+        status ||= 500
         {
           'method' => request.request_method,
           'path' => request.original_path,

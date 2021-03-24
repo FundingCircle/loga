@@ -74,9 +74,31 @@ describe Loga::Rack::Logger do
 
     context 'when an exception is raised' do
       let(:app) {  ->(_env) { raise exception_class } }
+      let(:response_status) { 500 }
 
-      it 'does not rescue the exception' do
-        expect { middleware.call(env) }.to raise_error(exception_class)
+      it 'raises error, but still logs an event' do
+        allow(Loga::Event).to receive(:new).and_call_original
+
+        expect { middleware.call(env, started_at) }.to raise_error(exception_class)
+
+        expect(Loga::Event).to have_received(:new).with(
+          data:      {
+            request: {
+              'status'     => response_status,
+              'method'     => 'GET',
+              'path'       => '/about_us',
+              'params'     => { 'limit' => '1' },
+              'request_id' => nil,
+              'request_ip' => nil,
+              'user_agent' => nil,
+              'duration'   => 500,
+            },
+          },
+          exception: logged_exception,
+          message:   %r{^GET \/about_us\?limit=1 #{response_status} in \d+ms$},
+          timestamp: started_at,
+          type:      'request',
+        )
       end
     end
 
