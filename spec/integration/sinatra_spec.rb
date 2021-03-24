@@ -68,7 +68,6 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
     end
     let(:data) do
       {
-        'status' => 200,
         'method' => 'GET',
         'path'   => '/ok',
         'params' => { 'username'=>'yoshi' },
@@ -76,6 +75,7 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
         'request_ip' => '127.0.0.1',
         'user_agent' => nil,
         'duration'   => 0,
+        'status' => 200,
       }
     end
     let(:data_as_text)  { "data=#{{ request: data }.inspect}" }

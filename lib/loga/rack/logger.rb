@@ -7,65 +7,57 @@ module Loga
         @app = app
       end
 
-      def call(env)
+      def call(env, started_at = Time.now)
         request = Loga::Rack::Request.new(env)
         env['loga.request.original_path'] = request.path
 
         if logger.respond_to?(:tagged)
-          logger.tagged(compute_tags(request)) { call_app(request, env) }
+          logger.tagged(compute_tags(request)) { call_app(request, env, started_at) }
         else
-          call_app(request, env)
+          call_app(request, env, started_at)
         end
       end
 
       private
 
-      attr_reader :data, :env, :request, :started_at
-
-      def call_app(request, env)
-        @data       = {}
-        @env        = env
-        @request    = request
-        @started_at = Time.now
-
-        @app.call(env).tap { |status, _headers, _body| data['status'] = status.to_i }
+      def call_app(request, env, started_at)
+        status, _headers, _body = @app.call(env)
       ensure
-        set_data
-        send_message
-      end
+        data = generate_data(request, status, started_at)
 
-      # rubocop:disable Metrics/LineLength
-      def set_data
-        data['method']     = request.request_method
-        data['path']       = request.original_path
-        data['params']     = request.filtered_parameters
-        data['request_id'] = request.uuid
-        data['request_ip'] = request.ip
-        data['user_agent'] = request.user_agent
-        data['controller'] = request.controller_action_name if request.controller_action_name
-        data['duration']   = duration_in_ms(started_at, Time.now)
+        exception = compute_exception(env)
 
-        # If data['status'] is nil we assume an exception was raised when calling the application
-        data['status']     ||= 500
-      end
-      # rubocop:enable Metrics/LineLength
-
-      def send_message
         event = Loga::Event.new(
           data:       { request: data },
-          exception:  compute_exception,
-          message:    compute_message,
+          exception:  exception,
+          message:    compute_message(request, data),
           timestamp:  started_at,
           type:       'request',
         )
-        logger.public_send(compute_level, event)
+
+        exception ? logger.error(event) : logger.info(event)
+      end
+
+      def generate_data(request, status, started_at)
+        controller = request.controller_action_name
+        status ||= 500
+        {
+          'method' => request.request_method,
+          'path' => request.original_path,
+          'params' => request.filtered_parameters,
+          'request_id' => request.uuid,
+          'request_ip' => request.ip,
+          'user_agent' => request.user_agent,
+          'duration' => duration_in_ms(started_at, Time.now),
+          'status' => status.to_i,
+        }.tap { |d| d['controller'] = controller if controller }
       end
 
       def logger
         Loga.logger
       end
 
-      def compute_message
+      def compute_message(request, data)
         '%<method>s %<filtered_full_path>s %<status>d in %<duration>dms' % {
           method:             request.request_method,
           filtered_full_path: request.filtered_full_path,
@@ -74,17 +66,12 @@ module Loga
         }
       end
 
-      def compute_level
-        compute_exception ? :error : :info
-      end
-
-      def compute_exception
-        filter_exceptions.include?(exception.class.to_s) ? nil : exception
-      end
-
-      def exception
-        env['loga.exception'] || env['action_dispatch.exception'] ||
+      def compute_exception(env)
+        exception =
+          env['loga.exception'] || env['action_dispatch.exception'] ||
           env['sinatra.error'] || env['rack.exception']
+
+        filter_exceptions.include?(exception.class.to_s) ? nil : exception
       end
 
       def filter_exceptions

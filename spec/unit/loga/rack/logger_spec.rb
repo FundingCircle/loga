@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'rack/test'
 
-# rubocop:disable RSpec/SubjectStub, RSpec/MessageSpies, RSpec/VerifiedDoubles
+# rubocop:disable RSpec/VerifiedDoubles RSpec/MessageSpies
 describe Loga::Rack::Logger do
-  subject { described_class.new(app) }
+  subject(:middleware) { described_class.new(app) }
 
   let(:env)     { Rack::MockRequest.env_for('/about_us?limit=1', options) }
   let(:options) { {} }
@@ -21,18 +21,25 @@ describe Loga::Rack::Logger do
     )
   end
 
-  before { Loga.instance_variable_set(:@configuration, configuration) }
+  let(:started_at) { Time.new(2021, 1, 2, 9, 30, 4.500, '+00:00') }
+
+  around do |example|
+    Timecop.freeze(Time.new(2021, 1, 2, 9, 30, 5.000, '+00:00'), &example)
+  end
+
+  before do
+    allow(Loga).to receive(:configuration).and_return(configuration)
+  end
 
   shared_examples 'logs the event' do |details|
     let(:level) { details[:level] }
 
-    before do
-      allow(subject).to receive(:started_at).and_return(:timestamp)
-      allow(subject).to receive(:duration_in_ms).with(any_args).and_return(5)
-    end
-
     it 'instantiates a Loga::Event' do
-      expect(Loga::Event).to receive(:new).with(
+      allow(Loga::Event).to receive(:new).and_call_original
+
+      middleware.call(env, started_at)
+
+      expect(Loga::Event).to have_received(:new).with(
         data:      {
           request: {
             'status'     => response_status,
@@ -42,21 +49,19 @@ describe Loga::Rack::Logger do
             'request_id' => nil,
             'request_ip' => nil,
             'user_agent' => nil,
-            'duration'   => 5,
+            'duration'   => 500,
           },
         },
         exception: logged_exception,
         message:   %r{^GET \/about_us\?limit=1 #{response_status} in \d+ms$},
-        timestamp: :timestamp,
+        timestamp: started_at,
         type:      'request',
       )
-
-      subject.call(env)
     end
 
     it "logs the Loga::Event with severity #{details[:level]}" do
       allow(logger).to receive(level)
-      subject.call(env)
+      middleware.call(env, started_at)
       expect(logger).to have_received(level).with(an_instance_of(Loga::Event))
     end
   end
@@ -69,9 +74,31 @@ describe Loga::Rack::Logger do
 
     context 'when an exception is raised' do
       let(:app) {  ->(_env) { raise exception_class } }
+      let(:response_status) { 500 }
 
-      it 'does not rescue the exception' do
-        expect { subject.call(env) }.to raise_error(exception_class)
+      it 'raises error, but still logs an event' do
+        allow(Loga::Event).to receive(:new).and_call_original
+
+        expect { middleware.call(env, started_at) }.to raise_error(exception_class)
+
+        expect(Loga::Event).to have_received(:new).with(
+          data:      {
+            request: {
+              'status'     => response_status,
+              'method'     => 'GET',
+              'path'       => '/about_us',
+              'params'     => { 'limit' => '1' },
+              'request_id' => nil,
+              'request_ip' => nil,
+              'user_agent' => nil,
+              'duration'   => 500,
+            },
+          },
+          exception: logged_exception,
+          message:   %r{^GET \/about_us\?limit=1 #{response_status} in \d+ms$},
+          timestamp: started_at,
+          type:      'request',
+        )
       end
     end
 
@@ -113,28 +140,21 @@ describe Loga::Rack::Logger do
     end
 
     context 'when the logger is tagged' do
-      let(:logger) { double(:logger, tagged: true) }
+      let(:logger) { Loga::TaggedLogging.new(Logger.new('/dev/null')) }
+      let(:fake_tag_proc) { double(:proc, call: true) }
 
-      before do
-        allow(subject).to receive(:call_app).with(any_args).and_return(:response)
-        allow(subject).to receive(:compute_tags).with(any_args).and_return(:tag)
-        allow(logger).to receive(:tagged).with('hello') do |&block|
-          block.call
-        end
-      end
+      let(:tags) { [->(request) { fake_tag_proc.call(request) }] }
 
-      context 'when tags are present' do
-        let(:tags) { [:foo] }
+      include_examples 'logs the event', level: :info
 
-        it 'yields the app with tags' do
-          allow(logger).to receive(:tagged)
-          subject.call(env)
-          expect(logger).to have_received(:tagged).with(:tag) do |&block|
-            expect(block.call).to eq(:response)
-          end
-        end
+      it 'calls the tags and computes them' do
+        middleware.call(env)
+
+        expect(fake_tag_proc)
+          .to have_received(:call)
+          .with(instance_of(Loga::Rack::Request))
       end
     end
   end
 end
-# rubocop:enable RSpec/SubjectStub, RSpec/MessageSpies, RSpec/VerifiedDoubles
+# rubocop:enable RSpec/VerifiedDoubles RSpec/MessageSpies
