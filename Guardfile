@@ -15,7 +15,7 @@ end
 
 group :rails do
   %w[production development].each do |env|
-    %w[rails32 rails40 rails50 rails52].each do |appraisal|
+    %w[rails52 rails61 rails70].each do |appraisal|
       cmd = "RACK_ENV=#{env} bundle exec appraisal #{appraisal} rspec"
 
       guard :rspec, all_on_start: true, cmd: cmd do
