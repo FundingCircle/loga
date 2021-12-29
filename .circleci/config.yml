@@ -104,6 +104,7 @@ workflows:
             tags:
               only: /.*/
       - push-to-rubygems:
+          context: org-rubygems
           filters:
             tags:
               only: /^v\d.+/
