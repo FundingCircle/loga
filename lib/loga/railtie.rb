@@ -125,7 +125,7 @@ module Loga
       def silence_rails_rack_logger
         case Rails::VERSION::MAJOR
         when 3    then require 'loga/ext/rails/rack/logger3.rb'
-        when 4..6 then require 'loga/ext/rails/rack/logger.rb'
+        when 4..7 then require 'loga/ext/rails/rack/logger.rb'
         else
           raise Loga::ConfigurationError,
                 "Rails #{Rails::VERSION::MAJOR} is unsupported"
