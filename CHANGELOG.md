@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.1] - 2022-02-22
+### Fixed
+- Fix compatibility with sidekiq 6.4.1
+
 ## [2.6.0] - 2021-12-22
 ### Added
 - Allow using the gem with rails 7

@@ -34,6 +34,10 @@ if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.5.0')
   appraise 'sidekiq6' do
     gem 'sidekiq', '~> 6.0'
   end
+
+  appraise 'sidekiq61' do
+    gem 'sidekiq', '~> 6.1.0'
+  end
 end
 
 if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.7.0')
