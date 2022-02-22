@@ -10,20 +10,25 @@ module Loga
 
         yield
 
-        with_elapsed_time_context(start) do
-          loga_log(
-            message: "#{item['class']} with jid: '#{item['jid']}' done", item: item,
-          )
-        end
+        ::Sidekiq::Context.current[:elapsed] = elapsed(start)
+
+        loga_log(message: "#{item['class']} with jid: '#{item['jid']}' done", item: item)
       rescue Exception => e # rubocop:disable Lint/RescueException
-        with_elapsed_time_context(start) do
-          loga_log(
-            message: "#{item['class']} with jid: '#{item['jid']}' fail", item: item,
-            exception: e
-          )
-        end
+        ::Sidekiq::Context.current[:elapsed] = elapsed(start)
+
+        loga_log(
+          message: "#{item['class']} with jid: '#{item['jid']}' fail", item: item,
+          exception: e
+        )
 
         raise
+      end
+
+      def prepare(job_hash, &block)
+        super
+      ensure
+        # For sidekiq version < 6.4
+        Thread.current[:sidekiq_context] = nil
       end
 
       private

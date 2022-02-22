@@ -64,6 +64,7 @@ RSpec.describe Loga::Sidekiq6::JobLogger do
 
         aggregate_failures do
           expect(json_line).to include(expected_body)
+          expect(json_line['_duration']).to be_a(Float)
           expect(json_line['timestamp']).to be_a(Float)
           expect(json_line['host']).to be_a(String)
           expect(json_line['short_message']).to match(/HardWorker with jid:*/)
@@ -110,6 +111,7 @@ RSpec.describe Loga::Sidekiq6::JobLogger do
 
         aggregate_failures do
           expect(&failed_job).to raise_error(StandardError)
+          expect(json_line['_duration']).to be_a(Float)
           expect(json_line).to include(expected_body)
           expect(json_line['timestamp']).to be_a(Float)
           expect(json_line['host']).to be_a(String)

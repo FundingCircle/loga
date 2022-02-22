@@ -37,7 +37,7 @@ when /sidekiq(?<version>\d+)/
       'spec/loga/sidekiq5/**/*_spec.rb',
       'spec/loga/sidekiq_spec.rb',
     ].join(',')
-  when '6'
+  when '6', '61'
     rspec_pattern = [
       'spec/integration/sidekiq6_spec.rb',
       'spec/loga/sidekiq6/**/*_spec.rb',
