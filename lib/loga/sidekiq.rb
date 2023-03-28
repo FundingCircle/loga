@@ -7,18 +7,22 @@ module Loga
       return if Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('5.0')
 
       if Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('6.0')
-        require 'loga/sidekiq5/job_logger'
-
-        ::Sidekiq.configure_server do |config|
-          config.options[:job_logger] = Loga::Sidekiq5::JobLogger
-        end
-
-        ::Sidekiq.logger = Loga.configuration.logger
+        configure_for_sidekiq5
       elsif Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('7.0')
         configure_for_sidekiq6
       elsif Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('8.0')
         configure_for_sidekiq7
       end
+    end
+
+    def self.configure_for_sidekiq5
+      require 'loga/sidekiq5/job_logger'
+
+      ::Sidekiq.configure_server do |config|
+        config.options[:job_logger] = Loga::Sidekiq5::JobLogger
+      end
+
+      ::Sidekiq.logger = Loga.configuration.logger
     end
 
     def self.configure_for_sidekiq6
