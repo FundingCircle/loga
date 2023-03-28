@@ -45,10 +45,12 @@ jobs:
   ruby-2.7:
     docker:
       - image: cimg/ruby:2.7
+      - image: redis:7
     <<: *test_build
   ruby-3.0:
     docker:
       - image: cimg/ruby:3.0
+      - image: redis:7
     <<: *test_build
   rubocop:
     <<: *basic_build
