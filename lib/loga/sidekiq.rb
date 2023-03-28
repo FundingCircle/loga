@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Loga
   module Sidekiq
     def self.configure_logging
@@ -10,15 +12,32 @@ module Loga
         ::Sidekiq.configure_server do |config|
           config.options[:job_logger] = Loga::Sidekiq5::JobLogger
         end
-      elsif Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('7.0')
-        require 'loga/sidekiq6/job_logger'
 
-        ::Sidekiq.configure_server do |config|
-          config.options[:job_logger] = Loga::Sidekiq6::JobLogger
-        end
+        ::Sidekiq.logger = Loga.configuration.logger
+      elsif Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('7.0')
+        configure_for_sidekiq6
+      elsif Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('8.0')
+        configure_for_sidekiq7
+      end
+    end
+
+    def self.configure_for_sidekiq6
+      require 'loga/sidekiq6/job_logger'
+
+      ::Sidekiq.configure_server do |config|
+        config.options[:job_logger] = Loga::Sidekiq6::JobLogger
       end
 
       ::Sidekiq.logger = Loga.configuration.logger
+    end
+
+    def self.configure_for_sidekiq7
+      require 'loga/sidekiq7/job_logger'
+
+      ::Sidekiq.configure_server do |config|
+        config[:job_logger] = Loga::Sidekiq7::JobLogger
+        config.logger = Loga.configuration.logger
+      end
     end
   end
 end

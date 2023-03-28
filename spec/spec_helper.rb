@@ -50,6 +50,12 @@ when /sidekiq(?<version>\d+)/
       'spec/loga/sidekiq6/**/*_spec.rb',
       'spec/loga/sidekiq_spec.rb',
     ].join(',')
+  when '7'
+    rspec_pattern = [
+      'spec/integration/sidekiq7_spec.rb',
+      'spec/loga/sidekiq7/**/*_spec.rb',
+      'spec/loga/sidekiq_spec.rb',
+    ].join(',')
   else
     raise "FIXME: Unknown sidekiq #{sidekiq_version} - update this file."
   end
