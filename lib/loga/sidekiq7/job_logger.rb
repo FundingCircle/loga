@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sidekiq/job_logger'
 
 module Loga
@@ -27,15 +29,12 @@ module Loga
       private
 
       def loga_log(message:, item:, exception: nil)
-        data = {
-          'created_at'  => item['created_at'],
-          'enqueued_at' => item['enqueued_at'],
-          'jid'         => item['jid'],
-          'queue'       => item['queue'],
-          'retry'       => item['retry'],
-          'params'      => item['args'],
-          'class'       => item['class'],
-        }
+        data = item.select do |k, _v|
+          %w[created_at enqueued_at jid queue retry
+             class].include? k
+        end
+
+        data['params'] = item['args']
 
         data['exception'] = exception if exception
 
