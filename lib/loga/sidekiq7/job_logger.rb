@@ -36,11 +36,15 @@ module Loga
           'params'      => item['args'],
           'class'       => item['class'],
         }
+
+        data['exception'] = exception if exception
+
+        event = Event.new(type: EVENT_TYPE, message: message, data: data)
+
         if exception
-          data['exception'] = exception
-          @logger.warn(Event.new(type: EVENT_TYPE, message: message, data: data))
+          @logger.warn(event)
         else
-          @logger.info(Event.new(type: EVENT_TYPE, message: message, data: data))
+          @logger.info(event)
         end
       end
     end
