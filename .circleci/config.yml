@@ -52,6 +52,11 @@ jobs:
       - image: cimg/ruby:3.0
       - image: redis:7
     <<: *test_build
+  ruby-3.1:
+    docker:
+      - image: cimg/ruby:3.1
+      - image: redis:7
+    <<: *test_build
   rubocop:
     <<: *basic_build
     steps:
@@ -105,6 +110,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - ruby-3.1:
+          filters:
+            tags:
+              only: /.*/
       - push-to-rubygems:
           context: org-rubygems
           filters:
@@ -119,3 +128,4 @@ workflows:
             - ruby-2.6
             - ruby-2.7
             - ruby-3.0
+            - ruby-3.1
