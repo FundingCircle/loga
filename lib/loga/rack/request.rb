@@ -34,12 +34,12 @@ module Loga
         env['loga.request.original_path']
       end
 
-      # rubocop:disable Metrics/LineLength
+      # rubocop:disable Layout/LineLength
       def filtered_full_path
         @filtered_full_path ||=
           query_string.empty? ? original_path : "#{original_path}?#{filtered_query_string}"
       end
-      # rubocop:enable Metrics/LineLength
+      # rubocop:enable Layout/LineLength
 
       def filtered_parameters
         @filtered_parameters ||= filtered_query_hash.merge(filtered_form_hash)

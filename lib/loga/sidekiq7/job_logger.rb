@@ -5,7 +5,7 @@ require 'sidekiq/job_logger'
 module Loga
   module Sidekiq7
     class JobLogger < ::Sidekiq::JobLogger
-      EVENT_TYPE = 'sidekiq'.freeze
+      EVENT_TYPE = 'sidekiq'
 
       def call(item, _queue)
         start = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)

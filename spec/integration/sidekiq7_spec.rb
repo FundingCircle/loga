@@ -51,11 +51,11 @@ describe 'Sidekiq client logger' do
         processor.terminate(true)
       end
 
-      it 'logs the job processing event' do
+      it 'logs the job processing event' do  # rubocop:disable RSpec/NoExpectationExample
         test_log_from_worker(read_json_log(line: -2))
       end
 
-      it 'logs the "done" event' do
+      it 'logs the "done" event' do  # rubocop:disable RSpec/NoExpectationExample
         test_job_end_log(read_json_log(line: -1))
       end
     end
@@ -69,7 +69,7 @@ describe 'Sidekiq client logger' do
         processor.terminate(true)
       end
 
-      it 'logs the "error" event' do
+      it 'logs the "error" event' do  # rubocop:disable RSpec/NoExpectationExample
         test_job_fail_log(read_json_log(line: 0))
       end
 

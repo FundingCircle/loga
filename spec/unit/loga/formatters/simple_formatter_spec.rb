@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'loga/formatters/simple_formatter'
 
-# rubocop:disable Metrics/LineLength
+# rubocop:disable Layout/LineLength
 describe Loga::Formatters::SimpleFormatter do
   before { allow(Process).to receive(:pid).and_return(999) }
 
@@ -127,4 +127,4 @@ describe Loga::Formatters::SimpleFormatter do
     end
   end
 end
-# rubocop:enable Metrics/LineLength
+# rubocop:enable Layout/LineLength

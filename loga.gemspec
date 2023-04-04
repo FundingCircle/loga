@@ -32,7 +32,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'fakeredis'
   spec.add_development_dependency 'rspec',    '~> 3.7'
-  spec.add_development_dependency 'rubocop',  '~> 0.57.0'
+  spec.add_development_dependency 'rubocop', '~> 1.49'
+  spec.add_development_dependency 'rubocop-rake', '~> 0.6.0'
   spec.add_development_dependency 'rubocop-rspec'
   spec.add_development_dependency 'timecop'
 end

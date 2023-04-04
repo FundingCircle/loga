@@ -26,7 +26,7 @@ RSpec.describe Loga::Sidekiq7::JobLogger do
 
   # https://github.com/mperham/sidekiq/blob/v6.1.2/lib/sidekiq/job_logger.rb
   it 'inherits from ::Sidekiq::JobLogger' do
-    expect(subject).to be_a(::Sidekiq::JobLogger)
+    expect(subject).to be_a(Sidekiq::JobLogger)
   end
 
   describe '#call' do

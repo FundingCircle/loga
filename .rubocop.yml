@@ -1,15 +1,16 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
   Exclude:
     - '*.gemspec'
     - 'gemfiles/*'
-    - 'spec/fixtures/**/*'
     - 'vendor/bundle/**/*'
     - 'gemfiles/vendor/bundle/**/*'
+  NewCops: enable
 
-require: rubocop-rspec
-
-Documentation:
-  Enabled: false
+require:
+  - rubocop-rake
+  - rubocop-rspec
 
 Layout/ExtraSpacing:
   Enabled: false
@@ -20,11 +21,7 @@ Layout/SpaceAroundOperators:
 Metrics/AbcSize:
   Enabled: false
 
-Metrics/BlockLength:
-  Exclude:
-    - spec/**/*_spec.rb
-
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: true
   Max: 90
 
@@ -38,11 +35,6 @@ RSpec/DescribeClass:
 RSpec/ExampleLength:
   Enabled: false
 
-RSpec/FilePath:
-  Exclude:
-    - spec/integration/rails/action_mailer_spec.rb
-    - spec/integration/rails/railtie_spec.rb
-
 RSpec/MultipleExpectations:
   Enabled: false
 
@@ -51,7 +43,11 @@ RSpec/NamedSubject:
 
 RSpec/NestedGroups:
   Enabled: false
+
 Style/BlockDelimiters:
+  Enabled: false
+
+Style/Documentation:
   Enabled: false
 
 Style/FormatString:
