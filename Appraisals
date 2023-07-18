@@ -1,13 +1,3 @@
-if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4.0')
-  appraise 'rails32' do
-    gem 'rails', '~> 3.2.0'
-  end
-
-  appraise 'rails40' do
-    gem 'rails', '~> 4.0.0'
-  end
-end
-
 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.7.0')
   appraise 'rails42' do
     gem 'rails', '~> 4.2.0'

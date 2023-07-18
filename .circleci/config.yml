@@ -30,10 +30,6 @@ test_build: &test_build
 
 version: 2
 jobs:
-  ruby-2.4:
-    docker:
-      - image: circleci/ruby:2.4
-    <<: *test_build
   ruby-2.5:
     docker:
       - image: circleci/ruby:2.5
@@ -85,10 +81,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - ruby-2.4:
-          filters:
-            tags:
-              only: /.*/
       - ruby-2.5:
           filters:
             tags:
@@ -114,7 +106,6 @@ workflows:
               ignore: /.*/
           requires:
             - rubocop
-            - ruby-2.4
             - ruby-2.5
             - ruby-2.6
             - ruby-2.7
