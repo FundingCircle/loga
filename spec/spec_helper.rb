@@ -38,13 +38,19 @@ when /sidekiq(?<version>\d+)/
       'spec/loga/sidekiq5/**/*_spec.rb',
       'spec/loga/sidekiq_spec.rb',
     ].join(',')
+  when '60'
+    rspec_pattern = [
+      'spec/integration/sidekiq60_spec.rb',
+      'spec/loga/sidekiq5/**/*_spec.rb',
+      'spec/loga/sidekiq_spec.rb',
+    ].join(',')
   when '61', '62', '63', '64'
     rspec_pattern = [
       'spec/integration/sidekiq61_spec.rb',
       'spec/loga/sidekiq6/**/*_spec.rb',
       'spec/loga/sidekiq_spec.rb',
     ].join(',')
-  when '6', '65'
+  when '65'
     rspec_pattern = [
       'spec/integration/sidekiq65_spec.rb',
       'spec/loga/sidekiq6/**/*_spec.rb',
