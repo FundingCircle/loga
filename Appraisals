@@ -1,13 +1,3 @@
-if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4.0')
-  appraise 'rails32' do
-    gem 'rails', '~> 3.2.0'
-  end
-
-  appraise 'rails40' do
-    gem 'rails', '~> 4.0.0'
-  end
-end
-
 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.7.0')
   appraise 'rails42' do
     gem 'rails', '~> 4.2.0'
@@ -31,12 +21,28 @@ if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.5.0')
     gem 'rails', '~> 6.0.0'
   end
 
-  appraise 'sidekiq6' do
-    gem 'sidekiq', '~> 6.0'
+  appraise 'sidekiq60' do
+    gem 'sidekiq', '~> 6.0.0'
   end
 
   appraise 'sidekiq61' do
     gem 'sidekiq', '~> 6.1.0'
+  end
+
+  appraise 'sidekiq62' do
+    gem 'sidekiq', '~> 6.2.0'
+  end
+
+  appraise 'sidekiq63' do
+    gem 'sidekiq', '~> 6.3.0'
+  end
+
+  appraise 'sidekiq64' do
+    gem 'sidekiq', '~> 6.4.0'
+  end
+
+  appraise 'sidekiq65' do
+    gem 'sidekiq', '~> 6.5.0'
   end
 end
 
@@ -47,6 +53,18 @@ if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.7.0')
 
   appraise 'rails70' do
     gem 'rails', '~> 7.0.0'
+  end
+
+  appraise 'sidekiq7' do
+    gem 'sidekiq', '~> 7.0'
+  end
+
+  appraise 'sidekiq70' do
+    gem 'sidekiq', '~> 7.0.0'
+  end
+
+  appraise 'sidekiq71' do
+    gem 'sidekiq', '~> 7.1.0'
   end
 end
 

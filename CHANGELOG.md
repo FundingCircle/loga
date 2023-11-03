@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.7.0] - 2023-03-28
+### Added
+- Support for sidekiq 7
+
 ## [2.6.1] - 2022-02-22
 ### Fixed
 - Fix compatibility with sidekiq 6.4.1
