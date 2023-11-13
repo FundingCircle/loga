@@ -107,7 +107,6 @@ module Loga
         {
           trace_id: span.context.hex_trace_id,
           span_id: span.context.hex_span_id,
-          operation: span.respond_to?(:name) ? span.name : 'undefined',
         }
       end
 
