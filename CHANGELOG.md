@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.8.0] - 2023-11-14
+### Added
+- Support open-telemetry and add trace_id and span_id to logs events
+
 ## [2.7.0] - 2023-03-28
 ### Added
 - Support for sidekiq 7
