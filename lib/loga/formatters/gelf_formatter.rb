@@ -39,12 +39,7 @@ module Loga
       private
 
       def build_event(time, message)
-        event = case message
-                when Loga::Event
-                  message
-                else
-                  Loga::Event.new(message: message)
-                end
+        event = message.is_a?(Loga::Event) ? message : Loga::Event.new(message: message)
 
         event.timestamp ||= time
         # Overwrite sidekiq_context data anything manually specified
@@ -54,6 +49,7 @@ module Loga
           hash.merge! compute_type(event.type)
           # Overwrite hash with Loga's additional fields
           hash.merge! loga_additional_fields
+          hash.merge! open_telemetry_fields
         end
         event
       end
@@ -100,6 +96,17 @@ module Loga
             version: @service_version,
           },
           tags: current_tags.join(' '),
+        }
+      end
+
+      def open_telemetry_fields
+        return {} unless defined?(::OpenTelemetry::Trace)
+
+        span = ::OpenTelemetry::Trace.current_span
+
+        {
+          trace_id: span.context.hex_trace_id,
+          span_id: span.context.hex_span_id,
         }
       end
 

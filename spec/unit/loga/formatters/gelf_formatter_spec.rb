@@ -209,6 +209,29 @@ describe Loga::Formatters::GELFFormatter do
       end
     end
 
+    context 'when working with additional fields via otel' do
+      let(:options) { { message: 'Wooden house' } }
+      let(:message) { Loga::Event.new(options) }
+      let(:trace_context) { { hex_trace_id: '123', hex_span_id: '456' } }
+
+      before do
+        klass = Class.new do
+          class << self
+            attr_accessor :current_span
+          end
+        end
+        klass.current_span = OpenStruct.new(context: OpenStruct.new(trace_context))
+        stub_const('::OpenTelemetry::Trace', klass)
+      end
+
+      it 'includes the trace_id and span_id' do
+        expect(json['_trace_id']).to eq('123')
+        expect(json['_span_id']).to eq('456')
+      end
+
+      include_examples 'valid GELF message'
+    end
+
     {
       'DEBUG'   => 7,
       'INFO'    => 6,
