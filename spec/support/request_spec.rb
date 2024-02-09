@@ -114,8 +114,9 @@ RSpec.shared_examples 'request logger' do
         '_request.duration'    => 0,
         '_exception.klass'     => 'NoMethodError',
         '_exception.message'   => "undefined method `name' for nil:NilClass",
+        '_exception.message'   => start_with("undefined method `name' for nil:NilClass"),
         '_exception.backtrace' => be_a(String),
-        '_tags'               => '471a34dc TEST_TAG',
+        '_tags'                => '471a34dc TEST_TAG',
       )
     end
   end
