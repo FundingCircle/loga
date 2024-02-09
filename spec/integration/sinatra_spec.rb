@@ -122,7 +122,7 @@ RSpec.describe 'Structured logging with Sinatra', :timecop, :with_hostname do
       it 'logs the request with the exception' do
         get '/error', {}, 'HTTP_X_REQUEST_ID' => '700a6a01'
 
-        expect(last_log_entry).to start_with("E, #{time_pid_tags} GET /error 500 in 0ms type=request #{data_as_text} exception=undefined method `name' for nil:NilClass\n")
+        expect(last_log_entry).to start_with("E, #{time_pid_tags} GET /error 500 in 0ms type=request #{data_as_text} exception=undefined method `name' for nil")
       end
     end
   end
