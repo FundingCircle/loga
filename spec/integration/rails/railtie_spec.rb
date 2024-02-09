@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 
 RSpec.describe Loga::Railtie do
@@ -38,7 +40,7 @@ RSpec.describe Loga::Railtie do
       end
 
       it 'disables colorized logging' do
-        expect(app.config.colorize_logging).to eq(false)
+        expect(app.config.colorize_logging).to be(false)
       end
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'loga/formatters/simple_formatter'
 
@@ -112,11 +114,11 @@ describe Loga::Formatters::SimpleFormatter do
     end
 
     {
-      'DEBUG'   => 'D',
-      'INFO'    => 'I',
-      'WARN'    => 'W',
-      'ERROR'   => 'E',
-      'FATAL'   => 'F',
+      'DEBUG' => 'D',
+      'INFO' => 'I',
+      'WARN' => 'W',
+      'ERROR' => 'E',
+      'FATAL' => 'F',
       'UNKNOWN' => 'U',
     }.each do |ruby_severity, formatted_severity|
       context "with severity #{ruby_severity}" do

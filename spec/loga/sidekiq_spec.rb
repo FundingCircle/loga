@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe Loga::Sidekiq do
@@ -32,9 +34,9 @@ RSpec.describe Loga::Sidekiq do
 
         case m['version']
         when '51'
-          expect(::Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq5::JobLogger)
+          expect(Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq5::JobLogger)
         when '6'
-          expect(::Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq6::JobLogger)
+          expect(Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq6::JobLogger)
         end
       end
     end

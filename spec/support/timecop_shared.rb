@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'timecop'
 
-shared_context 'timecop', timecop: true do
+shared_context 'timecop', :timecop do
   # Allows fixed timestamps
   before(:all) { Timecop.freeze(time_anchor) }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Loga::Formatters::GELFFormatter do
@@ -8,25 +10,25 @@ describe Loga::Formatters::GELFFormatter do
   let(:host)            { 'www.example.com' }
   let(:params) do
     {
-      service_name:    service_name,
+      service_name: service_name,
       service_version: service_version,
-      host:            host,
+      host: host,
     }
   end
 
   shared_examples 'valid GELF message' do
     it 'includes the required fields' do
-      expect(json).to include('version'       => '1.1',
-                              'host'          => host,
+      expect(json).to include('version' => '1.1',
+                              'host' => host,
                               'short_message' => be_a(String),
-                              'timestamp'     => be_a(Float),
-                              'level'         => 6)
+                              'timestamp' => be_a(Float),
+                              'level' => 6)
     end
 
     it 'includes Loga additional fields' do
-      expect(json).to include('_service.name'    => service_name,
+      expect(json).to include('_service.name' => service_name,
                               '_service.version' => service_version,
-                              '_tags'            => '')
+                              '_tags' => '')
     end
 
     it 'outputs the timestamp in seconds since UNIX epoch' do
@@ -233,11 +235,11 @@ describe Loga::Formatters::GELFFormatter do
     end
 
     {
-      'DEBUG'   => 7,
-      'INFO'    => 6,
-      'WARN'    => 4,
-      'ERROR'   => 3,
-      'FATAL'   => 2,
+      'DEBUG' => 7,
+      'INFO' => 6,
+      'WARN' => 4,
+      'ERROR' => 3,
+      'FATAL' => 2,
       'UNKNOWN' => 1,
     }.each do |ruby_severity, syslog_level|
       context "with severity #{ruby_severity}" do

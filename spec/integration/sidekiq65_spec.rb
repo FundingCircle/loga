@@ -75,7 +75,7 @@ describe 'Sidekiq client logger' do
     aggregate_failures do
       expect(last_element['class']).to eq 'MySidekiqWorker'
       expect(last_element['args']).to eq ['Bob']
-      expect(last_element['retry']).to eq true
+      expect(last_element['retry']).to be true
       expect(last_element['queue']).to eq 'default'
     end
   end

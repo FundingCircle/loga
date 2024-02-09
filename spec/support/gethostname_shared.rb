@@ -1,4 +1,6 @@
-shared_context 'gethostname', with_hostname: true do
+# frozen_string_literal: true
+
+shared_context 'gethostname', :with_hostname do
   let(:hostname) { 'bird.example.com' }
 
   before do
