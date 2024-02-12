@@ -24,10 +24,6 @@ appraise 'sidekiq51' do
   gem 'sidekiq', '~> 5.1.0'
 end
 
-appraise 'rails60' do
-  gem 'rails', '~> 6.0.0'
-end
-
 appraise 'sidekiq60' do
   gem 'sidekiq', '~> 6.0.0'
 end
@@ -52,24 +48,40 @@ appraise 'sidekiq65' do
   gem 'sidekiq', '~> 6.5.0'
 end
 
-appraise 'rails61' do
-  gem 'rails', '~> 6.1.4.4'
-end
-
-appraise 'rails70' do
-  gem 'rails', '~> 7.0.0'
-end
-
-appraise 'sidekiq7' do
-  gem 'sidekiq', '~> 7.0'
-end
-
 appraise 'sidekiq70' do
   gem 'sidekiq', '~> 7.0.0'
 end
 
 appraise 'sidekiq71' do
   gem 'sidekiq', '~> 7.1.0'
+end
+
+appraise 'sidekiq7' do
+  gem 'sidekiq', '~> 7.0'
+end
+
+if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.2.0')
+  appraise 'rails60' do
+    gem 'rails', '~> 6.0.0'
+  end
+
+  appraise 'rails61' do
+    gem 'rails', '~> 6.1.4.4'
+  end
+end
+
+if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('3.0.0')
+  appraise 'rails70' do
+    gem 'rails', '~> 7.0.0'
+    gem 'base64'
+    gem 'mutex_m'
+  end
+
+  appraise 'rails71' do
+    gem 'rails', '~> 7.1.0'
+    gem 'base64'
+    gem 'mutex_m'
+  end
 end
 
 appraise 'unit' do
