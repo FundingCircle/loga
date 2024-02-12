@@ -86,10 +86,10 @@ module Loga
 
         private
 
-        def render_exception_with_loga(arg, exception)
+        def render_exception_with_loga(arg, exception, *args)
           env = arg.is_a?(ActionDispatch::Request) ? arg.env : arg
           env['loga.exception'] = exception
-          render_exception_without_loga(arg, exception)
+          render_exception_without_loga(arg, exception, *args)
         end
       end
 
