@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.8.1] - 2023-02-12
+### Added
+- Improve CI pipeline
+### Fixed
+- Support for rails 7.1
+
 ## [2.8.0] - 2023-11-14
 ### Added
 - Support open-telemetry and add trace_id and span_id to logs events
