@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 
 RSpec.describe Loga::Railtie do
@@ -17,7 +19,11 @@ RSpec.describe Loga::Railtie do
       let(:formatter) { Loga::Formatters::SimpleFormatter }
 
       it 'assign Loga logger to Rails logger' do
-        expect(Loga.logger).to equal(Rails.logger)
+        if defined?(ActiveSupport::BroadcastLogger)
+          expect(Loga.logger).to be_a(Logger)
+        else
+          expect(Loga.logger).to equal(Rails.logger)
+        end
       end
 
       it 'configures Loga with a simple formatter' do
@@ -29,7 +35,11 @@ RSpec.describe Loga::Railtie do
   context 'when production', if: Rails.env.production? do
     describe 'loga_initialize_logger' do
       it 'assign Loga logger to Rails logger' do
-        expect(Loga.logger).to equal(Rails.logger)
+        if defined?(ActiveSupport::BroadcastLogger)
+          expect(Loga.logger).to be_a(Logger)
+        else
+          expect(Loga.logger).to equal(Rails.logger)
+        end
       end
 
       it 'configures Loga with a structured formatter' do
@@ -38,7 +48,7 @@ RSpec.describe Loga::Railtie do
       end
 
       it 'disables colorized logging' do
-        expect(app.config.colorize_logging).to eq(false)
+        expect(app.config.colorize_logging).to be(false)
       end
     end
 

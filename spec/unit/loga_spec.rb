@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Loga do
@@ -64,7 +66,7 @@ describe Loga do
     context 'when Loga is configured' do
       before { subject.configure(options) }
 
-      specify { expect(subject.logger).to be_kind_of(Logger) }
+      specify { expect(subject.logger).to be_a(Logger) }
     end
   end
 

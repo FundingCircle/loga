@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Loga::Configuration do
@@ -20,8 +22,8 @@ describe Loga::Configuration do
       allow(Loga::ServiceVersionStrategies).to receive(:call).and_return('unknown.sha')
     end
 
-    context 'defaults', with_hostname: true do
-      specify { expect(subject.device).to eq(STDOUT) }
+    context 'defaults', :with_hostname do
+      specify { expect(subject.device).to eq($stdout) }
       specify { expect(subject.filter_exceptions).to eq(framework_exceptions) }
       specify { expect(subject.filter_parameters).to eq([]) }
       specify { expect(subject.format).to eq(:simple) }
@@ -29,7 +31,7 @@ describe Loga::Configuration do
       specify { expect(subject.level).to eq(:info) }
       specify { expect(subject.service_name).to eq('hello_world_app') }
       specify { expect(subject.service_version).to eq('unknown.sha') }
-      specify { expect(subject.sync).to eq(true) }
+      specify { expect(subject.sync).to be(true) }
       specify { expect(subject.tags).to eq([]) }
     end
 
@@ -174,11 +176,11 @@ describe Loga::Configuration do
       let(:logdev) { subject.logger.instance_variable_get(:@logdev) }
 
       {
-        debug:   0,
-        info:    1,
-        warn:    2,
-        error:   3,
-        fatal:   4,
+        debug: 0,
+        info: 1,
+        warn: 2,
+        error: 3,
+        fatal: 4,
         unknown: 5,
       }.each do |sym, level|
         context "when log level is #{sym}" do
@@ -194,7 +196,7 @@ describe Loga::Configuration do
         let(:options) { super().merge(sync: false) }
 
         it 'uses warn log level' do
-          expect(logdev.dev.sync).to eq(false)
+          expect(logdev.dev.sync).to be(false)
         end
       end
     end

@@ -2,7 +2,9 @@
 
 source "https://rubygems.org"
 
-gem "sidekiq", "~> 6.2.0"
+gem "rails", "~> 7.1.0"
+gem "base64"
+gem "mutex_m"
 
 group :development do
   gem "appraisal"

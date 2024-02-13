@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-RSpec.describe 'Structured logging with Rails', timecop: true,
-                                                if: Rails.env.production? do
+RSpec.describe 'Structured logging with Rails', :timecop,
+               if: Rails.env.production? do
   let(:app) { Rails.application }
 
   let(:log_entries) do

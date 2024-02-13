@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe Loga::LogSubscribers::ActionMailer, if: Rails.env.production? do

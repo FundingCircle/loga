@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'request logger' do
   describe 'get request' do
     it 'logs the request' do
@@ -6,23 +8,23 @@ RSpec.shared_examples 'request logger' do
           'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
       expect(last_log_entry).to include(
-        'version'             => '1.1',
-        'host'                => 'bird.example.com',
-        'short_message'       => 'GET /ok?username=yoshi 200 in 0ms',
-        'timestamp'           => 1_450_150_205.123,
-        'level'               => 6,
-        '_type'               => 'request',
-        '_service.name'       => 'hello_world_app',
-        '_service.version'    => '1.0',
-        '_request.method'     => 'GET',
-        '_request.path'       => '/ok',
-        '_request.params'     => { 'username' => 'yoshi' },
+        'version' => '1.1',
+        'host' => 'bird.example.com',
+        'short_message' => 'GET /ok?username=yoshi 200 in 0ms',
+        'timestamp' => 1_450_150_205.123,
+        'level' => 6,
+        '_type' => 'request',
+        '_service.name' => 'hello_world_app',
+        '_service.version' => '1.0',
+        '_request.method' => 'GET',
+        '_request.path' => '/ok',
+        '_request.params' => { 'username' => 'yoshi' },
         '_request.request_ip' => '127.0.0.1',
         '_request.user_agent' => 'Chrome',
-        '_request.status'     => 200,
+        '_request.status' => 200,
         '_request.request_id' => '471a34dc',
-        '_request.duration'   => 0,
-        '_tags'               => '471a34dc TEST_TAG',
+        '_request.duration' => 0,
+        '_tags' => '471a34dc TEST_TAG',
       )
     end
   end
@@ -36,23 +38,23 @@ RSpec.shared_examples 'request logger' do
            'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
       expect(last_log_entry).to include(
-        'version'             => '1.1',
-        'host'                => 'bird.example.com',
-        'short_message'       => 'POST /users?username=yoshi 200 in 0ms',
-        'timestamp'           => 1_450_150_205.123,
-        'level'               => 6,
-        '_type'               => 'request',
-        '_service.name'       => 'hello_world_app',
-        '_service.version'    => '1.0',
-        '_request.method'     => 'POST',
-        '_request.path'       => '/users',
-        '_request.params'     => { 'username' => 'yoshi', 'email' => 'hello@world.com' },
+        'version' => '1.1',
+        'host' => 'bird.example.com',
+        'short_message' => 'POST /users?username=yoshi 200 in 0ms',
+        'timestamp' => 1_450_150_205.123,
+        'level' => 6,
+        '_type' => 'request',
+        '_service.name' => 'hello_world_app',
+        '_service.version' => '1.0',
+        '_request.method' => 'POST',
+        '_request.path' => '/users',
+        '_request.params' => { 'username' => 'yoshi', 'email' => 'hello@world.com' },
         '_request.request_ip' => '127.0.0.1',
         '_request.user_agent' => 'Chrome',
-        '_request.status'     => 200,
+        '_request.status' => 200,
         '_request.request_id' => '471a34dc',
-        '_request.duration'   => 0,
-        '_tags'               => '471a34dc TEST_TAG',
+        '_request.duration' => 0,
+        '_tags' => '471a34dc TEST_TAG',
       )
     end
 
@@ -68,23 +70,23 @@ RSpec.shared_examples 'request logger' do
       get '/new', {}, 'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
       expect(last_log_entry).to include(
-        'version'             => '1.1',
-        'host'                => 'bird.example.com',
-        'short_message'       => 'GET /new 302 in 0ms',
-        'timestamp'           => 1_450_150_205.123,
-        'level'               => 6,
-        '_type'               => 'request',
-        '_service.name'       => 'hello_world_app',
-        '_service.version'    => '1.0',
-        '_request.method'     => 'GET',
-        '_request.path'       => '/new',
-        '_request.params'     => {},
+        'version' => '1.1',
+        'host' => 'bird.example.com',
+        'short_message' => 'GET /new 302 in 0ms',
+        'timestamp' => 1_450_150_205.123,
+        'level' => 6,
+        '_type' => 'request',
+        '_service.name' => 'hello_world_app',
+        '_service.version' => '1.0',
+        '_request.method' => 'GET',
+        '_request.path' => '/new',
+        '_request.params' => {},
         '_request.request_ip' => '127.0.0.1',
         '_request.user_agent' => 'Chrome',
-        '_request.status'     => 302,
+        '_request.status' => 302,
         '_request.request_id' => '471a34dc',
-        '_request.duration'   => 0,
-        '_tags'               => '471a34dc TEST_TAG',
+        '_request.duration' => 0,
+        '_tags' => '471a34dc TEST_TAG',
       )
     end
   end
@@ -96,26 +98,26 @@ RSpec.shared_examples 'request logger' do
           'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
       expect(last_log_entry).to include(
-        'version'              => '1.1',
-        'host'                 => 'bird.example.com',
-        'short_message'        => 'GET /error?username=yoshi 500 in 0ms',
-        'timestamp'            => 1_450_150_205.123,
-        'level'                => 3,
-        '_type'                => 'request',
-        '_service.name'        => 'hello_world_app',
-        '_service.version'     => '1.0',
-        '_request.method'      => 'GET',
-        '_request.path'        => '/error',
-        '_request.params'      => { 'username' => 'yoshi' },
-        '_request.request_ip'  => '127.0.0.1',
-        '_request.user_agent'  => 'Chrome',
-        '_request.status'      => 500,
-        '_request.request_id'  => '471a34dc',
-        '_request.duration'    => 0,
-        '_exception.klass'     => 'NoMethodError',
-        '_exception.message'   => "undefined method `name' for nil:NilClass",
+        'version' => '1.1',
+        'host' => 'bird.example.com',
+        'short_message' => 'GET /error?username=yoshi 500 in 0ms',
+        'timestamp' => 1_450_150_205.123,
+        'level' => 3,
+        '_type' => 'request',
+        '_service.name' => 'hello_world_app',
+        '_service.version' => '1.0',
+        '_request.method' => 'GET',
+        '_request.path' => '/error',
+        '_request.params' => { 'username' => 'yoshi' },
+        '_request.request_ip' => '127.0.0.1',
+        '_request.user_agent' => 'Chrome',
+        '_request.status' => 500,
+        '_request.request_id' => '471a34dc',
+        '_request.duration' => 0,
+        '_exception.klass' => 'NoMethodError',
+        '_exception.message' => start_with("undefined method `name' for nil"),
         '_exception.backtrace' => be_a(String),
-        '_tags'               => '471a34dc TEST_TAG',
+        '_tags' => '471a34dc TEST_TAG',
       )
     end
   end
@@ -125,23 +127,23 @@ RSpec.shared_examples 'request logger' do
       get '/not_found', {}, 'HTTP_X_REQUEST_ID' => '471a34dc'
 
       expect(last_log_entry).to include(
-        'version'              => '1.1',
-        'host'                 => 'bird.example.com',
-        'short_message'        => 'GET /not_found 404 in 0ms',
-        'timestamp'            => 1_450_150_205.123,
-        'level'                => 6,
-        '_type'                => 'request',
-        '_service.name'        => 'hello_world_app',
-        '_service.version'     => '1.0',
-        '_request.method'      => 'GET',
-        '_request.path'        => '/not_found',
-        '_request.params'      => {},
-        '_request.request_ip'  => '127.0.0.1',
-        '_request.user_agent'  => nil,
-        '_request.status'      => 404,
-        '_request.request_id'  => '471a34dc',
-        '_request.duration'    => 0,
-        '_tags'               => '471a34dc TEST_TAG',
+        'version' => '1.1',
+        'host' => 'bird.example.com',
+        'short_message' => 'GET /not_found 404 in 0ms',
+        'timestamp' => 1_450_150_205.123,
+        'level' => 6,
+        '_type' => 'request',
+        '_service.name' => 'hello_world_app',
+        '_service.version' => '1.0',
+        '_request.method' => 'GET',
+        '_request.path' => '/not_found',
+        '_request.params' => {},
+        '_request.request_ip' => '127.0.0.1',
+        '_request.user_agent' => nil,
+        '_request.status' => 404,
+        '_request.request_id' => '471a34dc',
+        '_request.duration' => 0,
+        '_tags' => '471a34dc TEST_TAG',
       )
     end
   end
@@ -188,9 +190,9 @@ RSpec.shared_examples 'request logger' do
            bob_file: Rack::Test::UploadedFile.new('spec/fixtures/random_bin')
 
       expect(last_log_entry).to include(
-        'short_message'       => 'POST /users?username=yoshi 200 in 0ms',
-        'level'               => 6,
-        '_request.params'     => {
+        'short_message' => 'POST /users?username=yoshi 200 in 0ms',
+        'level' => 6,
+        '_request.params' => {
           'username' => 'yoshi',
           'bob_file' => include(
             'filename' => 'random_bin',

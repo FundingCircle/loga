@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'byebug'
 require 'pry'
 require 'support/gethostname_shared'
@@ -8,16 +10,17 @@ require 'rack/test'
 require 'simplecov'
 
 SimpleCov.start do
-  command_name "ruby-#{RUBY_VERSION}-#{File.basename(ENV['BUNDLE_GEMFILE'], '.gemfile')}"
+  command_name "ruby-#{RUBY_VERSION}-#{File.basename(ENV.fetch('BUNDLE_GEMFILE', nil),
+                                                     '.gemfile')}"
 
   # Exclude specs from showing up in the code coverage report.
   add_filter 'spec/'
 end
 
-case ENV['BUNDLE_GEMFILE']
+case ENV.fetch('BUNDLE_GEMFILE', nil)
 when /rails/
   rspec_pattern = 'integration/rails/**/*_spec.rb'
-  /(?<appraisal>rails\d{2})\.gemfile/ =~ ENV['BUNDLE_GEMFILE']
+  /(?<appraisal>rails\d{2})\.gemfile/ =~ ENV.fetch('BUNDLE_GEMFILE', nil)
   require 'rails'
   require 'action_mailer'
   require File.expand_path("../fixtures/#{appraisal}.rb",  __FILE__)

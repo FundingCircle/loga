@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 class MySinatraApp < Sinatra::Base
@@ -21,7 +23,7 @@ class MySinatraApp < Sinatra::Base
   end
 end
 
-RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
+RSpec.describe 'Structured logging with Sinatra', :timecop, :with_hostname do
   let(:io) { StringIO.new }
   let(:format) {}
   let(:last_log_entry) do
@@ -69,12 +71,12 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
     let(:data) do
       {
         'method' => 'GET',
-        'path'   => '/ok',
+        'path' => '/ok',
         'params' => { 'username'=>'yoshi' },
         'request_id' => '700a6a01',
         'request_ip' => '127.0.0.1',
         'user_agent' => nil,
-        'duration'   => 0,
+        'duration' => 0,
         'status' => 200,
       }
     end
@@ -97,7 +99,7 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
       let(:data) do
         super().merge(
           'status' => 302,
-          'path'   => '/new',
+          'path' => '/new',
           'params' => {},
         )
       end
@@ -112,14 +114,15 @@ RSpec.describe 'Structured logging with Sinatra', :with_hostname, :timecop do
       let(:data) do
         super().merge(
           'status' => 500,
-          'path'   => '/error',
+          'path' => '/error',
           'params' => {},
         )
       end
 
       it 'logs the request with the exception' do
         get '/error', {}, 'HTTP_X_REQUEST_ID' => '700a6a01'
-        expect(last_log_entry).to eql("E, #{time_pid_tags} GET /error 500 in 0ms type=request #{data_as_text} exception=undefined method `name' for nil:NilClass\n")
+
+        expect(last_log_entry).to start_with("E, #{time_pid_tags} GET /error 500 in 0ms type=request #{data_as_text} exception=undefined method `name' for nil")
       end
     end
   end

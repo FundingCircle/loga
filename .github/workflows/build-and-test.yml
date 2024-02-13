@@ -1,0 +1,72 @@
+name: Build & Test
+run-name:  Build & Test - ${{ github.ref_name }}
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'master')"
+    steps:
+      - name: Checkout commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gem versioned correctly
+        shell: sh
+        run: |
+          CHANGED=$(git diff origin/master HEAD --name-only | grep 'lib/loga') || exit 0
+          [[ -z "$CHANGED" ]] || (echo "$CHANGED" | grep 'version.rb') || exit 1
+
+  rubocop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Run RuboCop
+        run: bundle exec rubocop
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    strategy:
+      matrix:
+        ruby-version: ['2.7', '3.0', '3.1', '3.2', '3.3', 'head']
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby ${{ matrix.ruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+
+      - name: Install appraisal gems
+        run: bundle exec appraisal install
+
+      - name: Test with RACK_ENV=development
+        run: RACK_ENV=development bundle exec appraisal rspec
+
+      - name: Test with RACK_ENV=production
+        run: RACK_ENV=production bundle exec appraisal rspec

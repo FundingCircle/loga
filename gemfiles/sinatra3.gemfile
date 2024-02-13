@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "sidekiq", "~> 6.2.0"
+gem "sinatra", "~> 3.2.0"
 
 group :development do
   gem "appraisal"

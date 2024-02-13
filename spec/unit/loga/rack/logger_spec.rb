@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'rack/test'
 
@@ -40,22 +42,22 @@ describe Loga::Rack::Logger do
       middleware.call(env, started_at)
 
       expect(Loga::Event).to have_received(:new).with(
-        data:      {
+        data: {
           request: {
-            'status'     => response_status,
-            'method'     => 'GET',
-            'path'       => '/about_us',
-            'params'     => { 'limit' => '1' },
+            'status' => response_status,
+            'method' => 'GET',
+            'path' => '/about_us',
+            'params' => { 'limit' => '1' },
             'request_id' => nil,
             'request_ip' => nil,
             'user_agent' => nil,
-            'duration'   => 500,
+            'duration' => 500,
           },
         },
         exception: logged_exception,
-        message:   %r{^GET \/about_us\?limit=1 #{response_status} in \d+ms$},
+        message: %r{^GET /about_us\?limit=1 #{response_status} in \d+ms$},
         timestamp: started_at,
-        type:      'request',
+        type: 'request',
       )
     end
 
@@ -82,22 +84,22 @@ describe Loga::Rack::Logger do
         expect { middleware.call(env, started_at) }.to raise_error(exception_class)
 
         expect(Loga::Event).to have_received(:new).with(
-          data:      {
+          data: {
             request: {
-              'status'     => response_status,
-              'method'     => 'GET',
-              'path'       => '/about_us',
-              'params'     => { 'limit' => '1' },
+              'status' => response_status,
+              'method' => 'GET',
+              'path' => '/about_us',
+              'params' => { 'limit' => '1' },
               'request_id' => nil,
               'request_ip' => nil,
               'user_agent' => nil,
-              'duration'   => 500,
+              'duration' => 500,
             },
           },
           exception: logged_exception,
-          message:   %r{^GET \/about_us\?limit=1 #{response_status} in \d+ms$},
+          message: %r{^GET /about_us\?limit=1 #{response_status} in \d+ms$},
           timestamp: started_at,
-          type:      'request',
+          type: 'request',
         )
       end
     end

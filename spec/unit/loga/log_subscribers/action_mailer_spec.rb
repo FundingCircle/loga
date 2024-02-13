@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'active_support'
 require 'loga/log_subscribers/action_mailer'
@@ -9,7 +11,7 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
 
   let(:event) do
     instance_double(
-      'ActiveSupport::Notifications::Event',
+      ActiveSupport::Notifications::Event,
       payload: payload,
       duration: 0.0001,
       time: Time.now,
@@ -21,7 +23,7 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
       let(:payload) do
         {
           mailer: 'FakeMailer',
-          to:     ['user@example.com'],
+          to: ['user@example.com'],
         }
       end
       let(:config) { instance_double Loga::Configuration, hide_pii: hide_pii }
@@ -82,8 +84,8 @@ RSpec.describe Loga::LogSubscribers::ActionMailer do
     context 'when an email is sent' do
       let(:payload) do
         {
-          mailer:  'FakeMailer',
-          from:    'loremipsum@example.com',
+          mailer: 'FakeMailer',
+          from: 'loremipsum@example.com',
           subject: 'Lorem ipsum',
         }
       end
