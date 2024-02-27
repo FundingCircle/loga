@@ -97,6 +97,13 @@ RSpec.shared_examples 'request logger' do
           { username: 'yoshi' },
           'HTTP_USER_AGENT' => 'Chrome', 'HTTP_X_REQUEST_ID' => '471a34dc'
 
+      method_missing_exception =
+        if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('3.4.0dev')
+          "undefined method 'name' for nil"
+        else
+          "undefined method `name' for nil"
+        end
+
       expect(last_log_entry).to include(
         'version' => '1.1',
         'host' => 'bird.example.com',
@@ -115,7 +122,7 @@ RSpec.shared_examples 'request logger' do
         '_request.request_id' => '471a34dc',
         '_request.duration' => 0,
         '_exception.klass' => 'NoMethodError',
-        '_exception.message' => start_with("undefined method `name' for nil"),
+        '_exception.message' => start_with(method_missing_exception),
         '_exception.backtrace' => be_a(String),
         '_tags' => '471a34dc TEST_TAG',
       )
