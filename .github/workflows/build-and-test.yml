@@ -3,8 +3,8 @@ run-name:  Build & Test - ${{ github.ref_name }}
 
 on:
   push:
-    branches:
-      - '**'
+    branches: [ master ]
+  pull_request:
 
 jobs:
   version-check:
