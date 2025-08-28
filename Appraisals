@@ -84,5 +84,21 @@ if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('3.0.0')
   end
 end
 
+if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('3.1.0')
+  appraise 'rails72' do
+    gem 'rails', '~> 7.2.0'
+    gem 'base64'
+    gem 'mutex_m'
+  end
+end
+
+if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('3.2.0')
+  appraise 'rails80' do
+    gem 'rails', '~> 8.0.0'
+    gem 'base64'
+    gem 'mutex_m'
+  end
+end
+
 appraise 'unit' do
 end
