@@ -12,6 +12,8 @@ module Loga
         configure_for_sidekiq6
       elsif Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('8.0')
         configure_for_sidekiq7
+      elsif Gem::Version.new(::Sidekiq::VERSION) < Gem::Version.new('9.0')
+        configure_for_sidekiq8
       end
     end
 
@@ -40,6 +42,15 @@ module Loga
 
       ::Sidekiq.configure_server do |config|
         config[:job_logger] = Loga::Sidekiq7::JobLogger
+        config.logger = Loga.configuration.logger
+      end
+    end
+
+    def self.configure_for_sidekiq8
+      require 'loga/sidekiq8/job_logger'
+
+      ::Sidekiq.configure_server do |config|
+        config[:job_logger] = Loga::Sidekiq8::JobLogger
         config.logger = Loga.configuration.logger
       end
     end

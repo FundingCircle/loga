@@ -70,11 +70,6 @@ appraise 'sidekiq71' do
   gem 'sidekiq', '~> 7.1.0'
 end
 
-appraise 'sidekiq7' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 7.0'
-end
-
 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.2.0')
   appraise 'rails60' do
     gem 'concurrent-ruby', '1.3.4'
@@ -118,6 +113,21 @@ if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('3.2.0')
     gem 'rails', '~> 8.0.0'
     gem 'base64'
     gem 'mutex_m'
+  end
+
+  appraise 'sidekiq72' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 7.2.0'
+  end
+
+  appraise 'sidekiq73' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 7.3.0'
+  end
+
+  appraise 'sidekiq80' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 8.0.0'
   end
 end
 
