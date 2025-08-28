@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'ostruct'
 
 describe Loga::Formatters::GELFFormatter do
   subject { described_class.new(params) }

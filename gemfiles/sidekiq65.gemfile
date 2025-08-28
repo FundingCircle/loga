@@ -2,28 +2,30 @@
 
 source "https://rubygems.org"
 
+gem "concurrent-ruby", "1.3.4"
 gem "sidekiq", "~> 6.5.0"
 
 group :development do
   gem "appraisal"
+  gem "bigdecimal"
   gem "bundler", ">= 1.6"
   gem "byebug"
-  gem "guard"
+  gem "fakeredis"
   gem "guard-rspec"
   gem "guard-rubocop"
+  gem "guard"
+  gem "net-imap"
+  gem "net-pop"
+  gem "net-smtp"
+  gem "ostruct"
   gem "pry"
+  gem "psych"
   gem "rack-test"
   gem "rake"
-  gem "fakeredis"
   gem "rspec", "~> 3.7"
-  gem "rubocop"
   gem "rubocop-rspec"
+  gem "rubocop"
   gem "timecop"
-  gem "psych"
-  gem "net-smtp"
-  gem "net-pop"
-  gem "net-imap"
-  gem "bigdecimal"
 end
 
 group :test do
