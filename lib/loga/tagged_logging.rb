@@ -8,7 +8,7 @@ require 'active_support/core_ext/object/blank'
 require 'logger'
 
 module Loga
-  # rubocop:disable Metrics/LineLength
+  # rubocop:disable Layout/LineLength
   # Wraps any standard Logger object to provide tagging capabilities.
   #
   #   logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
@@ -19,7 +19,7 @@ module Loga
   # This is used by the default Rails.logger as configured by Railties to make
   # it easy to stamp log lines with subdomains, request ids, and anything else
   # to aid debugging of multi-user production applications.
-  # rubocop:enable Metrics/LineLength
+  # rubocop:enable Layout/LineLength
   module TaggedLogging
     module Formatter # :nodoc:
       def tagged(*tags)

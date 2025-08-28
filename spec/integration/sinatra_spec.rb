@@ -61,7 +61,7 @@ RSpec.describe 'Structured logging with Sinatra', :timecop, :with_hostname do
     end
   end
 
-  # rubocop:disable Metrics/LineLength
+  # rubocop:disable Layout/LineLength
   context 'when RACK_ENV is development', if: ENV['RACK_ENV'].eql?('development') do
     let(:format) { :simple }
     let(:last_log_entry) do
@@ -133,5 +133,5 @@ RSpec.describe 'Structured logging with Sinatra', :timecop, :with_hostname do
       end
     end
   end
-  # rubocop:enable Metrics/LineLength
+  # rubocop:enable Layout/LineLength
 end
