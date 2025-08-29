@@ -5,6 +5,7 @@ gemspec
 
 group :development do
   gem 'appraisal'
+  gem 'benchmark'
   gem 'bigdecimal'
   gem 'bundler',   '>= 1.6'
   gem 'byebug'

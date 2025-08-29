@@ -7,6 +7,7 @@ gem "sidekiq", "~> 6.2.0"
 
 group :development do
   gem "appraisal"
+  gem "benchmark"
   gem "bigdecimal"
   gem "bundler", ">= 1.6"
   gem "byebug"

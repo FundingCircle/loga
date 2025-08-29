@@ -25,39 +25,41 @@ appraise 'sinatra4' do
   gem 'sinatra', '~> 4.0.0'
 end
 
-appraise 'sidekiq51' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 5.1.0'
-end
+if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.5.0')
+  appraise 'sidekiq51' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 5.1.0'
+  end
 
-appraise 'sidekiq60' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 6.0.0'
-end
+  appraise 'sidekiq60' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 6.0.0'
+  end
 
-appraise 'sidekiq61' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 6.1.0'
-end
+  appraise 'sidekiq61' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 6.1.0'
+  end
 
-appraise 'sidekiq62' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 6.2.0'
-end
+  appraise 'sidekiq62' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 6.2.0'
+  end
 
-appraise 'sidekiq63' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 6.3.0'
-end
+  appraise 'sidekiq63' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 6.3.0'
+  end
 
-appraise 'sidekiq64' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 6.4.0'
-end
+  appraise 'sidekiq64' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 6.4.0'
+  end
 
-appraise 'sidekiq65' do
-  gem 'concurrent-ruby', '1.3.4'
-  gem 'sidekiq', '~> 6.5.0'
+  appraise 'sidekiq65' do
+    gem 'concurrent-ruby', '1.3.4'
+    gem 'sidekiq', '~> 6.5.0'
+  end
 end
 
 appraise 'sidekiq70' do
