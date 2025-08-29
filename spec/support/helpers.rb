@@ -18,4 +18,12 @@ module Helpers
     allow(loga).to receive(:logger).and_return(logger)
     loga
   end
+
+  def with_new_ruby(**data)
+    if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.4')
+      data[:test]
+    else
+      data[:else]
+    end
+  end
 end

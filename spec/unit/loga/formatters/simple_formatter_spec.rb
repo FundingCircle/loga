@@ -32,7 +32,12 @@ describe Loga::Formatters::SimpleFormatter do
       let(:message) { { record: 'Wooden house' } }
 
       specify do
-        expect(subject).to eq("I, #{time_pid} {:record=>\"Wooden house\"}\n")
+        expect(subject).to eq(
+          with_new_ruby(
+            test: "I, #{time_pid} {record: \"Wooden house\"}\n",
+            else: "I, #{time_pid} {:record=>\"Wooden house\"}\n",
+          ),
+        )
       end
     end
 
@@ -80,7 +85,12 @@ describe Loga::Formatters::SimpleFormatter do
         end
 
         specify do
-          expect(subject).to eq("I, #{time_pid} Hello World data={:admin=>true, :user=>{:email=>\"hello@world.com\"}}\n")
+          expect(subject).to eq(
+            with_new_ruby(
+              test: "I, #{time_pid} Hello World data={admin: true, user: {email: \"hello@world.com\"}}\n",
+              else: "I, #{time_pid} Hello World data={:admin=>true, :user=>{:email=>\"hello@world.com\"}}\n",
+            ),
+          )
         end
       end
 
@@ -94,7 +104,12 @@ describe Loga::Formatters::SimpleFormatter do
         end
 
         specify do
-          expect(subject).to eq("I, #{time_pid} Hello World type=request data={:ssl=>true}\n")
+          expect(subject).to eq(
+            with_new_ruby(
+              test: "I, #{time_pid} Hello World type=request data={ssl: true}\n",
+              else: "I, #{time_pid} Hello World type=request data={:ssl=>true}\n",
+            ),
+          )
         end
       end
     end

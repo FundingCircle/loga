@@ -66,7 +66,12 @@ describe Loga::Formatters::GELFFormatter do
       let(:message) { { message: 'Wooden house' } }
 
       it 'the short_message is a String reprentation of that Hash' do
-        expect(json['short_message']).to eq('{:message=>"Wooden house"}')
+        expect(json['short_message']).to eq(
+          with_new_ruby(
+            test: '{message: "Wooden house"}',
+            else: '{:message=>"Wooden house"}',
+          ),
+        )
       end
 
       include_examples 'valid GELF message'
