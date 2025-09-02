@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.9.0] - 2025-08-29
+### Added
+- Test against rails 7.2
+- Support for rails 8.0
+- Support for sidekiq 8
+### Fixed
+- Fix tests for ruby 3.4 and head
+
 ## [2.8.1] - 2023-02-12
 ### Added
 - Improve CI pipeline

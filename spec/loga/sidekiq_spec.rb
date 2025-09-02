@@ -32,11 +32,23 @@ RSpec.describe Loga::Sidekiq do
 
         m = ENV['BUNDLE_GEMFILE'].match(/sidekiq(?<version>\d+)/)
 
+        job_logger =
+          if Sidekiq.respond_to?(:options)
+            Sidekiq.options[:job_logger]
+          else
+            sidekiq_config = Sidekiq.instance_variable_get(:@config)
+            sidekiq_config && sidekiq_config[:job_logger]
+          end
+
         case m['version']
         when '51'
-          expect(Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq5::JobLogger)
-        when '6'
-          expect(Sidekiq.options[:job_logger]).to eq(Loga::Sidekiq6::JobLogger)
+          expect(job_logger).to eq(Loga::Sidekiq5::JobLogger)
+        when '6', '60', '61', '62', '63', '64', '65'
+          expect(job_logger).to eq(Loga::Sidekiq6::JobLogger)
+        when '7', '70', '71', '72', '73'
+          expect(job_logger).to eq(Loga::Sidekiq7::JobLogger)
+        when '8', '80'
+          expect(job_logger).to eq(Loga::Sidekiq8::JobLogger)
         end
       end
     end

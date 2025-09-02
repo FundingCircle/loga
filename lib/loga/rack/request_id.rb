@@ -3,7 +3,7 @@ require 'securerandom'
 require 'active_support/core_ext/string/access'
 require 'active_support/core_ext/object/blank'
 
-# rubocop:disable Lint/AssignmentInCondition, Metrics/LineLength, Style/GuardClause
+# rubocop:disable Lint/AssignmentInCondition, Layout/LineLength, Style/GuardClause
 module Loga
   module Rack
     # Makes a unique request id available to the action_dispatch.request_id env variable (which is then accessible through
@@ -41,4 +41,4 @@ module Loga
     end
   end
 end
-# rubocop:enable Lint/AssignmentInCondition, Metrics/LineLength, Style/GuardClause
+# rubocop:enable Lint/AssignmentInCondition, Layout/LineLength, Style/GuardClause

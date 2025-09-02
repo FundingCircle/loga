@@ -20,8 +20,6 @@ module Loga
 
     class CompiledFilter
       def self.compile(filters)
-        ->(params) { params.dup } if filters.empty?
-
         regexps = []
         strings = []
 

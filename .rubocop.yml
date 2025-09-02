@@ -10,9 +10,9 @@ AllCops:
     - 'vendor/bundle/**/*'
     - 'gemfiles/vendor/bundle/**/*'
 
-require: rubocop-rspec
+plugins: rubocop-rspec
 
-Documentation:
+Style/Documentation:
   Enabled: false
 
 Layout/ExtraSpacing:
@@ -21,16 +21,16 @@ Layout/ExtraSpacing:
 Layout/SpaceAroundOperators:
   Enabled: false
 
+Layout/LineLength:
+  Enabled: true
+  Max: 90
+
 Metrics/AbcSize:
   Enabled: false
 
 Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
-
-Metrics/LineLength:
-  Enabled: true
-  Max: 90
 
 Metrics/MethodLength:
   Enabled: true
@@ -41,11 +41,6 @@ RSpec/DescribeClass:
 
 RSpec/ExampleLength:
   Enabled: false
-
-RSpec/FilePath:
-  Exclude:
-    - spec/integration/rails/action_mailer_spec.rb
-    - spec/integration/rails/railtie_spec.rb
 
 RSpec/MultipleExpectations:
   Enabled: false
